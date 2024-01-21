@@ -23,8 +23,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui/**",
                         "/v3/api-docs/**"
                         ,"/api/v1/registerUser"
+                        ,"/api/v1/allRoles"
                         ,"/api/v1/registerUser"
-                        ,"/api/v1/registerUser"
+                        ,"/passwordReset"
+                        ,"/smsForgotPassword"
+                        ,"/emailForgotPassword"
+                        ,"/registerUser"
+                        ,"/login"
 
                 )
                 .permitAll()
