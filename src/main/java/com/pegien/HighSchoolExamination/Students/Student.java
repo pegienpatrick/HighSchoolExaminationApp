@@ -2,6 +2,7 @@ package com.pegien.HighSchoolExamination.Students;
 
 
 import com.pegien.HighSchoolExamination.Cohorts.Cohort;
+import com.pegien.HighSchoolExamination.Guardian.Guardian;
 import com.pegien.HighSchoolExamination.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 
 @Data
@@ -49,5 +51,11 @@ public class Student {
     private Long leaveDate;
 
     private int cohort;
+
+
+    @ManyToMany
+    private List<Guardian> guardians;
+
+
 
 }
