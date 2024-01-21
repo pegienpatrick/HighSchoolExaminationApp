@@ -1,10 +1,10 @@
 package com.pegien.HighSchoolExamination.Users.controllers;
 
-import com.pegien.HighSchoolExamination.Students.models.RegisterResponse;
 import com.pegien.HighSchoolExamination.Users.User;
 import com.pegien.HighSchoolExamination.Users.UserRepository;
 import com.pegien.HighSchoolExamination.Users.models.requests.*;
 
+import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
 import com.pegien.HighSchoolExamination.Users.service.UsersService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +34,10 @@ public class UsersController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody @Valid LoginRequest loginRequest,BindingResult bindingResult)
+    public ResponseEntity<LoginResponseModel> loginUser(@RequestBody @Valid LoginRequest loginRequest, BindingResult bindingResult)
     {
         if(bindingResult.hasErrors())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(LoginResponseModel.builder().message(MyUtils.createErrorMessage(bindingResult)).build());
 
         return usersService.loginUser(loginRequest);
     }
@@ -126,7 +126,7 @@ public class UsersController {
     @GetMapping("/viewUser/{username}")
     public ResponseEntity<User> viewUser(@PathVariable("username") String username)
     {
-        Optional<User> usr=userRepository.findByUsername(username);
+        Optional<User> usr=userRepository.findByUsernameIgnoreCase(username);
         if(usr.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         else
