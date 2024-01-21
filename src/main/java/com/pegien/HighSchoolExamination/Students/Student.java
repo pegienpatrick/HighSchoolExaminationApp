@@ -1,6 +1,7 @@
 package com.pegien.HighSchoolExamination.Students;
 
 
+import com.pegien.HighSchoolExamination.Cohorts.Cohort;
 import com.pegien.HighSchoolExamination.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,10 +46,8 @@ public class Student {
 
     private Long dateOfAdm;
 
-    private Long leaveDate
+    private Long leaveDate;
 
-
-
-
+    private int cohort;
 
 }
