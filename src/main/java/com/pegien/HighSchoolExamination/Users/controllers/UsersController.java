@@ -7,6 +7,7 @@ import com.pegien.HighSchoolExamination.Users.models.requests.*;
 import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
 import com.pegien.HighSchoolExamination.Users.service.UsersService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
+import com.pegien.HighSchoolExamination.enums.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -170,6 +171,12 @@ public class UsersController {
             userRepository.save(user);
             return ResponseEntity.ok("Assigned Successfully");
         }
+    }
+
+    @GetMapping("/allRoles")
+    public ResponseEntity<UserRoles[]> getAllRoles()
+    {
+        return ResponseEntity.ok(UserRoles.values());
     }
 
 

@@ -142,7 +142,28 @@ public class UsersService {
     }
 
     public ResponseEntity<String> passwordReset(ResetPasswordRequest resetPasswordRequest) {
-        return null;
+
+        Optional<User> usr=userRepository.findByUsernameIgnoreCase(resetPasswordRequest.getUsername().trim());
+        if(usr.isEmpty())
+            throw new UsernameNotFoundException(resetPasswordRequest.getUsername()+" does not exist");
+
+        User user=usr.get();
+
+        Optional<PasswordResetCode> optionalPasswordResetCode=passwordResetCodeRepository.findResetCode(user.getNum(),resetPasswordRequest.getResetCode());
+        if(optionalPasswordResetCode.isEmpty())
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Password Reset code");
+
+        PasswordResetCode passwordResetCode=optionalPasswordResetCode.get();
+        if(!passwordResetCode.isUsable())
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Expired Password Reset code");
+
+        if(!resetPasswordRequest.getNewPassword().equals(resetPasswordRequest.getConfirmPassword()))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Passwords dont match");
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password Reset Successfully");
     }
 
 
