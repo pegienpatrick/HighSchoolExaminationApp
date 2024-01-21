@@ -57,5 +57,8 @@ public class Student {
     private List<Guardian> guardians;
 
 
+    private String reserved;
+
+
 
 }
