@@ -27,7 +27,7 @@ public class ConvertionUtils {
         return fine;
     }
 
-    private static Long getLong(String str)
+    public static Long getLong(String str)
     {
         Long val=0L;
         try{

@@ -29,6 +29,19 @@ public class UsersController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+
+
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody @Valid LoginRequest loginRequest,BindingResult bindingResult)
+    {
+        if(bindingResult.hasErrors())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
+
+        return usersService.loginUser(loginRequest);
+    }
+
 
     @PostMapping("/registerUser")
     public ResponseEntity<String> registerUser(@RequestBody @Valid RegisterUserRequest registerRequest, BindingResult bindingResult)
@@ -87,7 +100,7 @@ public class UsersController {
     {
         if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
-        return usersService.updateUser(updateRequest);
+        return usersService.updateUser(updateRequest,num);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -96,7 +109,7 @@ public class UsersController {
     {
         if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
-        return usersService.updatePassword(updatePasswordRequest);
+        return usersService.updatePassword(updatePasswordRequest,num);
     }
 
     @GetMapping("/userInfo")
