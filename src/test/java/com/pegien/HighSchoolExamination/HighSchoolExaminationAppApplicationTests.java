@@ -2,9 +2,13 @@ package com.pegien.HighSchoolExamination;
 
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
+import com.pegien.HighSchoolExamination.enums.UserRoles;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.HashMap;
+import java.util.Set;
 
 
 //@SpringBootTest
@@ -15,8 +19,7 @@ class HighSchoolExaminationAppApplicationTests {
 //	}
 
 	@Test
-	public void testPhoneNumbers1()
-	{
+	public void testPhoneNumbers1() {
 		String rawPhone="0723466505";
 		String expectedPhone="254723466505";
 
@@ -24,8 +27,7 @@ class HighSchoolExaminationAppApplicationTests {
 	}
 
 	@Test
-	public void testPhoneNumbers2()
-	{
+	public void testPhoneNumbers2() {
 		String rawPhone="723-466-505";
 		String expectedPhone="254723466505";
 
@@ -33,8 +35,7 @@ class HighSchoolExaminationAppApplicationTests {
 	}
 
 	@Test
-	public void testPhoneNumbers3()
-	{
+	public void testPhoneNumbers3() {
 		String rawPhone="0723 466 505";
 		String expectedPhone="254723466505";
 
@@ -42,17 +43,22 @@ class HighSchoolExaminationAppApplicationTests {
 	}
 
 	@Test
-	public void testPhoneNumbers4()
-	{
+	public void testPhoneNumbers4() {
 		String rawPhone="+254723466505";
 		String expectedPhone="254723466505";
 
 		Assertions.assertEquals(expectedPhone, ConvertionUtils.formatPhone(rawPhone));
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 
+		HashMap<UserRoles,Set<String>> all= new HashMap<>();
+		for(UserRoles r:UserRoles.values())
+		{
+			all.put(r,r.getPermissions());
+		}
+
+		System.out.println(all);
 	}
 
 }

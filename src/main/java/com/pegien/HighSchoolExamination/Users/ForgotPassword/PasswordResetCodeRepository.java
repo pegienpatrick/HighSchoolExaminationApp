@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface PasswordResetCodeRepository extends JpaRepository<PasswordResetCode,Long> {
 
-    @Query("select c from PasswordResetCode c where c.userId=?1 and c.passwordResetCode")
+    @Query("select c from PasswordResetCode c where c.userId=?1 and c.passwordResetCode=?2")
     Optional<PasswordResetCode> findResetCode(Long userId,String resetCode);
 }

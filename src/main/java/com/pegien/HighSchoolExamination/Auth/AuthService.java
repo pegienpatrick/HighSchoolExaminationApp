@@ -38,8 +38,8 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+//    @Autowired
+//    private AuthenticationManager authenticationManager;
 
 
 
@@ -73,11 +73,13 @@ public class AuthService {
     }
 
 
-    public String loginUser(Long num, String password) {
+    public String loginUser(Long num, String password,AuthenticationManager authenticationManager) {
+//        System.out.println("Loggin in "+num+" - "+password);
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(num,password)
         );
 
+//        System.out.println("success Loggin in "+num+" - "+password);
         String token = Jwts.builder().setClaims(new HashMap<>()).setSubject(num.toString()).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
                 .signWith(SignatureAlgorithm.HS256, SecurityConfig.jwtSecretKey).compact();

@@ -11,7 +11,7 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
 
     Optional<Student> findByAdmNo(int admNo);
 
-    @Query("select max(s.AdmNo) from Student s")
+    @Query("select max(s.admNo) from Student s")
     int maxAdm();
 
 

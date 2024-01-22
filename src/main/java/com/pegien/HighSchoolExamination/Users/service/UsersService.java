@@ -16,6 +16,7 @@ import com.pegien.HighSchoolExamination.Utils.SMSUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,9 @@ public class UsersService {
 
     @Autowired
     private PasswordResetCodeRepository passwordResetCodeRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
     public ResponseEntity<String> registerUser(RegisterUserRequest registerRequest) {
@@ -211,7 +215,7 @@ public class UsersService {
 
         User user = optionalUser.get();
 
-        String authorization = authService.loginUser(user.getNum(), loginRequest.getPassword());
+        String authorization = authService.loginUser(user.getNum(), loginRequest.getPassword(),authenticationManager);
 
         LoginResponseModel loginResponseModel = LoginResponseModel.builder()
                 .user(user)

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
+@Component
 public class JWTTOkenFilter extends OncePerRequestFilter {
 
 
@@ -37,7 +39,7 @@ public class JWTTOkenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorization=request.getHeader("Authorization");
         String init="Bearer ";
-        if(authorization.contains(init))
+        if(authorization!=null&&authorization.contains(init))
         {
             String tokenString=authorization.replaceAll(init,"");
             Jws<Claims> claims=Jwts.parser().setSigningKey(SecurityConfig.jwtSecretKey).build().parseClaimsJws(tokenString);

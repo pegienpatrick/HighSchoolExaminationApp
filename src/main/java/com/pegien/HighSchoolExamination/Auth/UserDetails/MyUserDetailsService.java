@@ -32,9 +32,10 @@ public class MyUserDetailsService implements UserDetailsService {
         User user=usr.get();
 
         HashSet<GrantedAuthority> authorities=new HashSet<>();
-        for(String i: user.getRoles())
-            authorities.add(new SimpleGrantedAuthority(i));
-
+        if(user.getRoles()!=null) {
+            for (String i : user.getRoles())
+                authorities.add(new SimpleGrantedAuthority(i));
+        }
         MyUserDetails myUserDetails= MyUserDetails.builder()
                 .username(username)
                 .password(user.getPassword())

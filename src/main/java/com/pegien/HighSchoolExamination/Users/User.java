@@ -16,7 +16,7 @@ import java.util.HashSet;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name="users")
 public class User {
 
     @Id

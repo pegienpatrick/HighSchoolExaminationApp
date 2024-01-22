@@ -13,15 +13,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")
+
 public class UsersController {
 
     @Autowired
@@ -37,7 +43,7 @@ public class UsersController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseModel> loginUser(@RequestBody @Valid LoginRequest loginRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasErrors()||loginRequest==null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(LoginResponseModel.builder().message(MyUtils.createErrorMessage(bindingResult)).build());
 
         return usersService.loginUser(loginRequest);
@@ -47,15 +53,17 @@ public class UsersController {
     @PostMapping("/registerUser")
     public ResponseEntity<String> registerUser(@RequestBody @Valid RegisterUserRequest registerRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+
+        if(bindingResult.hasErrors()||registerRequest==null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
-        return usersService.registerUser(registerRequest);
+        else
+            return usersService.registerUser(registerRequest);
     }
 
     @PostMapping("/emailForgotPassword")
     public ResponseEntity<String> emailForgotPassword(@RequestBody @Valid ForgotPasswordEMailRequest forgotPasswordEMailRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.emailForgotPassword(forgotPasswordEMailRequest);
     }
@@ -63,7 +71,7 @@ public class UsersController {
     @PostMapping("/smsForgotPassword")
     public ResponseEntity<String> smsForgotPassword(@RequestBody @Valid ForgotPasswordSmsRequest forgotPasswordSmsRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.smsForgotPassword(forgotPasswordSmsRequest);
     }
@@ -71,7 +79,7 @@ public class UsersController {
     @PostMapping("/passwordReset")
     public ResponseEntity<String> passwordReset(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest,BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.passwordReset(resetPasswordRequest);
     }
@@ -81,7 +89,7 @@ public class UsersController {
     @PutMapping("/updateUser")
     public ResponseEntity<String> updateUser(@RequestBody @Valid UpdateRequest updateRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updateUser(updateRequest);
     }
@@ -89,7 +97,7 @@ public class UsersController {
     @PutMapping("/updatePassword")
     public ResponseEntity<String> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updatePassword(updatePasswordRequest);
     }
@@ -99,7 +107,7 @@ public class UsersController {
     @PutMapping("/adminUpdateUser/{num}")
     public ResponseEntity<String> adminUpdateUser(@PathVariable("num") Long num,@RequestBody @Valid UpdateRequest updateRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updateUser(updateRequest,num);
     }
@@ -108,7 +116,7 @@ public class UsersController {
     @PutMapping("/adminUpdatePassword/{num}")
     public ResponseEntity<String> adminUpdatePassword(@PathVariable("num") Long num,@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updatePassword(updatePasswordRequest,num);
     }
@@ -157,7 +165,7 @@ public class UsersController {
     @GetMapping("/assignRoles/{num}")
     public ResponseEntity<String> assignUserRoles(@PathVariable("num") Long num,@RequestBody @Valid AssignRoleRequest assignRoleRequest,BindingResult bindingResult)
     {
-        if(bindingResult.hasErrors())
+        if(bindingResult.hasGlobalErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
 
         Optional<User> usr=userRepository.findById(num);
@@ -174,9 +182,9 @@ public class UsersController {
     }
 
     @GetMapping("/allRoles")
-    public ResponseEntity<UserRoles[]> getAllRoles()
+    public ResponseEntity<HashMap> getAllRoles()
     {
-        return ResponseEntity.ok(UserRoles.values());
+        return ResponseEntity.ok(UserRoles.listAllRoles());
     }
 
 

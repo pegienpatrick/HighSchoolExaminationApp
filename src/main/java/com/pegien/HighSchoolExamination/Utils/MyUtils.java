@@ -37,6 +37,7 @@ public class MyUtils {
         try {
         List<FieldError> fieldErrors = result.getFieldErrors();
 
+
         List<String> errorMessages = new ArrayList<>();
         for (FieldError fError : fieldErrors) {
             Map<String, String> fieldErrorMap = new HashMap<>();
@@ -49,6 +50,9 @@ public class MyUtils {
 
 
             return objectMapper.writeValueAsString(errorMessageMap);
+
+//            return result.getAllErrors().toString();
+
         } catch (Exception e) {
             // Handle the exception (e.g., log it) or throw a more specific exception
             return ""; // Return an empty string or handle the error as needed
