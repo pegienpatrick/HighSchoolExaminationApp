@@ -26,7 +26,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        int[] subjects={};
+        int[] subjects={101,102,121,233,314};
         for(int i:subjects)
             studySubjects.add(findBySubjectCode(i));
 
@@ -37,9 +37,9 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         HashMap<String,StudySubject[]> choices=new HashMap<>();
 
-        choices.put("sciences",new StudySubject[]{});
-        choices.put("humanities",new StudySubject[]{});
-        choices.put("applied",new StudySubject[]{});
+        choices.put("sciences",new StudySubject[]{findBySubjectCode(231),findBySubjectCode(232)});
+        choices.put("humanities",new StudySubject[]{findBySubjectCode(311),findBySubjectCode(312)});
+        choices.put("applied",new StudySubject[]{findBySubjectCode(451),findBySubjectCode(565),findBySubjectCode(503)});
 
         return choices;
     }

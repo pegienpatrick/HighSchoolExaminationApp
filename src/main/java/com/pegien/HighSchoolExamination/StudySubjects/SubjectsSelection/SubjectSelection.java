@@ -22,9 +22,8 @@ public class SubjectSelection {
     @Id
     private Long studentId;
 
-    @Column(columnDefinition = "default false")
+    @Column(columnDefinition = "boolean default false")
     private Boolean hasSelected;
-
 
     private int sciences;
 
