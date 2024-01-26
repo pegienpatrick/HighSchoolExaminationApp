@@ -61,6 +61,10 @@ public class Student {
 
     private String reserved;
 
+    public String getName() {
+        return getSurname().toUpperCase()+", "+firstName+" "+otherName;
+    }
+
 
 //    private List<Integer> subjects;
 

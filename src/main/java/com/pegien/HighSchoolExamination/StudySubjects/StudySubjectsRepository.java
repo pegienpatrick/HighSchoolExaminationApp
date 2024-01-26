@@ -26,13 +26,9 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        studySubjects.add(new StudySubject(101, "English", "ENG"));
-        studySubjects.add(new StudySubject(102, "Kiswahili", "KIS"));
-        studySubjects.add(new StudySubject(121, "Mathematics", "MAT"));
-        studySubjects.add(new StudySubject(232, "Chemistry", "CHE"));
-
-
-        studySubjects.add(new StudySubject(314, "Islamic Religious Education", "IRE"));
+        int[] subjects={};
+        for(int i:subjects)
+            studySubjects.add(findBySubjectCode(i));
 
         return studySubjects;
     }
@@ -41,9 +37,9 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         HashMap<String,StudySubject[]> choices=new HashMap<>();
 
-        choices.put("sciences",new StudySubject[]{new StudySubject(233, "Physics", "PHY"),new StudySubject(231, "Biology", "BIO")});
-        choices.put("humanities",new StudySubject[]{new StudySubject(311, "History and Government", "HIS"),new StudySubject(312, "Geography", "GEO")});
-        choices.put("applied",new StudySubject[]{new StudySubject(504, "Business Studies", "BST"),new StudySubject(501, "Computer Studies/ICT", "ICT")});
+        choices.put("sciences",new StudySubject[]{});
+        choices.put("humanities",new StudySubject[]{});
+        choices.put("applied",new StudySubject[]{});
 
         return choices;
     }
@@ -52,26 +48,9 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        // Adding StudySubjects to the list
-        studySubjects.add(new StudySubject(101, "English", "ENG"));
-        studySubjects.add(new StudySubject(102, "Kiswahili", "KIS"));
-        studySubjects.add(new StudySubject(121, "Mathematics", "MAT"));
-        studySubjects.add(new StudySubject(232, "Chemistry", "CHE"));
-
-
-        studySubjects.add(new StudySubject(314, "Islamic Religious Education", "IRE"));
-
-        studySubjects.add(new StudySubject(231, "Biology", "BIO"));
-        studySubjects.add(new StudySubject(233, "Physics", "PHY"));
-
-        studySubjects.add(new StudySubject(504, "Business Studies", "BST"));
-        studySubjects.add(new StudySubject(501, "Computer Studies/ICT", "ICT"));
-
-        studySubjects.add(new StudySubject(311, "History and Government", "HIS"));
-        studySubjects.add(new StudySubject(312, "Geography", "GEO"));
-
-//        studySubjects.add(new StudySubject(313, "Christian Religious Education", "CRE"));
-
+        int[] subjects={};
+        for(int i:subjects)
+            studySubjects.add(findBySubjectCode(i));
 
         return studySubjects;
     }
