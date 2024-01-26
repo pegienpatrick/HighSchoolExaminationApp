@@ -13,6 +13,8 @@ import io.jsonwebtoken.Jwts;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -97,5 +99,28 @@ public class AuthService {
         String authorization="Bearer "+token;
 
         return authorization;
+    }
+
+
+    public String logOut(HttpServletRequest request)
+    {
+        String authorization=request.getHeader("Authorization");
+        String init="Bearer ";
+        if(authorization!=null&&authorization.contains(init)) {
+            String tokenString = authorization.replaceAll(init, "");
+            Optional<Token> optionalAuthorizationTokens = tokenRepository.findByValue(tokenString);
+            if (optionalAuthorizationTokens.isEmpty())
+                throw new UnsupportedOperationException("no such authorization");
+
+            Token authorizationTokens = optionalAuthorizationTokens.get();
+
+            //perform the logout action
+            authorizationTokens.setLoggedOut(true);
+            tokenRepository.save(authorizationTokens);
+
+            return "Success";
+        }
+        else
+            throw new UnsupportedOperationException("no such authorization");
     }
 }

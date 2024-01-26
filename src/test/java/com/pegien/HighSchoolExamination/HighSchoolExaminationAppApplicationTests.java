@@ -1,11 +1,9 @@
 package com.pegien.HighSchoolExamination;
 
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
-import com.pegien.HighSchoolExamination.Utils.MyUtils;
-import com.pegien.HighSchoolExamination.enums.UserRoles;
+import com.pegien.HighSchoolExamination.Users.enums.UserRoles;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
 import java.util.Set;

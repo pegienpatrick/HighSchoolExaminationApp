@@ -1,15 +1,17 @@
-package com.pegien.HighSchoolExamination.Students;
+package com.pegien.HighSchoolExamination.Students.models.requests;
 
-
-import com.pegien.HighSchoolExamination.Cohorts.Cohort;
-import com.pegien.HighSchoolExamination.Guardian.Guardian;
 import com.pegien.HighSchoolExamination.enums.Gender;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 
@@ -17,53 +19,33 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+public class StudentRegisterRequest {
 
-@Entity
-public class Student {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long num;
-
-    @Column(unique = true)
     private int admNo;
 
+    @NotEmpty(message = "Surname cannot Be Empty")
     private String surname;
 
+    @NotEmpty(message = "First Name cannot Be Empty")
     private String firstName;
 
     private String otherName;
 
-    private Long dateOfBirth;
+    private Date dateOfBirth;
 
     private String birthCertno;
 
     private String ifmisNo;
 
+    @NotNull(message = "You have to select Gender")
     private Gender gender;
 
     private String stream;
 
     private Double stage;
 
-    private Long dateOfAdm;
-
-    private Long leaveDate;
-
     private int kcpeMarks;
 
     private int cohort;
-
-
-    @ManyToMany
-    private List<Guardian> guardians;
-
-
-    private String reserved;
-
-
-//    private List<Integer> subjects;
-
-
 
 }

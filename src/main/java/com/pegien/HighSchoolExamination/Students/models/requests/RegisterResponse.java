@@ -1,4 +1,4 @@
-package com.pegien.HighSchoolExamination.Students.models;
+package com.pegien.HighSchoolExamination.Students.models.requests;
 
 
 import lombok.AllArgsConstructor;

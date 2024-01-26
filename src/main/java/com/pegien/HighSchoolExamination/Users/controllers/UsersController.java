@@ -7,19 +7,18 @@ import com.pegien.HighSchoolExamination.Users.models.requests.*;
 import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
 import com.pegien.HighSchoolExamination.Users.service.UsersService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
-import com.pegien.HighSchoolExamination.enums.UserRoles;
+import com.pegien.HighSchoolExamination.Users.enums.UserRoles;
+import com.pegien.HighSchoolExamination.enums.Gender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -187,6 +186,18 @@ public class UsersController {
         return ResponseEntity.ok(UserRoles.listAllRoles());
     }
 
+
+    @GetMapping("/possibleGenders")
+    public ResponseEntity<Gender[]> possibleGenders()
+    {
+        return ResponseEntity.ok(Gender.values());
+    }
+
+    @GetMapping("/logOut")
+    public ResponseEntity<String> logOut(HttpServletRequest request)
+    {
+        return usersService.logOut(request);
+    }
 
 
 }

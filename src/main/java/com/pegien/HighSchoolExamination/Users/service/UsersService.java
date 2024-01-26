@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Optional;
 
@@ -229,5 +230,9 @@ public class UsersService {
 
     public User currentUser() {
         return authService.getActiveUser();
+    }
+
+    public ResponseEntity<String> logOut(HttpServletRequest request) {
+        return ResponseEntity.ok(authService.logOut(request));
     }
 }

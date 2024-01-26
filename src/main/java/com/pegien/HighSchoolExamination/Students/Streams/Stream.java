@@ -1,13 +1,12 @@
-package com.pegien.HighSchoolExamination.Logs;
+package com.pegien.HighSchoolExamination.Students.Streams;
 
-
-import com.pegien.HighSchoolExamination.Users.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 
 @Data
@@ -16,19 +15,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 
 @Entity
-public class Log {
+public class Stream {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long num;
 
-    private Long date;
+    private String streamName;
 
-    @ManyToOne
-    private User user;
+    private String capacity;
 
-    @Column(columnDefinition = "TEXT",length = 10000)
-    private String log;
-
+    private int cohort;
 
 }

@@ -1,8 +1,6 @@
-package com.pegien.HighSchoolExamination.Guardian;
-
+package com.pegien.HighSchoolExamination.Guardian.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.enums.Gender;
 import com.pegien.HighSchoolExamination.enums.GuardianRelationship;
 import lombok.AllArgsConstructor;
@@ -10,27 +8,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+public class GuardianRegisterRequest {
 
-@Entity
+    @NotNull
+    private int admNo;
 
-public class Guardian {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long num;
-
+    @NotEmpty
     private String fullName;
 
     private String idNo;
@@ -41,11 +34,6 @@ public class Guardian {
 
     private String email;
 
-    @NotNull
-    @JsonIgnore
-    private Long student;
-
     private GuardianRelationship relationship;
-
 
 }
