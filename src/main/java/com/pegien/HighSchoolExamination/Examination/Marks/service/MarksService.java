@@ -86,8 +86,10 @@ public class MarksService {
         for(Student student:studentRepository.findByStage(grade))
         {
             HashMap<Integer,Marks> marks=new HashMap<>();
-            for(StudySubject i:studySubjectsRepository.allAvailable())
-                marks.put(i.getSubjectCode(),getMark(student.getNum(),examination,i.getSubjectCode()));
+//            System.out.println(studySubjectsRepository.allAvailable());
+            for(StudySubject i:studySubjectsRepository.allAvailable()) {
+                marks.put(i.getSubjectCode(), getMark(student.getNum(), examination, i.getSubjectCode()));
+            }
 
             MarksSheetResponse marksSheetResponse=MarksSheetResponse.builder()
                     .admNo(student.getAdmNo())
@@ -99,6 +101,7 @@ public class MarksService {
                     .build();
             marksSheetResponses.add(marksSheetResponse);
         }
+//        System.out.println(marksSheetResponses);
         return ResponseEntity.ok(marksSheetResponses);
 
     }

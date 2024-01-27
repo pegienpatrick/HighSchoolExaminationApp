@@ -9,18 +9,6 @@ import java.util.List;
 public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long> {
 
 
-    default int[] getGroupSubjects(String group) {
-        switch (group.toUpperCase()) {
-            case "A":
-                return new int[]{101, 102, 121, 231, 232, 233, 311, 312, 313, 314, 401};
-            case "B":
-                return new int[]{501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511};
-            case "C":
-                return new int[]{601, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611};
-            default:
-                return new int[0];
-        }
-    }
 
     default List<StudySubject> listCompulsory()
     {
@@ -48,16 +36,38 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        int[] subjects={};
-        for(int i:subjects)
-            studySubjects.add(findBySubjectCode(i));
+//        int[] subjects={};
+//        for(int i:subjects)
+//            studySubjects.add(findBySubjectCode(i));
+        studySubjects.addAll(listCompulsory());
+        for(StudySubject[] s:selectionOptions().values())
+            studySubjects.addAll(List.of(s));
+
 
         return studySubjects;
     }
 
-    StudySubject findBySubjectCode(int code);
+//    StudySubject findBySubjectCode(int code);
+//
+//    StudySubject findBySubjectRep(String rep);
 
-    StudySubject findBySubjectRep(String rep);
+    default StudySubject findBySubjectCode(int code){
+
+        for(StudySubject studySubject:findAll())
+            if(studySubject.getSubjectCode().equals(code))
+                return studySubject;
+        return null;
+
+    }
+
+    default StudySubject findBySubjectRep(String rep){
+        for(StudySubject studySubject:findAll())
+            if(studySubject.getSubjectRep().equals(rep))
+                return studySubject;
+
+        return null;
+    }
+
 
 
 
