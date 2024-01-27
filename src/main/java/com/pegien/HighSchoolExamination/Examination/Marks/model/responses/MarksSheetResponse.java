@@ -21,9 +21,11 @@ public class MarksSheetResponse {
 
     private String studentName;
 
+    private String stream;
+
     private Long examination;
 
-    private Double grade;
+    private Double form;
 
     private HashMap<Integer,Marks> marks;
 

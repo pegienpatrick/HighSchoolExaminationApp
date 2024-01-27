@@ -1,6 +1,8 @@
 package com.pegien.HighSchoolExamination.Examination.models.requests;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NewExaminationRequest {
 
-    @NotNull
+    @NotEmpty
+    @Size(min = 2)
     private String Title;
 
     @NotNull
