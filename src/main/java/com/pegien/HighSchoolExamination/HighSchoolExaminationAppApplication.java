@@ -24,7 +24,7 @@ public class HighSchoolExaminationAppApplication {
 //			f.setVisible(true);
 			try {
 				// Specify the URL you want to open
-				String url = "https://localhost:8080";
+				String url = "http://localhost:8080/";
 
 				// Get the operating system name
 				String os = System.getProperty("os.name").toLowerCase();
