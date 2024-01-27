@@ -112,6 +112,7 @@ public class MarksService {
         String prevma=marks.toString();
 
         marks.setMarks(updateMarksRequest.getMarks());
+        marks.setLastUpdate(new Date().getTime());
 
         marksRepository.saveAndFlush(marks);
         logService.recordLog("Entered marks from "+prevma+" to "+marks);
