@@ -36,13 +36,12 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-//        int[] subjects={};
-//        for(int i:subjects)
-//            studySubjects.add(findBySubjectCode(i));
-        studySubjects.addAll(listCompulsory());
-        for(StudySubject[] s:selectionOptions().values())
-            studySubjects.addAll(List.of(s));
-
+        int[] subjects={101,102,121,233,314,231,232,311,312,451,565,503};
+        for(int i:subjects)
+            studySubjects.add(findBySubjectCode(i));
+//        studySubjects.addAll(listCompulsory());
+//        for(StudySubject[] s:selectionOptions().values())
+//            studySubjects.addAll(List.of(s));
 
         return studySubjects;
     }
@@ -87,7 +86,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
         studySubjects.add(new StudySubject(311, "History", "HIST"));
         studySubjects.add(new StudySubject(312, "Geography", "GEO"));
         studySubjects.add(new StudySubject(313, "CRE", "CRE"));
-        studySubjects.add(new StudySubject(314, "IRE", "IRE"));
+        studySubjects.add(new StudySubject(314, "ISlamic Religious Education", "IRE"));
         studySubjects.add(new StudySubject(315, "HRE", "HRE"));
         studySubjects.add(new StudySubject(441, "Home Science", "Home Sci"));
         studySubjects.add(new StudySubject(442, "Art and Design", "Art"));
@@ -102,6 +101,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
         studySubjects.add(new StudySubject(451, "Computer Studies", "Comp. Studies"));
         studySubjects.add(new StudySubject(501, "French", "FRE"));
         studySubjects.add(new StudySubject(502, "German", "GER"));
+        studySubjects.add(new StudySubject(565, "Business Studies", "Bus. Studies"));
         studySubjects.add(new StudySubject(503, "Arabic", "ARAB"));
         studySubjects.add(new StudySubject(504, "Sign Language", "Sign Lang"));
         studySubjects.add(new StudySubject(511, "Music", "MUSIC"));
