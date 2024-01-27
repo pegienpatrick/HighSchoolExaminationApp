@@ -5,7 +5,7 @@ import com.pegien.HighSchoolExamination.Logs.service.LogService;
 import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import com.pegien.HighSchoolExamination.enums.Gender;
-import jakarta.servlet.annotation.MultipartConfig;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
