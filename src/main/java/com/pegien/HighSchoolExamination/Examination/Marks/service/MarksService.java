@@ -94,6 +94,7 @@ public class MarksService {
                     .studentName(student.getName())
                     .examination(examination)
                     .marks(marks)
+                    .form(student.getStage())
                     .stream(student.getStream())
                     .build();
             marksSheetResponses.add(marksSheetResponse);
