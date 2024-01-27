@@ -101,7 +101,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
         studySubjects.add(new StudySubject(451, "Computer Studies", "Comp. Studies"));
         studySubjects.add(new StudySubject(501, "French", "FRE"));
         studySubjects.add(new StudySubject(502, "German", "GER"));
-        studySubjects.add(new StudySubject(565, "Business Studies", "Bus. Studies"));
+        studySubjects.add(new StudySubject(565, "Business Studies", "BST"));
         studySubjects.add(new StudySubject(503, "Arabic", "ARAB"));
         studySubjects.add(new StudySubject(504, "Sign Language", "Sign Lang"));
         studySubjects.add(new StudySubject(511, "Music", "MUSIC"));
