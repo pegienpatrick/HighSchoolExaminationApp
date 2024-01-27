@@ -103,7 +103,7 @@ public class MarksService {
                     .build();
             marksSheetResponses.add(marksSheetResponse);
         }
-        System.out.println(marksSheetResponses);
+//        System.out.println(marksSheetResponses);
         return ResponseEntity.ok(marksSheetResponses);
 
     }
