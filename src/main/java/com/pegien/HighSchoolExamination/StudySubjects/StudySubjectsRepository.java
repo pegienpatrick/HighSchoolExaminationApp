@@ -53,7 +53,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     default StudySubject findBySubjectCode(int code){
 
         for(StudySubject studySubject:findAll())
-            if(studySubject.getSubjectCode().equals(code))
+            if(studySubject.getSubjectCode()==code)
                 return studySubject;
         return null;
 
