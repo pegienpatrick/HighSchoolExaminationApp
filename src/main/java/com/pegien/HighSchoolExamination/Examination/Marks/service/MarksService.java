@@ -88,7 +88,9 @@ public class MarksService {
             HashMap<Integer,Marks> marks=new HashMap<>();
 //            System.out.println(studySubjectsRepository.allAvailable());
             for(StudySubject i:studySubjectsRepository.allAvailable()) {
-                marks.put(i.getSubjectCode(), getMark(student.getNum(), examination, i.getSubjectCode()));
+                Marks tmpMarks=getMark(student.getNum(), examination, i.getSubjectCode());
+                tmpMarks.setRep(i.getSubjectRep());
+                marks.put(i.getSubjectCode(), tmpMarks);
             }
 
             MarksSheetResponse marksSheetResponse=MarksSheetResponse.builder()

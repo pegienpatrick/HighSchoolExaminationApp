@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -37,6 +38,9 @@ public class Marks {
     private int subjectCode;
 
     private Long lastUpdate;
+
+    @Transient
+    private String rep;
 
 
 }
