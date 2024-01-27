@@ -2,6 +2,7 @@ package com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade;
 
 
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.model.requests.SubjectGradingUpdateRequest;
+import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.model.responses.SubjectGradingResponse;
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.service.SubjectGradingService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class SubjectGradingController {
 
 
     @GetMapping("/viewGradings")
-    public ResponseEntity<List<SubjectGrading>> allGradings()
+    public ResponseEntity<List<SubjectGradingResponse>> allGradings()
     {
         return subjectGradingService.viewGrading();
     }

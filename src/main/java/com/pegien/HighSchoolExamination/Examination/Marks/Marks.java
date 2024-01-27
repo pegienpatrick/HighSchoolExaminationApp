@@ -23,7 +23,7 @@ public class Marks {
     private Long num;
 
     @NotNull
-    private Long student;
+    private Long studentId;
 
     @NotNull
     private Long examination;
@@ -35,7 +35,7 @@ public class Marks {
     private Double marks;
 
     @NotNull
-    private int subject;
+    private int subjectCode;
 
     private Long lastUpdate;
 
