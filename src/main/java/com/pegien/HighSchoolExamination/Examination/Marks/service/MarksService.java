@@ -83,7 +83,7 @@ public class MarksService {
     public ResponseEntity<List<MarksSheetResponse>> viewMarksSheet(Long examination, Double grade) {
 
         List<MarksSheetResponse> marksSheetResponses=new ArrayList<>();
-        for(Student student:studentRepository.findByGrade(grade))
+        for(Student student:studentRepository.findByStage(grade))
         {
             HashMap<Integer,Marks> marks=new HashMap<>();
             for(StudySubject i:studySubjectsRepository.allAvailable())
