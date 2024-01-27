@@ -16,6 +16,6 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     int maxAdm();
 
 
-    List<Student> findByGrade(Double grade);
+    List<Student> findByStage(Double grade);
 
 }
