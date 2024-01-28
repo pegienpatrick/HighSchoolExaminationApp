@@ -37,7 +37,7 @@ public class MarksService {
 
 
 
-    private Student getStudentByNum(Long student)
+    public Student getStudentByNum(Long student)
     {
         Optional<Student> student1=studentRepository.findById(student);
         if(student1.isEmpty())
@@ -46,7 +46,7 @@ public class MarksService {
         return student1.get();
     }
 
-    private Student getStudentByAdmno(int student)
+    public Student getStudentByAdmno(int student)
     {
         Optional<Student> student1=studentRepository.findByAdmNo(student);
         if(student1.isEmpty())
@@ -59,7 +59,7 @@ public class MarksService {
 
 
 
-    private Marks getMark(Long student,Long examination,int subjectCode){
+    public Marks getMark(Long student,Long examination,int subjectCode){
         Optional<Marks> optionalMarks=marksRepository.findByExaminationAndStudentIdAndSubjectCode(examination,student,subjectCode);
         if(optionalMarks.isPresent())
             return optionalMarks.get();

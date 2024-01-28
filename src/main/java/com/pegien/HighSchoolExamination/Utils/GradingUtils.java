@@ -3,7 +3,7 @@ package com.pegien.HighSchoolExamination.Utils;
 public class GradingUtils {
 
 
-    public static int getGrade(int a,int e,int marks)
+    public static int getGrade(int a,int e,Double marks)
     {
         if (marks>100||marks<=0) {
             return 0;
@@ -13,11 +13,12 @@ public class GradingUtils {
             return 1;
 
 
-        int range=a-e;
-        int change=(marks-e);
+        Double range=a*1.0-e*1.0;
+        Double change=(marks-e);
 //        System.out.println("change is "+change+" percentage "+(change*10/range));
-        int value=change*10/range+2;
-        return value;
+        int value= (int) (change*10/range+2);
+        int val=value;
+        return val;
     }
 
 

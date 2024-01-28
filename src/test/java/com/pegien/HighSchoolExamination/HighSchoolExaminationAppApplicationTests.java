@@ -95,7 +95,7 @@ class HighSchoolExaminationAppApplicationTests {
 			int prev = -7;
 			String rec = "";
 			for (int i = 0; i < 110; i++) {
-				int grade = GradingUtils.getGrade(78, 27, i);
+				int grade = GradingUtils.getGrade(78, 27, i*1.0);
 				if (grade != prev) {
 					System.out.println(" to \n" + rec + " \n\n\n\n");
 					System.out.println(i + " - " + grade + " - " + GradingUtils.gradeChar(grade));
