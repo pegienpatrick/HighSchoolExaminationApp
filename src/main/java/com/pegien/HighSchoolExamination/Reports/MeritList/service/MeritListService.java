@@ -147,7 +147,7 @@ public class MeritListService {
 
     }
 
-    private MeritListLine getMeritLine(Student student, Long examination, Double stage) {
+    public MeritListLine getMeritLine(Student student, Long examination, Double stage) {
 
         MeritListLine meritListLine1;
         Optional<MeritListLine> meritListLine = meritListLineRepository.findByStudentIdAndExamination(student.getNum(),examination);

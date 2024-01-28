@@ -16,5 +16,9 @@ public interface MeritListLineRepository extends JpaRepository<MeritListLine,Lon
 
     List<MeritListLine> findByStageAndExaminationAndStreamOrderByClassRankAsc(Double stage, Long examination, String stream);
 
+    int countByStageAndExaminationOrderByClassRankAsc(Double stage, Long examination);
+
+    int countByStageAndExaminationAndStreamOrderByClassRankAsc(Double stage, Long examination, String stream);
+
 
 }
