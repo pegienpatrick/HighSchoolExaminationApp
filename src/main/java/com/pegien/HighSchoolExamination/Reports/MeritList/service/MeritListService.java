@@ -70,11 +70,13 @@ public class MeritListService {
             meritListLine.setSubjectGrades(subjectGrades);
             meritListLine.setSubjectMarks(subjectMarks);
             pointsList.add(points);
+            meritListLine.setExamination(examination);
+            meritListLine.setStage(stage);
             meritListLines.add(meritListLine);
         }
         setRanks(pointsList,meritListLines);
         meritListLineRepository.saveAllAndFlush(meritListLines);
-        return meritListLines;
+        return viewMeritList(examination,stage);
     }
 
     private void setRanks(List<Integer> pointsList, List<MeritListLine> meritListLines) {
@@ -85,41 +87,59 @@ public class MeritListService {
 
         HashMap<String,Integer> lastStreamPosition=new HashMap<>();
         HashMap<String,Integer> lastStreamPoints=new HashMap<>();
+        HashMap<String,Integer> streamCounts=new HashMap<>();
 
         //set last positions
-        lastStreamPosition.put("A",0);
-        lastStreamPosition.put("B",0);
-        lastStreamPosition.put("C",0);
-        //set last stream points
-        lastStreamPoints.put("A",0);
-        lastStreamPoints.put("B",0);
-        lastStreamPoints.put("C",0);
+//        lastStreamPosition.put("A",0);
+//        lastStreamPosition.put("B",0);
+//        lastStreamPosition.put("C",0);
+//        //set last stream points
+//        lastStreamPoints.put("A",0);
+//        lastStreamPoints.put("B",0);
+//        lastStreamPoints.put("C",0);
 
         //set positions
         int lastPosition=0;
         int lastPoints=0;
+        int count=0;
 
         for(MeritListLine meritListLine:meritListLines)
         {
+            if(meritListLine.getAggregateGrade().equalsIgnoreCase("z"))
+            {
+                return;
+            }
+            count++;
             //set class position
             if(meritListLine.getPoints()!=lastPoints)
             {
                 lastPoints=meritListLine.getPoints();
-                lastPosition++;
+                lastPosition=count;
             }
-            meritListLine.setStreamRank(lastPosition);
+            meritListLine.setClassRank(lastPosition);
             //streamWise Rank
             String stream=meritListLine.getStream().toUpperCase().trim();
-            if(lastStreamPoints.containsKey(stream)) {
+            if(!lastStreamPoints.containsKey(stream)) {
+                lastStreamPoints.put(stream, 0);
+                lastStreamPosition.put(stream, 0);
+                streamCounts.put(stream,0);
+            }
+
+
+            {
+                int streamCount=streamCounts.get(stream);
+                streamCount++;
                 int strlPoints = lastStreamPoints.get(stream);
                 int strlPos=lastStreamPosition.get(stream);
                 if(meritListLine.getPoints()!=strlPoints) {
-                    strlPos++;
+                    strlPos=streamCount;
                     lastStreamPoints.put(stream,meritListLine.getPoints());
                     lastStreamPosition.put(stream,strlPos);
+                    streamCounts.put(stream,streamCount);
                 }
                 meritListLine.setStreamRank(strlPos);
             }
+
 
 
         }
@@ -153,7 +173,7 @@ public class MeritListService {
     public List<MeritListLine> viewMeritList(Long examination,Double stage)
     {
         List<MeritListLine> fullList=new ArrayList<>();
-        for(MeritListLine l:meritListLineRepository.listByStageAndExaminationOrderByClassRankAsc(stage,examination))
+        for(MeritListLine l:meritListLineRepository.findByStageAndExaminationOrderByClassRankAsc(stage,examination))
         {
             Optional<Student> student=studentRepository.findById(l.getStudentId());
             if(student.isPresent())
@@ -171,7 +191,7 @@ public class MeritListService {
     public List<MeritListLine> viewMeritList(Long examination,Double stage,String stream)
     {
         List<MeritListLine> fullList=new ArrayList<>();
-        for(MeritListLine l:meritListLineRepository.listByStageAndExaminationAndStreamOrderByClassRankAsc(stage,examination,stream))
+        for(MeritListLine l:meritListLineRepository.findByStageAndExaminationAndStreamOrderByClassRankAsc(stage,examination,stream))
         {
             Optional<Student> student=studentRepository.findById(l.getStudentId());
             if(student.isPresent())

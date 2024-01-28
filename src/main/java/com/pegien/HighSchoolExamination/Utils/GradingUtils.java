@@ -5,6 +5,8 @@ public class GradingUtils {
 
     public static int getGrade(int a,int e,Double marks)
     {
+        if(marks==null)
+            return 0;
         if (marks>100||marks<=0) {
             return 0;
         }else if(marks>=a)
