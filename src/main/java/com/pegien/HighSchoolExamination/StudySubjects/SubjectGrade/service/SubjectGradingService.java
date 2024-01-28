@@ -33,7 +33,7 @@ public class SubjectGradingService {
             if(optionalSubjectGrading.isEmpty())
                 subjectGradingRepository.saveAndFlush(new SubjectGrading(studySubject.getSubjectCode(),80,29));
         }
-        return subjectGradingRepository.findAll();
+        return subjectGradingRepository.findAllOrderedBySubjectCode();
     }
 
 
