@@ -22,6 +22,13 @@ public class SubjectGradingResponse extends SubjectGrading {
         this.subjectRep = subjectRep;
     }
 
+    public SubjectGradingResponse(SubjectGrading subjectGrading)
+    {
+        setSubjectCode(subjectGrading.getSubjectCode());
+        setAMarks(subjectGrading.getAMarks());
+        setEMarks(subjectGrading.getEMarks());
+    }
+
     public String getSubjectName() {
         return subjectName;
     }

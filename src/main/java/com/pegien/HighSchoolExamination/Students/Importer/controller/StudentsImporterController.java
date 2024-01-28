@@ -29,10 +29,11 @@ public class StudentsImporterController {
     private LogService logService;
 
 
+
     @PostMapping("/importStudents")
     public ResponseEntity<String> importStudents(@RequestParam("file") MultipartFile multipartFile)
     {
-        String errors="";
+        StringBuilder errors= new StringBuilder();
         int success=0;
         try {
             Scanner s=new Scanner(multipartFile.getInputStream());
@@ -77,16 +78,16 @@ public class StudentsImporterController {
                     logService.recordLog("imported Student : "+student1);
                 }catch (Exception es)
                 {
-                    errors+=" student "+line+" "+es;
+                    errors.append("\n student ").append(line).append(" ").append(es);
                 }
 
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error : "+e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error - "+e);
         }
 
-        return ResponseEntity.ok("Imported : "+success+" Errors : "+errors);
+        return ResponseEntity.ok("{imported : "+success+", errors : {"+errors+"}}");
     }
 
 

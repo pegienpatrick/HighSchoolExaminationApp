@@ -48,28 +48,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         ,"/api/v1/user/smsForgotPassword"
                         ,"/api/v1/user/emailForgotPassword"
                         ,"/api/v1/user/login"
-                        ,"/api/v1/user/possibleGenders",
-                        "/static/**",
-                        "/templates/**",
-                        "/",
-                        "*.html",
-                        "*.css",
-                        "*.js",
-                        "*.jpg",
-                        "*.ico",
-                        "/assets/**",
-                        "/**"
-
+                        ,"/api/v1/user/possibleGenders"
 
                 )
                 .permitAll()
-                .antMatchers("/api/v1/**").authenticated().and()
+                .antMatchers("/api/v1/**").authenticated()
+                .anyRequest().permitAll()
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 
-
-
-        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 

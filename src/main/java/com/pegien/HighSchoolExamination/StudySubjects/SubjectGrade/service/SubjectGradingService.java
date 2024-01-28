@@ -40,10 +40,13 @@ public class SubjectGradingService {
     public ResponseEntity<List<SubjectGradingResponse>> viewGrading() {
         List<SubjectGradingResponse> subjectGradingResponses=new ArrayList<>();
         for(SubjectGrading subjectGrading:viewGradings()) {
-            SubjectGradingResponse subjectGradingResponse= (SubjectGradingResponse) subjectGrading;
+            SubjectGradingResponse subjectGradingResponse= new SubjectGradingResponse(subjectGrading);
+
             StudySubject s=studySubjectsRepository.findBySubjectCode(subjectGrading.getSubjectCode());
             subjectGradingResponse.setSubjectName(s.getSubjectName());
             subjectGradingResponse.setSubjectRep(s.getSubjectRep());
+            subjectGradingResponse.setAMarks(subjectGrading.getAMarks());
+            subjectGradingResponse.setEMarks(subjectGrading.getEMarks());
             subjectGradingResponses.add(subjectGradingResponse);
         }
         return ResponseEntity.ok(subjectGradingResponses);
@@ -55,6 +58,7 @@ public class SubjectGradingService {
         {
             subjectGradingRepository.saveAndFlush(subjectGrading);
         }
+
         return "Updated Successfully";
     }
 }
