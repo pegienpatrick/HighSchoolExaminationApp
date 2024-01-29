@@ -36,7 +36,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        int[] subjects={101,102,121,233,314,231,232,311,312,451,565,503};
+        int[] subjects={101,102,121,231,232,233,314,311,312,451,503,565};
         for(int i:subjects)
             studySubjects.add(findBySubjectCode(i));
 //        studySubjects.addAll(listCompulsory());
@@ -101,7 +101,6 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
         studySubjects.add(new StudySubject(451, "Computer Studies", "Comp. Studies"));
         studySubjects.add(new StudySubject(501, "French", "FRE"));
         studySubjects.add(new StudySubject(502, "German", "GER"));
-        studySubjects.add(new StudySubject(565, "Business Studies", "BST"));
         studySubjects.add(new StudySubject(503, "Arabic", "ARAB"));
         studySubjects.add(new StudySubject(504, "Sign Language", "Sign Lang"));
         studySubjects.add(new StudySubject(511, "Music", "MUSIC"));

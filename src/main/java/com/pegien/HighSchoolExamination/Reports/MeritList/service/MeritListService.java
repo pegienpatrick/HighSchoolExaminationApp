@@ -49,6 +49,8 @@ public class MeritListService {
         List<SubjectGrading> subjectGradings=subjectGradingService.viewGradings();
         List<Integer> pointsList=new ArrayList<>();
         List<MeritListLine> meritListLines=new ArrayList<>();
+        List<Integer> comPulsorysubjects= Arrays.asList(101, 102, 121);
+
         for(Student student:studentRepository.findByStage(stage))
         {
             MeritListLine meritListLine=getMeritLine(student,examination,stage);
@@ -56,15 +58,26 @@ public class MeritListService {
             HashMap<Integer,Double> subjectMarks=new HashMap<>();
             HashMap<Integer,String> subjectGrades=new HashMap<>();
             int points=0;
+            int pos=0;
+            List<Integer> choices=new ArrayList<>();
             for(SubjectGrading subjectGrading:subjectGradings)
             {
+                pos++;
                 Marks marks=marksService.getMark(student.getNum(),examination,subjectGrading.getSubjectCode());
                 Double mark=marks.getMarks();
                 int grad= GradingUtils.getGrade(subjectGrading.getAMarks(),subjectGrading.getEMarks(),mark);
-                points+=grad;
                 subjectMarks.put(subjectGrading.getSubjectCode(),mark);
                 subjectGrades.put(subjectGrading.getSubjectCode(),GradingUtils.gradeChar(grad));
+                if(comPulsorysubjects.contains(subjectGrading.getSubjectCode()))
+                    points+=grad;
+                else
+                    choices.add(grad);
             }
+            //add max 4 among subject choices
+            choices.sort(Collections.reverseOrder());
+            for(int i=0;i<4;i++)
+                points+=choices.get(i);
+
             meritListLine.setPoints(points);
             meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading(points)));
             meritListLine.setSubjectGrades(subjectGrades);
@@ -107,6 +120,8 @@ public class MeritListService {
         {
             if(meritListLine.getAggregateGrade().equalsIgnoreCase("z"))
             {
+                meritListLine.setStreamRank(99999);
+                meritListLine.setClassRank(99999);
                 return;
             }
             count++;

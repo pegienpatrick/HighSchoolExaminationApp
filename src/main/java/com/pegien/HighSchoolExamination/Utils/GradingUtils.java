@@ -1,5 +1,7 @@
 package com.pegien.HighSchoolExamination.Utils;
 
+import com.itextpdf.text.pdf.PdfPCell;
+
 public class GradingUtils {
 
 
@@ -46,5 +48,29 @@ public class GradingUtils {
             return 0;
         double tmp=points;
         return (int)Math.round(points/7.0);
+    }
+
+    public static String[] performanceComments = {
+            "Extremely Poor",//0-9
+            "Poor",//10-20
+            "A bit Poor",//20-30
+            "Improve",//30-40
+            "Below Average",//40-50
+            "Average",//50-60
+            "Good",//60-70
+            "Very Good",//70-80
+            "Excellent",//80-90
+            "Outstanding",//90-100
+            "Exceptional",
+            "Perfect"
+    };
+
+    public static String getComment(Double marks) {
+        if(marks==null||marks==0||marks>100)
+            return " ";
+        else{
+            int word= (int) (marks/10);
+            return performanceComments[word];
+        }
     }
 }

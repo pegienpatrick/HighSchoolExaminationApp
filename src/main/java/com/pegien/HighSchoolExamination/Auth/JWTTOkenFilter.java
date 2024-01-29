@@ -41,15 +41,20 @@ public class JWTTOkenFilter extends OncePerRequestFilter {
         String init="Bearer ";
         if(authorization!=null&&authorization.contains(init))
         {
-            String tokenString=authorization.replaceAll(init,"");
-            Jws<Claims> claims=Jwts.parser().setSigningKey(SecurityConfig.jwtSecretKey).build().parseClaimsJws(tokenString);
-            String username=claims.getBody().getSubject();
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Date expiry = claims.getBody().getExpiration();
-                Date current = new Date();
-                if (current.before(expiry)) {
-                    authService.authorizeRequest(tokenString,request,username);
+            try {
+                String tokenString = authorization.replaceAll(init, "");
+                Jws<Claims> claims = Jwts.parser().setSigningKey(SecurityConfig.jwtSecretKey).build().parseClaimsJws(tokenString);
+                String username = claims.getBody().getSubject();
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Date expiry = claims.getBody().getExpiration();
+                    Date current = new Date();
+                    if (current.before(expiry)) {
+                        authService.authorizeRequest(tokenString, request, username);
+                    }
                 }
+            }catch (Exception es)
+            {
+
             }
         }
         filterChain.doFilter(request, response);
