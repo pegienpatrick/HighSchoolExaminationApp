@@ -341,7 +341,7 @@ public class ReportCardService {
         }
     }
 
-    private void addExamTitle(Document document, Examination examination) throws Exception{
+    public static void addExamTitle(Document document, Examination examination) throws Exception{
         Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD | Font.UNDERLINE);
         Paragraph hh2=new Paragraph(examination.getTitle()+"  Term ("+examination.getTerm()+") Year : "+examination.getYear(),boldFont);
         hh2.setAlignment(Element.ALIGN_CENTER);
@@ -350,7 +350,7 @@ public class ReportCardService {
         document.add(hh2);
     }
 
-    private void addSchoolHeader(Document document) throws Exception {
+    public static void addSchoolHeader(Document document) throws Exception {
 
 
         Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 30, Font.BOLD);

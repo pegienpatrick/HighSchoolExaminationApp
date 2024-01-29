@@ -33,6 +33,17 @@ public class MeritListController {
     }
 
 
+    @GetMapping("/printMerit/{examination}/{stage}")
+    public ResponseEntity<byte[]> printMerit(@PathVariable("examination") Long examination, @PathVariable("stage") Double stage, @RequestParam(required = false,name = "stream")String stream)
+    {
+//        if(stream==null)
+//            return ResponseEntity.ok(meritListService.viewMeritList(examination,stage));
+//        else
+            return meritListService.printMeritList(examination,stage,stream);
+    }
+
+
+
 
 
 }

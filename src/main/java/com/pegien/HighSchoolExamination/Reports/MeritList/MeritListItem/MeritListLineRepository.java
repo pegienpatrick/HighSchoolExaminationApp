@@ -1,7 +1,9 @@
 package com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Transient;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +23,6 @@ public interface MeritListLineRepository extends JpaRepository<MeritListLine,Lon
     int countByStageAndExaminationAndStreamOrderByClassRankAsc(Double stage, Long examination, String stream);
 
 
+    @Transactional
+    void deleteByStageAndExaminationOrderByClassRankAsc(Double stage, Long examination);
 }
