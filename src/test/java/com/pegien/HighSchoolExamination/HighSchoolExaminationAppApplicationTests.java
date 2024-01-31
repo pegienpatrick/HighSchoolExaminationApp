@@ -1,14 +1,20 @@
 package com.pegien.HighSchoolExamination;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.pegien.HighSchoolExamination.Reports.ReportCards.service.ReportCardService;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import com.pegien.HighSchoolExamination.Users.enums.UserRoles;
 import com.pegien.HighSchoolExamination.Utils.GradingUtils;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
+import com.pegien.HighSchoolExamination.Utils.SMSUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -91,19 +97,19 @@ class HighSchoolExaminationAppApplicationTests {
 
 //		for(int i=1;i<=12;i++)
 //			System.out.println(i+"-"+ GradingUtils.gradeChar(i));
-		{
-			int prev = -7;
-			String rec = "";
-			for (int i = 0; i < 110; i++) {
-				int grade = GradingUtils.getGrade(78, 27, i*1.0);
-				if (grade != prev) {
-					System.out.println(" to \n" + rec + " \n\n\n\n");
-					System.out.println(i + " - " + grade + " - " + GradingUtils.gradeChar(grade));
-				}
-				prev = grade;
-				rec = i + " - " + grade + " - " + GradingUtils.gradeChar(grade);
-			}
-		}
+//		{
+//			int prev = -7;
+//			String rec = "";
+//			for (int i = 0; i < 110; i++) {
+//				int grade = GradingUtils.getGrade(78, 27, i*1.0);
+//				if (grade != prev) {
+//					System.out.println(" to \n" + rec + " \n\n\n\n");
+//					System.out.println(i + " - " + grade + " - " + GradingUtils.gradeChar(grade));
+//				}
+//				prev = grade;
+//				rec = i + " - " + grade + " - " + GradingUtils.gradeChar(grade);
+//			}
+//		}
 
 
 //		{
@@ -119,7 +125,38 @@ class HighSchoolExaminationAppApplicationTests {
 //				rec = i + " - " + grade + " - " + GradingUtils.gradeChar(grade);
 //			}
 //		}
+//					JFrame f=new JFrame("Failed to start new instance ");
+//			f.setSize(160,160);
+//			f.setLocationRelativeTo(null);
+//			f.setVisible(true);
+//
+//
+//			JButton btn=new JButton("start");
+//			f.add(btn);
+//			btn.addActionListener((e)->{
+//				HighSchoolExaminationAppApplication.main(args);
+//			});
+//		try{
+//
+//			FileOutputStream stream= new FileOutputStream("/home/patrick/Documents/trashes/file.pdf");
+//
+//			com.itextpdf.text.Document document = new Document();
+//			PdfWriter.getInstance(document, stream);
+//
+//			document.open();
+//
+//			ReportCardService.addSchoolHeader(document);
+//
+//
+//			document.close();
+//
+//		}catch (Exception es)
+//		{
+//			es.printStackTrace();
+//		}
 
+		System.out.println(SMSUtils.getBalance());
+		System.out.println(SMSUtils.sendSms("0723466505","Hello"));
 
 	}
 

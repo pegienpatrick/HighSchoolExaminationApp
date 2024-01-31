@@ -77,11 +77,13 @@ public class ReportCardService {
 
 
 
-    public static String schoolName="TAKABA BOYS HIGH SCHOOL";
-    public static String schoolEmail="email@gmail.com";
+    public static String schoolName="TAKABA BOYS` SECONDARY SCHOOL";
+    public static String schoolEmail="takababoysch@gmail.com";
 
-    public static String schoolPhone="0700 000 000";
-    public static String addr="P.O Box 56-56, Nairobi";
+    public static String schoolMotto="DISCIPLINE AND SUCCESS";
+    public static String addr="P.O BOX 101 - 70300, MANDERA";
+
+    public static String schoolPhone="0722 841 386";
 
     public ResponseEntity<byte[]> viewReport(Long examination, int admNo) {
         try {
@@ -130,12 +132,14 @@ public class ReportCardService {
 
             document.open();
 
-            document.setMargins(20,10,10,20);
+//            document.setMargins(20,10,10,20);
             addSchoolHeader(document);
 
             Optional<Examination> examination1=examinationRepository.findById(examination);
-            if(examination1.isEmpty())
+            if(examination1.isEmpty()) {
+                System.out.println("exam Null");
                 return null;
+            }
 
            addExamTitle(document,examination1.get());
 
@@ -177,7 +181,7 @@ public class ReportCardService {
 
             document.open();
 
-            document.setMargins(20,10,10,20);
+//            document.setMargins(20,10,10,20);
 
             Optional<Examination> examination1=examinationRepository.findById(examination);
             if(examination1.isEmpty())
@@ -283,8 +287,15 @@ public class ReportCardService {
 
         table.addCell(meritListLine.getAggregateGrade());
         table.addCell(meritListLine.getPoints()+"");
-        table.addCell(meritListLine.getStreamRank()+" / "+streamStudents);
-        table.addCell(meritListLine.getClassRank()+" / "+classStudents);
+        if(meritListLine.getAggregateGrade().equalsIgnoreCase("z")) {
+            table.addCell(meritListLine.getStreamRank() + " / " + streamStudents);
+            table.addCell(meritListLine.getClassRank() + " / " + classStudents);
+        }
+        else{
+            table.addCell( "- / " + streamStudents);
+            table.addCell( "- / " + classStudents);
+
+        }
         table.addCell(meritListLine.getKcpeMarks()+" / 500");
 
 
@@ -344,36 +355,14 @@ public class ReportCardService {
     public static void addExamTitle(Document document, Examination examination) throws Exception{
         Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD | Font.UNDERLINE);
         Paragraph hh2=new Paragraph(examination.getTitle()+"  Term ("+examination.getTerm()+") Year : "+examination.getYear(),boldFont);
+        document.addTitle(examination.getTitle()+"  Term ("+examination.getTerm()+") Year : "+examination.getYear());
         hh2.setAlignment(Element.ALIGN_CENTER);
 //        hh2.setFont(new Font(Font.FontFamily.COURIER,30, Font.UNDERLINE | Font.BOLD,BaseColor.BLACK));
 
         document.add(hh2);
     }
 
-    public static void addSchoolHeader(Document document) throws Exception {
 
-
-        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 30, Font.BOLD);
-        Paragraph hh=new Paragraph(schoolName,boldFont);
-        hh.setAlignment(Element.ALIGN_CENTER);
-//        hh.setFont(new Font(Font.FontFamily.COURIER,48, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
-
-        document.add(hh);
-
-        boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
-        Paragraph box=new Paragraph(addr,boldFont);
-        box.setAlignment(Element.ALIGN_CENTER);
-        document.add(box);
-
-        Paragraph email=new Paragraph(schoolEmail,boldFont);
-        email.setAlignment(Element.ALIGN_CENTER);
-        document.add(email);
-
-        boldFont = new Font(Font.FontFamily.COURIER, 20, Font.BOLD);
-        Paragraph phone=new Paragraph(schoolPhone,boldFont);
-        phone.setAlignment(Element.ALIGN_CENTER);
-        document.add(phone);
-    }
 
 
 
@@ -395,29 +384,82 @@ public class ReportCardService {
     }
 
 
-    private List<Subject> getSampleSubjects() {
-        // Replace this method with logic to fetch actual subject data from your system or database
-        // For demonstration purposes, returning sample data
-        return List.of(
-                new Subject("Math", 90, "A", 1, "Excellent"),
-                new Subject("Science", 85, "B", 2, "Good"),
-                new Subject("English", 92, "A", 1, "Excellent")
-                // Add more subjects as needed
-        );
+    public static void addSchoolHeader(Document document) throws Exception {
+
+        int ident=100;
+        int identLeft=ident;
+
+        Boolean isPortrait=true;
+
+        if(document.getPageSize().getWidth()>document.getPageSize().getHeight()) {
+            identLeft += 100;
+            isPortrait=false;
+        }
+
+
+
+
+        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+        Paragraph hh=new Paragraph(schoolName,boldFont);
+        hh.setAlignment(Element.ALIGN_LEFT);
+//        hh.setFont(new Font(Font.FontFamily.COURIER,48, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
+        hh.setIndentationLeft(identLeft);
+
+        document.add(hh);
+//        document.setMargins(0,0,0,0);
+
+        boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+        Paragraph box=new Paragraph(addr,boldFont);
+        box.setAlignment(Element.ALIGN_LEFT);
+        box.setIndentationLeft(identLeft);
+        document.add(box);
+
+        boldFont = new Font(Font.FontFamily.COURIER, 13, Font.BOLD);
+        Paragraph email=new Paragraph("E-MAIL: "+schoolEmail+"    TEL: "+schoolPhone,boldFont);
+        email.setAlignment(Element.ALIGN_LEFT);
+        email.setIndentationLeft(identLeft);
+        document.add(email);
+
+        boldFont = new Font(Font.FontFamily.COURIER, 16, Font.BOLD);
+        Paragraph phone=new Paragraph("SCHOOL MOTTO : "+schoolMotto,boldFont);
+        phone.setAlignment(Element.ALIGN_LEFT);
+        phone.setIndentationLeft(identLeft);
+        document.add(phone);
+
+        try{
+            int width=ident;
+
+            if(logo==null){
+                logo=Image.getInstance(ClassLoader.getSystemResourceAsStream("images/logo.png").readAllBytes());
+
+            float height=logo.getHeight()*width/logo.getWidth();
+            logo.scaleAbsolute(width,height );
+            logo.setAbsolutePosition(isPortrait?20:100, document.getPageSize().getHeight()-height*4/3);
+}
+
+            document.add(logo);
+
+
+
+        }catch (Exception es)
+        {
+            es.printStackTrace();
+        }
+
+
+
+
+
     }
 
 
+    public static Image logo=null;
+
+
+
+
+
 }
 
-@Data
-@AllArgsConstructor
-class Subject {
-    private String name;
-    private int score;
-    private String grade;
-    private int rank;
-    private String comment;
 
-    // Constructors, getters, setters
-}
 

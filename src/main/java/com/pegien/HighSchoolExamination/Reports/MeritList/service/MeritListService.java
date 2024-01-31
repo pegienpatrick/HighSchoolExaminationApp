@@ -334,22 +334,29 @@ public class MeritListService {
                     "Stream Pos",
                     "Adm No",
                     "Student Name",
-                    "ENG",
-                    "KIS",
-                    "MATH",
-                    "BIO",
-                    "PHY",
-                    "CHEM",
-                    "IRE",
-                    "HIST",
-                    "GEO",
-                    "ICT",
-                    "ARAB",
-                    "BST",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
                     "Aggr Points",
                     "Aggr Grade",
                     "Entry Marks"
             };
+
+
+            List<SubjectGrading> gradings=subjectGradingService.viewGradings();
+
+            for(int i=0;i<gradings.size();i++)
+                columnTitles[i+5]=studySubjectsRepository.findBySubjectCode(gradings.get(i).getSubjectCode()).getSubjectRep()+" ("+gradings.get(i).getSubjectCode()+")";
+
 
             for(String i:columnTitles)
                 pdfPTable.addCell(CreateHeaderCell(i));
@@ -365,7 +372,7 @@ public class MeritListService {
 
                 HashMap<Integer, String> subjectGrades = meritListLine.getSubjectGrades();
                 HashMap<Integer, Double> subjectMarks = meritListLine.getSubjectMarks();
-                for (SubjectGrading s : subjectGradingService.viewGradings()) {
+                for (SubjectGrading s : gradings) {
                     if(subjectMarks.get(s.getSubjectCode())==null)
                     {
                         pdfPTable.addCell(createCell(" ", smallFont));
@@ -411,9 +418,12 @@ public class MeritListService {
         PdfPCell headerCell = new PdfPCell();
         headerCell.addElement(new com.itextpdf.text.Paragraph(i,new Font(Font.FontFamily.TIMES_ROMAN, 5)));
         headerCell.setGrayFill(0.7f); // Set background color
-        headerCell.setHorizontalAlignment(Element.ALIGN_TOP);
+        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
         headerCell.setNoWrap(false);
+        headerCell.setFixedHeight(20);
+       if(!i.contains("ame"))
+           headerCell.setRotation(90);
         return headerCell;
     }
 
