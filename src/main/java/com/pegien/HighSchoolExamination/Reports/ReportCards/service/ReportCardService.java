@@ -493,20 +493,20 @@ public class ReportCardService {
        String message="TAKABA BOYS, Dear Parent/Guardian of "+student.getAdmNo()+"-"+student.getName()+" class "+((int)(meritListLine.getStage()/1))
                +meritListLine.getStream()+" "+fineExamination.getTitle()+" Term "+fineExamination.getTerm()+","+fineExamination.getYear()
                +" Total Points:"+meritListLine.getPoints()+" AggrGrade: "+meritListLine.getAggregateGrade()+" OverallPosition: "+meritListLine.getClassRank()+"/"+students
-               +" StreamPosition "+meritListLine.getStreamRank()+"/"+streamStudents+" ";
+               +" StreamPosition: "+meritListLine.getStreamRank()+"/"+streamStudents+" ";
 
        for(StudySubject s: studySubjectsRepository.allAvailable()) {
            if (meritListLine.getSubjectMarks().containsKey(s.getSubjectCode())) {
                Double marks = meritListLine.getSubjectMarks().get(s.getSubjectCode());
                if (marks == null || marks == 0)
                    continue;
-               message += s.getSubjectRep() + " " + marks + meritListLine.getSubjectGrades().get(s.getSubjectCode()) + ", ";
+               message += s.getSubjectRep() + " " + marks +" "+ meritListLine.getSubjectGrades().get(s.getSubjectCode()) + ", ";
            }
        }
 
        if(message.endsWith(", "))
        {
-           message.substring(0,message.length()-2);
+           message=message.substring(0,message.length()-2);
        }
 
        List<Guardian> guardians=guardianRepository.findByStudent(student.getNum());
@@ -562,19 +562,19 @@ public class ReportCardService {
             String message = "TAKABA BOYS, Dear Parent/Guardian of " + student.getAdmNo() + "-" + student.getName() + " class " + ((int) (grade / 1))
                     + meritListLine.getStream() + " " + fineExamination.getTitle() + " Term " + fineExamination.getTerm() + "," + fineExamination.getYear()
                     + " Total Points:" + meritListLine.getPoints() + " AggrGrade: " + meritListLine.getAggregateGrade() + " OverallPosition: " + meritListLine.getClassRank() + "/" + students
-                    + " StreamPosition " + meritListLine.getStreamRank() + "/" + streamStudents + " ";
+                    + " StreamPosition: " + meritListLine.getStreamRank() + "/" + streamStudents + " ";
 
             for (StudySubject s : studySubjectsRepository.allAvailable()) {
                 if (meritListLine.getSubjectMarks().containsKey(s.getSubjectCode())) {
                     Double marks = meritListLine.getSubjectMarks().get(s.getSubjectCode());
                     if (marks == null || marks == 0)
                         continue;
-                    message += s.getSubjectRep() + " " + marks + meritListLine.getSubjectGrades().get(s.getSubjectCode()) + ", ";
+                    message += s.getSubjectRep() + " " + marks +" "+ meritListLine.getSubjectGrades().get(s.getSubjectCode()) + ", ";
                 }
             }
 
             if (message.endsWith(", ")) {
-                message.substring(0, message.length() - 2);
+                message=message.substring(0, message.length() - 2);
             }
 
             List<Guardian> guardians = guardianRepository.findByStudent(student.getNum());

@@ -58,7 +58,7 @@ public class SMSController {
 
     @GetMapping("/sent")
     public List<SMSLog> getSentLogs() {
-        return smsLogRepository.findTop200BySentTrueOrderBySentOnDesc();
+        return smsLogRepository.findTop200BySentTrueOrderByNumDesc();
     }
 
     @GetMapping("/failed")
@@ -75,13 +75,21 @@ public class SMSController {
     @PostMapping("/smsGuardians")
     public ResponseEntity<String> smsGuardians(@RequestBody @Valid SMSGuardiansRequest smsGuardiansRequest)
     {
+        if(smsGuardiansRequest.getMessage().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Message");
+//        System.out.println(smsGuardiansRequest);
         return smsService.smsGuardians(smsGuardiansRequest);
     }
 
     @PostMapping("/smsClassGuardians/{stage}/{stream}")
     public ResponseEntity<String> smsClassGuardians(@RequestBody String message,@PathVariable("stage") Double stage,@PathVariable("stream") String stream){
+        if(message.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Message");
         return smsService.smsClassGuardians(stage,stream,message);
     }
+
+
+
 
 
 

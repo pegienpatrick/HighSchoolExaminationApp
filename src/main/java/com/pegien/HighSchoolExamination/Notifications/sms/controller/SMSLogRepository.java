@@ -13,15 +13,15 @@ public interface SMSLogRepository extends JpaRepository<SMSLog,Long> {
 
     List<SMSLog> findTop200ByOrderBySentOnDesc();
 
-    @Query("select count(*) from SMSLog where sent=true and sentOn>?1 and sentOn<dateEnd")
+    @Query("select count(*) from SMSLog where sent=true and sentOn>?1 and sentOn<?2")
     int countBySentToday(Long dateStart,Long dateEnd);
 
-    @Query("select count(*) from SMSLog where sent=false and ignored=false")
+    @Query("select count(*) from SMSLog where sent=false and (ignored=false or ignored is null)")
     int countFailed();
 
 //    @Query("select count(*) from SMSLog where sent=true order by sentOn desc")
 //    List<SMSLog> findSent();
-    List<SMSLog> findTop200BySentTrueOrderBySentOnDesc();
+    List<SMSLog> findTop200BySentTrueOrderByNumDesc();
 
 //    @Query("select count(*) from SMSLog where sent=false and ignored=false order by sentOn desc having (rank() over(order by sentOn))<200")
 //    List<SMSLog> findFailed();
