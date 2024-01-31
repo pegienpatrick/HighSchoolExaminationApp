@@ -74,8 +74,8 @@ public class SMSUtils {
     public static Boolean sendSms(String phone,String message)
     {
         System.out.println(phone+":"+message);
-        if(phone.length()>0)
-            return false;
+//        if(phone.length()>0)
+//            return false;
 
         String url = "https://sms.textsms.co.ke/api/services/sendsms/";
 
