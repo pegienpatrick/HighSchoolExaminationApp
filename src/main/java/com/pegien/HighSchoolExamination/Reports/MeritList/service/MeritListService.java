@@ -144,7 +144,7 @@ public class MeritListService {
 
         for(MeritListLine meritListLine:meritListLines)
         {
-            if(meritListLine.getAggregateGrade().equalsIgnoreCase("z")||meritListLine.getPoints()==0)
+            if(meritListLine.getPoints()<1)
             {
                 meritListLine.setStreamRank(99999);
                 meritListLine.setClassRank(99999);

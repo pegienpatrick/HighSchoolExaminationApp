@@ -8,12 +8,17 @@ import com.pegien.HighSchoolExamination.Examination.ExaminationRepository;
 import com.pegien.HighSchoolExamination.Examination.Marks.MarksRepository;
 import com.pegien.HighSchoolExamination.Examination.Marks.service.MarksService;
 import com.pegien.HighSchoolExamination.Examination.service.ExaminationService;
+import com.pegien.HighSchoolExamination.Guardian.Guardian;
+import com.pegien.HighSchoolExamination.Guardian.GuardianRepository;
+import com.pegien.HighSchoolExamination.Notifications.sms.controller.SMSLog;
+import com.pegien.HighSchoolExamination.Notifications.sms.controller.SMSLogRepository;
 import com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem.MeritListLine;
 import com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem.MeritListLineRepository;
 import com.pegien.HighSchoolExamination.Reports.MeritList.service.MeritListService;
 import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import com.pegien.HighSchoolExamination.Students.service.StudentsService;
+import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubjectsRepository;
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.SubjectGrading;
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.service.SubjectGradingService;
@@ -36,6 +41,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
@@ -74,6 +81,14 @@ public class ReportCardService {
 
     @Autowired
     private MarksRepository marksRepository;
+
+
+
+    @Autowired
+    private GuardianRepository guardianRepository;
+
+    @Autowired
+    private SMSLogRepository smsLogRepository;
 
 
 
@@ -457,8 +472,135 @@ public class ReportCardService {
 
 
 
+    public ResponseEntity<String> smsReportCard(Long examination, int admNo) {
+        Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
+        if(optionalStudent.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such student");
+
+        Student student=optionalStudent.get();
+
+       Optional<MeritListLine> optionalMeritListLine=meritListLineRepository.findByStudentIdAndExamination(student.getNum(),examination);
+       if(optionalMeritListLine.isEmpty())
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Generate Merit List First");
+
+       MeritListLine meritListLine=optionalMeritListLine.get();
+       Optional<Examination> examination1=examinationRepository.findById(examination);
+       Examination fineExamination=examination1.get();
+
+       int students=meritListLineRepository.countByStageAndExaminationOrderByClassRankAsc(meritListLine.getStage(),examination);
+       int streamStudents=meritListLineRepository.countByStageAndExaminationAndStreamOrderByClassRankAsc(meritListLine.getStage(),examination,meritListLine.getStream());
+
+       String message="TAKABA BOYS, Dear Parent/Guardian of "+student.getAdmNo()+"-"+student.getName()+" class "+((int)(meritListLine.getStage()/1))
+               +meritListLine.getStream()+" "+fineExamination.getTitle()+" Term "+fineExamination.getTerm()+","+fineExamination.getYear()
+               +" Total Points:"+meritListLine.getPoints()+" AggrGrade: "+meritListLine.getAggregateGrade()+" OverallPosition: "+meritListLine.getClassRank()+"/"+students
+               +" StreamPosition "+meritListLine.getStreamRank()+"/"+streamStudents+" ";
+
+       for(StudySubject s: studySubjectsRepository.allAvailable()) {
+           if (meritListLine.getSubjectMarks().containsKey(s.getSubjectCode())) {
+               Double marks = meritListLine.getSubjectMarks().get(s.getSubjectCode());
+               if (marks == null || marks == 0)
+                   continue;
+               message += s.getSubjectRep() + " " + marks + meritListLine.getSubjectGrades().get(s.getSubjectCode()) + ", ";
+           }
+       }
+
+       if(message.endsWith(", "))
+       {
+           message.substring(0,message.length()-2);
+       }
+
+       List<Guardian> guardians=guardianRepository.findByStudent(student.getNum());
+       for(Guardian guardian:guardians)
+       {
+           if(guardian.getPhone()!=null&&guardian.getPhone().length()>8)
+           {
+               SMSLog smsLog= SMSLog.builder()
+                       .guardian(guardian.getFullName())
+                       .phone(guardian.getPhone())
+                       .student(student.getName())
+                       .message(message)
+                       .build();
+               smsLog.trySending();
+               smsLogRepository.save(smsLog);
+           }
+       }
+       if(guardians.size()==0)
+           return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("No guardian Registered");
+       else
+           return ResponseEntity.ok("Sending");
+
+    }
 
 
+
+
+
+
+    public ResponseEntity<String> smsReportCards(Long examination, Double grade, String stream) {
+
+        List<MeritListLine> meritListLines;
+        if(stream==null||stream.length()==0||stream.trim().equalsIgnoreCase("All"))
+            meritListLines=meritListService.viewMeritList(examination,grade);
+        else
+            meritListLines=meritListService.viewMeritList(examination,grade,stream);
+
+        Optional<Examination> examination1 = examinationRepository.findById(examination);
+        Examination fineExamination = examination1.get();
+
+        int students = meritListLineRepository.countByStageAndExaminationOrderByClassRankAsc(grade, examination);
+        int streamStudents = meritListLineRepository.countByStageAndExaminationAndStreamOrderByClassRankAsc(grade, examination, stream);
+
+
+        for(MeritListLine meritListLine:meritListLines) {
+
+            Optional<Student> optionalStudent = studentRepository.findById(meritListLine.getStudentId());
+            if (optionalStudent.isEmpty())
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such student");
+
+            Student student = optionalStudent.get();
+
+            String message = "TAKABA BOYS, Dear Parent/Guardian of " + student.getAdmNo() + "-" + student.getName() + " class " + ((int) (grade / 1))
+                    + meritListLine.getStream() + " " + fineExamination.getTitle() + " Term " + fineExamination.getTerm() + "," + fineExamination.getYear()
+                    + " Total Points:" + meritListLine.getPoints() + " AggrGrade: " + meritListLine.getAggregateGrade() + " OverallPosition: " + meritListLine.getClassRank() + "/" + students
+                    + " StreamPosition " + meritListLine.getStreamRank() + "/" + streamStudents + " ";
+
+            for (StudySubject s : studySubjectsRepository.allAvailable()) {
+                if (meritListLine.getSubjectMarks().containsKey(s.getSubjectCode())) {
+                    Double marks = meritListLine.getSubjectMarks().get(s.getSubjectCode());
+                    if (marks == null || marks == 0)
+                        continue;
+                    message += s.getSubjectRep() + " " + marks + meritListLine.getSubjectGrades().get(s.getSubjectCode()) + ", ";
+                }
+            }
+
+            if (message.endsWith(", ")) {
+                message.substring(0, message.length() - 2);
+            }
+
+            List<Guardian> guardians = guardianRepository.findByStudent(student.getNum());
+            for (Guardian guardian : guardians) {
+                if (guardian.getPhone() != null && guardian.getPhone().length() > 8) {
+                    final SMSLog smsLog = SMSLog.builder()
+                            .guardian(guardian.getFullName())
+                            .phone(guardian.getPhone())
+                            .student(student.getName())
+                            .message(message)
+                            .build();
+                    executorService.submit(()->{
+                        smsLog.trySending();
+                        smsLogRepository.save(smsLog);
+                    });
+
+                }
+            }
+        }
+        if(meritListLines.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cant find Report Cards");
+        else
+            return ResponseEntity.ok("Sending");
+    }
+
+    private ExecutorService executorService= Executors.newCachedThreadPool();
 }
 
 

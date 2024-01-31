@@ -18,4 +18,5 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
 
     List<Student> findByStage(Double grade);
 
+    List<Student> findByStageAndStream(Double stage, String stream);
 }

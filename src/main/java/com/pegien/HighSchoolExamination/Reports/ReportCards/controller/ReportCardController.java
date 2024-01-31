@@ -26,5 +26,17 @@ public class ReportCardController {
         return reportCardService.viewBulkReport(examination,grade,stream);
     }
 
+    @GetMapping("/smsReportCard/{examination}/{student}")
+    public ResponseEntity<String> smsReportCard(@PathVariable("examination") Long examination,@PathVariable("student") int admNo)
+    {
+        return reportCardService.smsReportCard(examination,admNo);
+    }
+
+    @GetMapping("/smsReportCards/{examination}/{grade}")
+    public ResponseEntity<String> smsReportCards(@PathVariable("examination") Long examination,@PathVariable("grade") Double grade, @RequestParam(name = "stream",required = false) String stream)
+    {
+        return reportCardService.smsReportCards(examination,grade,stream);
+    }
+
 
 }
