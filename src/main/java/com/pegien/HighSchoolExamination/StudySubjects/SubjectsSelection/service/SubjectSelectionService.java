@@ -56,7 +56,7 @@ public class SubjectSelectionService {
     {
         List<SelectionSubjectsResponse> all=new ArrayList<>();
         for(Student i: studentRepository.findAll())
-            all.add(new SelectionSubjectsResponse(i.getAdmNo(),i.getName(),getForStudent(i.getNum())));
+            all.add(new SelectionSubjectsResponse(i.getAdmNo(),i.getName(),i.getStage(),i.getStream(),getForStudent(i.getNum())));
         return all;
     }
 

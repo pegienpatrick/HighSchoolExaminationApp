@@ -49,10 +49,14 @@ public class SubjectTeacherService {
         if(optionalSubjectTeacher.isPresent())
             return optionalSubjectTeacher.get();
 
+        System.out.println("Didn't find class Teacher "+grade+" "+stream);
+
+
         SubjectTeacher subjectTeacher= SubjectTeacher.builder()
                 .grade(grade)
                 .teacher(null)
                 .subjectCode(-1)
+                .stream(stream)
                 .isClassTeacher(true)
                 .build();
 
@@ -71,6 +75,7 @@ public class SubjectTeacherService {
                 .teacher(null)
                 .subjectCode(subject)
                 .isClassTeacher(false)
+                .stream(stream)
                 .build();
 
         subjectTeacherRepository.saveAndFlush(subjectTeacher);
@@ -98,7 +103,7 @@ public class SubjectTeacherService {
     public ResponseEntity<HashMap<Long, String>> allTeachers() {
         HashMap<Long, String> teachers=new HashMap<>();
         for(User s: userRepository.findAll())
-            teachers.put(s.getNum(),s.getFname());
+            teachers.put(s.getNum(),s.getFname()==null||s.getFname().length()==0?s.getUsername():s.getFname());
 
         return ResponseEntity.ok(teachers);
     }

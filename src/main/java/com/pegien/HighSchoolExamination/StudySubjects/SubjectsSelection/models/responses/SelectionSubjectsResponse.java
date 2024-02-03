@@ -19,6 +19,10 @@ public class SelectionSubjectsResponse {
 
     private String studentName;
 
+    private Double form;
+
+    private String stream;
+
     private SubjectSelection subjectSelection;
 
 }
