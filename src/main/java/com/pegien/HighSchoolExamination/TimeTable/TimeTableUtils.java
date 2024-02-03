@@ -1,8 +1,10 @@
 //package com.pegien.HighSchoolExamination.TimeTable;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPage;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubjectsRepository;
@@ -168,7 +170,7 @@ public class TimeTableUtils {
                         int nextSubject=-1;
                         Long teacher=0L;
                         int trials=0;
-                        int maxTrials=800;
+                        int maxTrials=1500;
                         do {
                             trials++;
                             int nextIndex=random.nextInt(subjects.size());
@@ -236,7 +238,7 @@ public class TimeTableUtils {
     private static void printTimeTable() {
         try{
             FileOutputStream fileOutputStream=new FileOutputStream("/home/patrick/Documents/trashes/timeTable.pdf");
-            Document document=new Document();
+            Document document=new Document(PageSize.A4.rotate());
             PdfWriter.getInstance(document,fileOutputStream);
 
             document.open();
@@ -263,6 +265,7 @@ public class TimeTableUtils {
                     }
                     document.add(new Paragraph("Class "+i+j));
                     timeTable.setWidthPercentage(100);
+                    timeTable.setSpacingBefore(40);
                     document.add(timeTable);
 
                 }
@@ -281,13 +284,42 @@ public class TimeTableUtils {
     private static void printTeacherTimeTable() {
         try{
             FileOutputStream fileOutputStream=new FileOutputStream("/home/patrick/Documents/trashes/TeachersTimeTable.pdf");
-            Document document=new Document();
+            Document document=new Document(PageSize.A4.rotate());
             PdfWriter.getInstance(document,fileOutputStream);
-
-
-
             document.open();
             document.newPage();
+
+            for(Long teacher:teachersTimeTables.keySet())
+            {
+                document.newPage();
+                document.add(new Paragraph(teachersName.get(teacher)));
+
+                PdfPTable teacherTable=new PdfPTable(10);
+                for(int day:teachersTimeTables.get(teacher).keySet())
+                {
+                    teacherTable.addCell(dayNames[day]);
+                    for(TimeTableLesson l:teachersTimeTables.get(teacher).get(day))
+                    {
+                        if(l!=null)
+                        {
+                            teacherTable.addCell(studySubjectsRepository.findBySubjectCode(l.getSubjectCode()).getSubjectRep()+"\n"+((int)(l.getGrade()/1))+l.getStream());
+                        }
+                        else
+                        {
+                            teacherTable.addCell(" ");
+                        }
+                    }
+                }
+                teacherTable.setWidthPercentage(100);
+                teacherTable.setSpacingBefore(40);
+
+                document.add(teacherTable);
+
+            }
+
+
+
+            document.close();
         }catch (Exception es)
         {
             es.printStackTrace();
