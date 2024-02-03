@@ -302,7 +302,7 @@ public class ReportCardService {
 
         table.addCell(meritListLine.getAggregateGrade());
         table.addCell(meritListLine.getPoints()+"");
-        if(meritListLine.getAggregateGrade().equalsIgnoreCase("z")) {
+        if(meritListLine.getPoints()>1) {
             table.addCell(meritListLine.getStreamRank() + " / " + streamStudents);
             table.addCell(meritListLine.getClassRank() + " / " + classStudents);
         }
@@ -444,8 +444,9 @@ public class ReportCardService {
         try{
             int width=ident;
 
+
             if(logo==null){
-                logo=Image.getInstance(ClassLoader.getSystemResourceAsStream("images/logo.png").readAllBytes());
+                logo=Image.getInstance(ReportCardService.class.getResourceAsStream("/images/logo.png").readAllBytes());
 
             float height=logo.getHeight()*width/logo.getWidth();
             logo.scaleAbsolute(width,height );

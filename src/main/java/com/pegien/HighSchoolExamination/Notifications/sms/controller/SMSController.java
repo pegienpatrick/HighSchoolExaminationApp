@@ -35,7 +35,7 @@ public class SMSController {
 
     @GetMapping("/latest")
     public List<SMSLog> getLatestLogs() {
-        return smsLogRepository.findTop200ByOrderBySentOnDesc();
+        return smsLogRepository.findTop200ByOrderByNumDesc();
     }
 
     @GetMapping("/countSentToday")
@@ -58,7 +58,7 @@ public class SMSController {
 
     @GetMapping("/sent")
     public List<SMSLog> getSentLogs() {
-        return smsLogRepository.findTop200BySentTrueOrderByNumDesc();
+        return smsLogRepository.findTop200BySentTrueOrderBySentOnDesc();
     }
 
     @GetMapping("/failed")

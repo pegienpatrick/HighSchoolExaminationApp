@@ -8,6 +8,7 @@ import com.pegien.HighSchoolExamination.StudySubjects.SubjectsSelection.models.r
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectsSelection.service.SubjectSelectionService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,7 @@ public class SubjectSelectionController {
     public ResponseEntity<String> updateSelection(@RequestBody @Valid SubjectSelectionRequest subjectSelectionRequest, BindingResult result)
     {
         if(result.hasErrors())
-            return ResponseEntity.ok(MyUtils.createErrorMessage(result));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(result));
         return subjectSelectionService.updateSelection(subjectSelectionRequest);
     }
 

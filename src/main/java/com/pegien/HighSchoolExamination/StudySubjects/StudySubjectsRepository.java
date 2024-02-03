@@ -36,7 +36,7 @@ public interface StudySubjectsRepository extends JpaRepository<StudySubject,Long
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        int[] subjects={101,102,121,231,232,233,314,311,312,451,503,565};
+        int[] subjects={101,102,121,231,232,233,311,312,314,451,503,565};
         for(int i:subjects)
             studySubjects.add(findBySubjectCode(i));
 //        studySubjects.addAll(listCompulsory());

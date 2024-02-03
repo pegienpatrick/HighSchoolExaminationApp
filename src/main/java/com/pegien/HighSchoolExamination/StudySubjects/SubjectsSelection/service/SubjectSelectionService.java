@@ -65,7 +65,7 @@ public class SubjectSelectionService {
         SubjectSelection subjectSelection=getForStudent(subjectSelectionRequest.getStudentId());
         String prev=subjectSelection.toString();
         subjectSelection.setHasSelected(subjectSelectionRequest.getHasSelected());
-        subjectSelection.setHumanities(subjectSelection.getHumanities());
+        subjectSelection.setHumanities(subjectSelectionRequest.getHumanities());
         subjectSelection.setSciences(subjectSelectionRequest.getSciences());
         subjectSelection.setApplied(subjectSelectionRequest.getApplied());
         subjectSelectionRepository.save(subjectSelection);
