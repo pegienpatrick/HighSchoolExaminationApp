@@ -6,8 +6,9 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPage;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.pegien.HighSchoolExamination.Students.Streams.Stream;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
-import com.pegien.HighSchoolExamination.StudySubjects.StudySubjectsRepository;
+//import com.pegien.HighSchoolExamination.StudySubjects.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableLesson.TimeTableLesson;
 import org.springframework.data.domain.Example;
@@ -23,17 +24,19 @@ import java.util.function.Function;
 
 public class TimeTableUtils {
 
-    private static StudySubjectsRepository studySubjectsRepository=new DummyRepo();
+//    private static DummyRepo DummyRepo=new DummyRepo();
     private static HashMap<String, HashMap<Integer,Long>> subjectTeachers=new HashMap<>();
 
     private static HashMap<String,HashMap<Integer,TimeTableLesson[]>> classesTimeTables=new HashMap<>();
 
     private static HashMap<Long,HashMap<Integer,TimeTableLesson[]>> teachersTimeTables=new HashMap<>();
 
-    private static int teachers=20;
+    private static HashMap<String,HashMap<Integer,TimeTableLesson[]>> venues=new HashMap<>();
+
+    private static int teachers=25;
     private static int subjectsNum=2;
 
-    static List<StudySubject> subjects=studySubjectsRepository.allAvailable();
+    static List<StudySubject> subjects=DummyRepo.allAvailable();
 
 
     private static HashMap<Long,String> teachersName=new HashMap<>();
@@ -58,11 +61,14 @@ public class TimeTableUtils {
         printAllTeachers();
         printClassesAndTeachers();
         prepareTeacherEngagements();
-        generateTimeTable();
+//        generateTimeTable();
+        SubjectWiseTimeTable();
         printTimeTable();
         printTeacherTimeTable();
+        printVenuesTimeTable();
 
     }
+
 
 
 
@@ -80,6 +86,17 @@ public class TimeTableUtils {
         }
     }
 
+    private static void prepareVenuesEngagements() {
+        for(String i:subjectVenues.values())
+        {
+            HashMap<Integer, TimeTableLesson[]> day=new HashMap<>();
+            for(int d=0;d<days;d++) {
+                day.put(d,new TimeTableLesson[lessonsPerDay]);
+            }
+            venues.put(i,day);
+        }
+    }
+
 
     private static void printClassesAndTeachers() {
 
@@ -87,7 +104,7 @@ public class TimeTableUtils {
         {
             System.out.print("\n Class "+i+" T ");
             for(int j:subjectTeachers.get(i).keySet())
-                System.out.print( studySubjectsRepository.findBySubjectCode(j).getSubjectRep()+" : "+teachersName.get(subjectTeachers.get(i).get(j))+", ");
+                System.out.print( DummyRepo.findBySubjectCode(j).getSubjectRep()+" : "+teachersName.get(subjectTeachers.get(i).get(j))+", ");
         }
     }
 
@@ -95,7 +112,7 @@ public class TimeTableUtils {
         for(Long i:teachersName.keySet()) {
             System.out.print(String.format("\n%d. Teacher Name : %s Teaching Subjects : ", i,teachersName.get(i)));
             for(int j:teacherSubjects.get(i))
-                System.out.print(String.format(" %s , ", studySubjectsRepository.findBySubjectCode(j).getSubjectRep()));
+                System.out.print(String.format(" %s , ", DummyRepo.findBySubjectCode(j).getSubjectRep()));
         }
     }
 
@@ -179,7 +196,7 @@ public class TimeTableUtils {
                         }while((!hasNotHeldThatLesson(timeTableLesson,nextSubject)||teacherEngaged(teacher,k,lIndx))&&trials<maxTrials);
 
                         if(trials<maxTrials) {
-                            timeTableLesson[lIndx] = new TimeTableLesson(teacher, i * 1.0, j, nextSubject, k, lIndx, 40.0);
+                            timeTableLesson[lIndx] = new TimeTableLesson(teacher, i * 1.0, j, nextSubject, k, lIndx, 40.0,false,null);
 //                        addTeacherEngagement
 
                             classTimeTable.put(k,timeTableLesson);
@@ -209,6 +226,7 @@ public class TimeTableUtils {
                 System.out.println("Finished "+joint);
 
             }
+
         }
 
     }
@@ -218,6 +236,13 @@ public class TimeTableUtils {
         if(teacher==null)
             return false;
         return teachersTimeTables.get(teacher).get(day)[lesson]!=null;
+    }
+
+    private static boolean classEngaged(String classStream, int day, int lesson) {
+
+        Boolean ans = classesTimeTables.get(classStream).get(day)[lesson]!=null;
+//        System.out.println(String.format("Class : %s , day:%d,lesson:%d Result %s, what : %s",classStream,day,lesson,ans,classesTimeTables.get(classStream).get(day)[lesson]));
+        return ans;
     }
 
     private static boolean hasNotHeldThatLesson(TimeTableLesson[] timeTableLesson, int nextSubject) {
@@ -258,7 +283,7 @@ public class TimeTableUtils {
                         for(TimeTableLesson l:classTimeTable.get(d))
                         {
                             if(l!=null)
-                                timeTable.addCell(studySubjectsRepository.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
+                                timeTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
                             else
                                 timeTable.addCell("UnAvailable");
                         }
@@ -302,7 +327,7 @@ public class TimeTableUtils {
                     {
                         if(l!=null)
                         {
-                            teacherTable.addCell(studySubjectsRepository.findBySubjectCode(l.getSubjectCode()).getSubjectRep()+"\n"+((int)(l.getGrade()/1))+l.getStream());
+                            teacherTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()+"\n"+((int)(l.getGrade()/1))+l.getStream());
                         }
                         else
                         {
@@ -325,4 +350,269 @@ public class TimeTableUtils {
             es.printStackTrace();
         }
     }
+
+    private static void printVenuesTimeTable() {
+
+        try{
+            FileOutputStream fileOutputStream=new FileOutputStream("/home/patrick/Documents/trashes/venuesTimeTable.pdf");
+            Document document=new Document(PageSize.A4.rotate());
+            PdfWriter.getInstance(document,fileOutputStream);
+            document.open();
+            document.newPage();
+
+            for(String venue:venues.keySet())
+            {
+                document.newPage();
+                document.add(new Paragraph(venue));
+
+                PdfPTable teacherTable=new PdfPTable(10);
+                for(int day:venues.get(venue).keySet())
+                {
+                    teacherTable.addCell(dayNames[day]);
+                    for(TimeTableLesson l:venues.get(venue).get(day))
+                    {
+                        if(l!=null)
+                        {
+                            teacherTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()+"\n"+((int)(l.getGrade()/1))+l.getStream());
+                        }
+                        else
+                        {
+                            teacherTable.addCell(" ");
+                        }
+                    }
+                }
+                teacherTable.setWidthPercentage(100);
+                teacherTable.setSpacingBefore(40);
+
+                document.add(teacherTable);
+
+            }
+
+
+
+            document.close();
+        }catch (Exception es)
+        {
+            es.printStackTrace();
+        }
+    }
+
+    private static HashMap<Integer,HashMap<Integer,Integer>> lessonsPerWeek=new HashMap<>();
+
+    private static HashMap<Integer,String> subjectVenues=new HashMap<>();
+
+
+    private static void setLessonsPerWeek() {
+
+        for(int form=1;form<=4;form++)
+        {
+            HashMap<Integer,Integer> lessons=new HashMap<>();
+            int j=0;
+            for(StudySubject i: DummyRepo.allAvailable())
+            {
+                j++;
+                int num;
+                if(j<=3)
+                    num=6;
+                else if(j<=5)
+                    num=5;
+                else if(j<=12)
+                    num=3;
+                else
+                    num=1;
+
+                lessons.put(i.getSubjectCode(),num);
+            }
+
+            lessonsPerWeek.put(form,lessons);
+        }
+
+        setSubjectVenues();
+        prepareVenuesEngagements();
+
+    }
+
+    private static void setSubjectVenues() {
+        subjectVenues.put(451,"Comp Lab");
+    }
+
+
+
+    private static boolean subjectOverLoaded(String s, int subj, int day, int lesson) {
+        TimeTableLesson[] lessonsInDay=classesTimeTables.get(s).get(day);
+        int subjectsInADay=0;
+        for(TimeTableLesson l:lessonsInDay)
+            if(l!=null&&l.getSubjectCode()==subj)
+                subjectsInADay++;
+
+        if (lesson > 0 &&lessonsInDay[lesson - 1]!=null&& lessonsInDay[lesson - 1].getSubjectCode() == subj)
+            return true;
+
+        if(subjectsInADay>5) {
+            return (subjectsInADay>1);
+        }
+        else
+            return subjectsInADay>0;
+    }
+
+
+
+    private static void clearTeacherScedule(int form) {
+        for(Long teacher:teachersTimeTables.keySet())
+        {
+            for(int day=0;day<days;day++)
+            {
+                for(int l=0;l<teachersTimeTables.get(teacher).get(day).length;l++)
+                {
+                    if(teachersTimeTables.get(teacher).get(day)[l]!=null&&teachersTimeTables.get(teacher).get(day)[l].getGrade()==form)
+                        teachersTimeTables.get(teacher).get(day)[l]=null;
+                }
+            }
+        }
+    }
+
+    private static void clearVenuesShedule(int form) {
+        for(String venue:venues.keySet())
+        {
+            for(int day=0;day<days;day++)
+            {
+                for(int l=0;l<venues.get(venue).get(day).length;l++)
+                {
+                    if(venues.get(venue).get(day)[l]!=null&&venues.get(venue).get(day)[l].getGrade()==form)
+                        venues.get(venue).get(day)[l]=null;
+                }
+            }
+        }
+    }
+
+    private static Boolean venueEngaged(String venue,int day,int lesson) {
+        if(venue==null||venue.length()==0)
+            return false;
+
+        return (venues.get(venue).get(day)[lesson]!=null);
+    }
+
+    private static void setDefaultClassTimeTable() {
+        for(int form=4;form>0;form--) {
+            for(String stream:streams)
+            {
+                HashMap<Integer,TimeTableLesson[]> lessons=new HashMap<>();
+                for(int day=0;day<days;day++)
+                {
+                    lessons.put(day,new TimeTableLesson[lessonsPerDay]);
+                }
+                classesTimeTables.put(form+stream,lessons);
+            }
+        }
+    }
+
+
+    private static void SubjectWiseTimeTable() {
+        setLessonsPerWeek();
+        setDefaultClassTimeTable();
+        int spaces=lessonsPerDay*days;
+
+        Random random=new Random();
+
+        int fmaxTrials=50;
+        int ftrial=0;
+
+        int bestdefects=156;
+        HashMap<String,HashMap<Integer,TimeTableLesson[]>> bestTimeTable=new HashMap<>();
+
+
+
+        for(int form=4;form>0;form--)
+        {
+            ftrial++;
+            int defects=0;
+            Boolean hasDefect=false;
+            HashMap<Integer,Integer> lessons=lessonsPerWeek.get(form);
+
+            if(lessons==null) {
+
+                System.out.println(lessonsPerWeek.keySet());
+                continue;
+            }
+            for(int subj:lessons.keySet())
+            {
+                for(int lessonCount=0;lessonCount<lessons.get(subj);lessonCount++) {
+                    for (String stream : streams) {
+                        int day,lesson,trial=0,matTrials=10000;
+                        Long teacher;
+                        String joint=form+stream;
+                        String venue;
+                        do{
+                            trial++;
+//                            int space=random.nextInt(spaces);
+//                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
+                            day=random.nextInt(days);
+                            lesson=random.nextInt(lessonsPerDay);
+                            teacher=subjectTeachers.get(joint).get(subj);
+                            venue=null;
+                            if(subjectVenues.containsKey(subj))
+                                venue=subjectVenues.get(subj);
+
+                        }while ((classEngaged(joint,day,lesson)||teacherEngaged(teacher,day,lesson)||subjectOverLoaded(form+stream,subj,day,lesson)||venueEngaged(venue,day,lesson))&&trial<matTrials);
+
+                        if(trial<matTrials)//successful
+                        {
+                            TimeTableLesson abve=new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson, 40.0,false,venue);
+                            classesTimeTables.get(joint).get(day)[lesson]=abve;
+
+                            if(teacher!=null){//set Teacher Occupied
+                                teachersTimeTables.get(teacher).get(day)[lesson] =abve;
+                            }
+                        }
+                        else {
+                            hasDefect = true;
+                            defects++;
+                        }
+                    }
+                }
+            }
+            {//find best timetable version
+                if(defects<bestdefects)
+                {
+                    bestdefects=defects;
+                    for(String stream:streams) {
+                        bestTimeTable.put(form+stream,classesTimeTables.get(form+stream));
+                    }
+                }
+
+            }
+            if(hasDefect)
+            {
+
+                if(ftrial<fmaxTrials)
+                {//delete data
+                    for(String stream:streams)
+                    {
+                        HashMap<Integer,TimeTableLesson[]> lessonsd=new HashMap<>();
+                        for(int day=0;day<days;day++)
+                        {
+                            lessonsd.put(day,new TimeTableLesson[lessonsPerDay]);
+                        }
+                        classesTimeTables.put(form+stream,lessonsd);
+                    }
+                    {//clear teacher schedule
+                        clearTeacherScedule(form);
+                        clearVenuesShedule(form);
+                    }
+                    form++;
+                    continue;
+                }
+            }
+            System.out.println("\n Finished Form "+form);
+            ftrial=0;
+            bestdefects=156;
+            for(String stream:streams) {//return best timetable
+//                bestTimeTable.put(form+stream,classesTimeTables.get(form+stream));
+                classesTimeTables.put(form+stream,bestTimeTable.get(form+stream));
+            }
+
+        }
+    }
+
+
 }
