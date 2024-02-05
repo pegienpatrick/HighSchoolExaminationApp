@@ -559,6 +559,8 @@ public class TimeTableUtils {
                         {
                             TimeTableLesson abve=new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson, 40.0,false,venue);
                             classesTimeTables.get(joint).get(day)[lesson]=abve;
+                            if(venue!=null)
+                                venues.get(venue).get(day)[lesson]=abve;
 
                             if(teacher!=null){//set Teacher Occupied
                                 teachersTimeTables.get(teacher).get(day)[lesson] =abve;
