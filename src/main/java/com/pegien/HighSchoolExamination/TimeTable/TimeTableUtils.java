@@ -392,6 +392,10 @@ public class TimeTableUtils {
 
     private static HashMap<Integer,String> practicalSubjects=new HashMap<>();
 
+    private static HashMap<Integer,List<Integer>> streamJointSubjects=new HashMap<>();
+
+    private static List<Integer> selectedSubjectsGrades= Arrays.asList(3, 4);
+
 
     private static void setLessonsPerWeek() {
 
@@ -423,7 +427,19 @@ public class TimeTableUtils {
         setPracticalSubjects();
         prepareVenuesEngagements();
 
+        setStreamJointSubjects();
 
+
+    }
+
+    private static void setStreamJointSubjects() {
+        List<Integer> joints=new ArrayList<>();
+        for(StudySubject[] sa:DummyRepo.selectionOptions().values())
+            for(StudySubject s:sa)
+                joints.add(s.getSubjectCode());
+
+        for(int form:selectedSubjectsGrades)
+            streamJointSubjects.put(form,joints);
     }
 
     private static void setPracticalSubjects() {
@@ -567,52 +583,137 @@ public class TimeTableUtils {
             Boolean hasDefect=false;
             HashMap<Integer,Integer> lessons=lessonsPerWeek.get(form);
 
+            List<Integer> repreSentedSubject=new ArrayList<>();
+
+            HashMap<Integer,List<Integer>> representing=new HashMap<>();
+
+            if(selectedSubjectsGrades.contains(form)) {
+                for (String catg : DummyRepo.selectionOptions().keySet()) {
+                    StudySubject[] all=DummyRepo.selectionOptions().get(catg);
+                    int index=all[0].getSubjectCode();
+                    List<Integer> represented=new ArrayList<>();
+                    for(int m=1;m<all.length;m++)
+                        represented.add(all[m].getSubjectCode());
+                    repreSentedSubject.addAll(represented);
+                    representing.put(index,represented);
+                }
+            }
+
+
+
+
+            List<Integer> joint_subjects;
+            if(streamJointSubjects.containsKey(form))
+                joint_subjects=streamJointSubjects.get(form);
+            else
+                joint_subjects=new ArrayList<>();
+
             if(lessons==null) {
 
                 System.out.println(lessonsPerWeek.keySet());
                 continue;
             }
             for(int subj:lessons.keySet()) {
+                if(repreSentedSubject.contains(subj))
+                    continue;
+
                 int doubles = 0;
                 {//double session searching
                     if (practicalSubjects.containsKey(subj)) {//locate Double subjects
                         doubles = 2;
 
                         for (String stream : streams) {//looking for double lessons
+
+                            if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
+                                continue;
                             int day, lesson, trial = 0, matTrials = 500000;
                             Long teacher;
                             String joint = form + stream;
                             String venue;
-                            Boolean inValidFirst, inValidSecond;
+                            Boolean inValidFirst, inValidSecond,otherStreams;
                             venue = practicalSubjects.get(subj);
                             teacher = subjectTeachers.get(joint).get(subj);
+
+                            List<Integer> subjectsToCheck=new ArrayList<>();
+                            subjectsToCheck.add(subj);
+                            if(representing.containsKey(subj))
+                                subjectsToCheck.addAll(representing.get(subj));
+
+                            int nextLesson;
+
                             do {
                                 trial++;
 //                            int space=random.nextInt(spaces);
 //                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
                                 day = random.nextInt(days);
                                 lesson = random.nextInt(lessonsPerDay - 1);
+                                nextLesson=lesson+1;
 
 
-                                inValidFirst = classEngaged(joint, day, lesson) || teacherEngaged(teacher, day, lesson) || venueEngaged(venue, day, lesson);
-                                inValidSecond = classEngaged(joint, day, lesson + 1) || teacherEngaged(teacher, day, lesson + 1) || venueEngaged(venue, day, lesson + 1);
+                                otherStreams=false;
 
-                            } while ((inValidFirst || inValidSecond) && trial < matTrials);
+                                for(int subjectToCheck:subjectsToCheck) {
+                                    Long newTeacher=subjectTeachers.get(joint).get(subjectToCheck);
+                                    String newVenue="";
+                                    if(practicalSubjects.containsKey(subjectToCheck))
+                                        newVenue=practicalSubjects.get(subjectToCheck);
+
+                                    inValidFirst = classEngaged(joint, day, lesson) || teacherEngaged(newTeacher, day, lesson) || venueEngaged(newVenue, day, lesson);
+                                    inValidSecond = classEngaged(joint, day, nextLesson) || teacherEngaged(newTeacher, day, nextLesson) || venueEngaged(newVenue, day, nextLesson);
+
+                                    otherStreams = inValidFirst || inValidSecond;
+
+                                    if (joint_subjects.contains(subjectToCheck) && !stream.equalsIgnoreCase(streams[0]) && !otherStreams) {
+                                        for (String streamIn : streams) {
+                                            if (!streamIn.equals(streams[0]) && !otherStreams) {
+                                                Boolean inValidFirstIn = classEngaged(form + streamIn, day, lesson);
+                                                Boolean inValidSecondIn = classEngaged(form + streamIn, day, nextLesson);
+                                                if (!otherStreams)
+                                                    otherStreams = inValidSecondIn || inValidFirstIn;
+                                            }
+                                        }
+                                    }
+                                    if(otherStreams)
+                                        break;;
+                                }
+
+
+                            } while ((otherStreams) && trial < matTrials);
 
                             if (trial < matTrials)//successful
                             {
                                 TimeTableLesson abve = new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson, 40.0 * 2, true, venue);
-                                TimeTableLesson abve1 = new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson + 1, 40.0 * 2, true, venue);
-                                classesTimeTables.get(joint).get(day)[lesson] = abve;
-                                classesTimeTables.get(joint).get(day)[lesson + 1] = abve1;
-                                if (venue != null) {
-                                    venues.get(venue).get(day)[lesson] = abve;
-                                    venues.get(venue).get(day)[lesson + 1] = abve1;
-                                }
+                                TimeTableLesson abve1 = new TimeTableLesson(teacher, form * 1.0, stream, subj, day, nextLesson, 40.0 * 2, true, venue);
 
-                                if (teacher != null) {//set Teacher Occupied
-                                    teachersTimeTables.get(teacher).get(day)[lesson] = abve;
-                                    teachersTimeTables.get(teacher).get(day)[lesson + 1] = abve1;
+                                if(joint_subjects.contains(subj))
+                                {//write incase of joint subjects;
+                                    for(String polishStream:streams)
+                                    {
+                                        classesTimeTables.get(form+polishStream).get(day)[lesson] = abve;
+                                        classesTimeTables.get(form+polishStream).get(day)[nextLesson] = abve1;
+                                    }
+
+                                }else{
+                                classesTimeTables.get(joint).get(day)[lesson] = abve;
+                                classesTimeTables.get(joint).get(day)[nextLesson] = abve1;
+                                 }
+                                for(int subjectToVenue:subjectsToCheck) {
+                                    String newVenue=null;
+                                    if(practicalSubjects.containsKey(subjectToVenue))
+                                        newVenue=practicalSubjects.get(subjectToVenue);
+
+                                    if (newVenue != null) {
+                                        venues.get(newVenue).get(day)[lesson] = abve;
+                                        venues.get(newVenue).get(day)[nextLesson] = abve1;
+                                    }
+
+                                    Long newTeacher=null;
+                                    if(subjectTeachers.get(joint).containsKey(subjectToVenue))
+                                        newTeacher=subjectTeachers.get(joint).get(subjectToVenue);
+                                    if (newTeacher != null) {//set Teacher Occupied
+                                        teachersTimeTables.get(newTeacher).get(day)[lesson] = abve;
+                                        teachersTimeTables.get(newTeacher).get(day)[nextLesson] = abve1;
+                                    }
                                 }
                             } else {
                                 hasDefect = true;
@@ -625,6 +726,9 @@ public class TimeTableUtils {
             }
             for(int subj:lessons.keySet())
             {
+                if(repreSentedSubject.contains(subj))
+                    continue;
+
                 int doubles = 0;
                 //double session searching
                     if (practicalSubjects.containsKey(subj)) {//locate Double subjects
@@ -633,38 +737,166 @@ public class TimeTableUtils {
 
                 for(int lessonCount=0;lessonCount<lessons.get(subj)-doubles;lessonCount++) {
                     for (String stream : streams) {
-                        int day,lesson,trial=0,matTrials=10000;
+
+                        if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
+                            continue;
+                        int day, lesson, trial = 0, matTrials = 10000;
                         Long teacher;
-                        String joint=form+stream;
+                        String joint = form + stream;
                         String venue;
-                        do{
+                        Boolean inValidFirst, inValidSecond,otherStreams;
+                        venue = practicalSubjects.get(subj);
+                        teacher = subjectTeachers.get(joint).get(subj);
+
+                        List<Integer> subjectsToCheck=new ArrayList<>();
+                        subjectsToCheck.add(subj);
+                        if(representing.containsKey(subj))
+                            subjectsToCheck.addAll(representing.get(subj));
+
+                        int nextLesson;
+
+                        do {
                             trial++;
 //                            int space=random.nextInt(spaces);
 //                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
-                            day=random.nextInt(days);
-                            lesson=random.nextInt(lessonsPerDay);
-                            teacher=subjectTeachers.get(joint).get(subj);
-                            venue=null;
-                            if(subjectVenues.containsKey(subj))
-                                venue=subjectVenues.get(subj);
+                            day = random.nextInt(days);
+                            lesson = random.nextInt(lessonsPerDay - 1);
+                            nextLesson=lesson;
 
-                        }while ((classEngaged(joint,day,lesson)||teacherEngaged(teacher,day,lesson)||subjectOverLoaded(form+stream,subj,day,lesson)||venueEngaged(venue,day,lesson))&&trial<matTrials);
 
-                        if(trial<matTrials)//successful
-                        {
-                            TimeTableLesson abve=new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson, 40.0,false,venue);
-                            classesTimeTables.get(joint).get(day)[lesson]=abve;
-                            if(venue!=null)
-                                venues.get(venue).get(day)[lesson]=abve;
+                            otherStreams=false;
 
-                            if(teacher!=null){//set Teacher Occupied
-                                teachersTimeTables.get(teacher).get(day)[lesson] =abve;
+                            for(int subjectToCheck:subjectsToCheck) {
+                                Long newTeacher=subjectTeachers.get(joint).get(subjectToCheck);
+                                String newVenue="";
+                                if(practicalSubjects.containsKey(subjectToCheck))
+                                    newVenue=practicalSubjects.get(subjectToCheck);
+
+                                inValidFirst = classEngaged(joint, day, lesson) || teacherEngaged(newTeacher, day, lesson) || venueEngaged(newVenue, day, lesson);
+                                inValidSecond = classEngaged(joint, day, nextLesson) || teacherEngaged(newTeacher, day, nextLesson) || venueEngaged(newVenue, day, nextLesson);
+
+                                otherStreams = inValidFirst || inValidSecond;
+
+                                if (joint_subjects.contains(subjectToCheck) && !stream.equalsIgnoreCase(streams[0]) && !otherStreams) {
+                                    for (String streamIn : streams) {
+                                        if (!streamIn.equals(streams[0]) && !otherStreams) {
+                                            Boolean inValidFirstIn = classEngaged(form + streamIn, day, lesson);
+                                            Boolean inValidSecondIn = subjectOverLoaded(form+streamIn,subj,day,lesson);
+                                            if (!otherStreams)
+                                                otherStreams = inValidSecondIn || inValidFirstIn;
+                                        }
+                                    }
+                                }
+                                if(otherStreams)
+                                    break;;
                             }
-                        }
-                        else {
+
+
+                        } while ((otherStreams) && trial < matTrials);
+
+                        if (trial < matTrials)//successful
+                        {
+                            TimeTableLesson abve = new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson, 40.0 , false, "");
+                            TimeTableLesson abve1 = new TimeTableLesson(teacher, form * 1.0, stream, subj, day, nextLesson, 40.0 , false, "");
+
+                            if(joint_subjects.contains(subj))
+                            {//write incase of joint subjects;
+                                for(String polishStream:streams)
+                                {
+                                    classesTimeTables.get(form+polishStream).get(day)[lesson] = abve;
+                                    classesTimeTables.get(form+polishStream).get(day)[nextLesson] = abve1;
+                                }
+
+                            }else{
+                                classesTimeTables.get(joint).get(day)[lesson] = abve;
+                                classesTimeTables.get(joint).get(day)[nextLesson] = abve1;
+                            }
+                            for(int subjectToVenue:subjectsToCheck) {
+                                String newVenue=null;
+                                if(subjectVenues.containsKey(subjectToVenue))
+                                    newVenue=subjectVenues.get(subjectToVenue);
+
+                                if (newVenue != null) {
+                                    venues.get(newVenue).get(day)[lesson] = abve;
+                                    venues.get(newVenue).get(day)[nextLesson] = abve1;
+                                }
+
+                                Long newTeacher=null;
+                                if(subjectTeachers.get(joint).containsKey(subjectToVenue))
+                                    newTeacher=subjectTeachers.get(joint).get(subjectToVenue);
+                                if (newTeacher != null) {//set Teacher Occupied
+                                    teachersTimeTables.get(newTeacher).get(day)[lesson] = abve;
+                                    teachersTimeTables.get(newTeacher).get(day)[nextLesson] = abve1;
+                                }
+                            }
+                        } else {
                             hasDefect = true;
                             defects++;
                         }
+
+
+//                        if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
+//                            continue;
+//                        int day,lesson,trial=0,matTrials=10000;
+//                        Long teacher;
+//                        String joint=form+stream;
+//                        String venue;
+//                        Boolean falted;
+//                        do{
+//                            trial++;
+////                            int space=random.nextInt(spaces);
+////                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
+//                            day=random.nextInt(days);
+//                            lesson=random.nextInt(lessonsPerDay);
+//                            teacher=subjectTeachers.get(joint).get(subj);
+//                            venue=null;
+//                            if(subjectVenues.containsKey(subj))
+//                                venue=subjectVenues.get(subj);
+//                            falted=false;
+//
+//                            falted=classEngaged(joint,day,lesson)||teacherEngaged(teacher,day,lesson)||subjectOverLoaded(form+stream,subj,day,lesson)||venueEngaged(venue,day,lesson);
+//
+//                            if(joint_subjects.contains(subj)&&!stream.equalsIgnoreCase(streams[0])&&!falted)
+//                            {
+//                                for(String streamIn:streams)
+//                                {
+//                                    if(!streamIn.equals(streams[0])&&!falted)
+//                                    {
+//                                        Boolean inValidFirstIn = classEngaged(form+streamIn, day, lesson);
+//                                        Boolean inValidSecondIn = subjectOverLoaded(form+streamIn,subj,day,lesson);
+//                                        if(!falted)
+//                                            falted=inValidSecondIn||inValidFirstIn;
+//                                    }
+//                                }
+//                            }
+//
+//                        }while (falted&&trial<matTrials);
+//
+//                        if(trial<matTrials)//successful
+//                        {
+//                            TimeTableLesson abve=new TimeTableLesson(teacher, form * 1.0, stream, subj, day, lesson, 40.0,false,venue);
+////                            classesTimeTables.get(joint).get(day)[lesson]=abve;
+//                            if(joint_subjects.contains(subj))
+//                            {//write incase of joint subjects;
+//                                for(String polishStream:streams)
+//                                {
+//                                    classesTimeTables.get(form+polishStream).get(day)[lesson] = abve;
+//                                }
+//                            }else{
+//                                classesTimeTables.get(joint).get(day)[lesson] = abve;
+//                            }
+//
+//                            if(venue!=null)
+//                                venues.get(venue).get(day)[lesson]=abve;
+//
+//                            if(teacher!=null){//set Teacher Occupied
+//                                teachersTimeTables.get(teacher).get(day)[lesson] =abve;
+//                            }
+//                        }
+//                        else {
+//                            hasDefect = true;
+//                            defects++;
+//                        }
                     }
                 }
             }
@@ -720,8 +952,6 @@ public class TimeTableUtils {
             bestClassTimeTable=new HashMap<>();
             bestTeacherTimeTable = new HashMap<>();
             bestVenueTimeTable = new HashMap<>();
-
-
         }
     }
 

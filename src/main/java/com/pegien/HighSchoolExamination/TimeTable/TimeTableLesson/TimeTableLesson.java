@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.Null;
 
 @Data
@@ -15,6 +18,10 @@ import javax.validation.constraints.Null;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TimeTableLesson {
+
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY);
+//    private Long num;
 
     private Long teacher;
     private Double grade;
