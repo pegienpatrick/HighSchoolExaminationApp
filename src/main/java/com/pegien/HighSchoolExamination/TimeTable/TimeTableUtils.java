@@ -4,23 +4,14 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPage;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.pegien.HighSchoolExamination.Students.Streams.Stream;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 //import com.pegien.HighSchoolExamination.StudySubjects.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableLesson.TimeTableLesson;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery;
 
-import javax.persistence.Table;
 import java.io.FileOutputStream;
 import java.util.*;
-import java.util.function.Function;
 
 public class TimeTableUtils {
 
@@ -41,7 +32,7 @@ public class TimeTableUtils {
 
     private static HashMap<Long,String> teachersName=new HashMap<>();
 
-    private static HashMap<Long,Integer[]> teacherSubjects=new HashMap<>();
+    private static HashMap<Long, int[]> teacherSubjects=new HashMap<Long, int[]>();
 
 
     private static String[] streams={"A","B","C"};
@@ -107,15 +98,19 @@ public class TimeTableUtils {
 
     private static void addSubjectTeachers() {
         Random random=new Random();
+
         for(StudySubject s:subjects)
         {//fetch techers for that subject.
             List<Long> itsTeachers=new ArrayList<>();
+            if(s.getSubjectCode()!=999)
             {
                 for (Long i : teacherSubjects.keySet())
                     for (Integer j : teacherSubjects.get(i))
-                        if (j == s.getSubjectCode())
+                        if (Objects.equals(j, s.getSubjectCode()))
                             itsTeachers.add(i);
             }
+            else
+                itsTeachers.addAll(teacherSubjects.keySet());
 
             for(int i:grades)
                 for(String j:streams)
@@ -127,24 +122,37 @@ public class TimeTableUtils {
                             subjectTeachers.put(joint, new HashMap<>());
                         subjectTeachers.get(joint).put(s.getSubjectCode(), itsTeachers.get(indexT));
                     }
+                    else
+                        System.out.println(" Subject "+s.getSubjectRep()+" Lacked Teachers");
                 }
-
-
         }
     }
 
     private static void addTeachers() {
 
+        int[][] teachSubjects={
+                {101},
+                {231,233},
+                {121,232},
+                {102,311},
+                {311,314},
+                {451},
+                {121,565},
+                {312,565},
+                {503},
+                {231,443},
+        } ;
         for(int i=1;i<=teachers;i++)
         {
             teachersName.put((long) i,"Teacher "+i);
             Random random=new Random();
-            Integer[] rands= new Integer[subjectsNum];
-            for(int j=0;j<subjectsNum;j++)
-            {
-                int randIndex = random.nextInt(subjects.size());
-                rands[j]=subjects.get(randIndex).getSubjectCode();
-            }
+            int[] rands= teachSubjects[random.nextInt(teachSubjects.length)];
+//            new int[subjectsNum];
+//            for(int j=0;j<subjectsNum;j++)
+//            {
+//                int randIndex = random.nextInt(subjects.size());
+//                rands[j]=subjects.get(randIndex).getSubjectCode();
+//            }
             teacherSubjects.put((long) i,rands);
         }
     }
@@ -412,7 +420,10 @@ public class TimeTableUtils {
                 else if(j<=5)
                     num=5;
                 else if(j<=12)
-                    num=3;
+                    if(selectedSubjectsGrades.contains(form))
+                        num=5;
+                    else
+                        num=3;
                 else
                     num=1;
 
@@ -565,7 +576,7 @@ public class TimeTableUtils {
 
         Random random=new Random();
 
-        int fmaxTrials=25;
+        int fmaxTrials=100;
         int ftrial=0;
 
         int bestdefects=156;
@@ -740,7 +751,7 @@ public class TimeTableUtils {
 
                         if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
                             continue;
-                        int day, lesson, trial = 0, matTrials = 10000;
+                        int day, lesson, trial = 0, matTrials = 100;
                         Long teacher;
                         String joint = form + stream;
                         String venue;
@@ -760,7 +771,7 @@ public class TimeTableUtils {
 //                            int space=random.nextInt(spaces);
 //                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
                             day = random.nextInt(days);
-                            lesson = random.nextInt(lessonsPerDay - 1);
+                            lesson = random.nextInt(lessonsPerDay);
                             nextLesson=lesson;
 
 
@@ -773,7 +784,7 @@ public class TimeTableUtils {
                                     newVenue=practicalSubjects.get(subjectToCheck);
 
                                 inValidFirst = classEngaged(joint, day, lesson) || teacherEngaged(newTeacher, day, lesson) || venueEngaged(newVenue, day, lesson);
-                                inValidSecond = classEngaged(joint, day, nextLesson) || teacherEngaged(newTeacher, day, nextLesson) || venueEngaged(newVenue, day, nextLesson);
+                                inValidSecond =subjectOverLoaded(form+stream,subj,day,lesson); //classEngaged(joint, day, nextLesson) || teacherEngaged(newTeacher, day, nextLesson) || venueEngaged(newVenue, day, nextLesson);
 
                                 otherStreams = inValidFirst || inValidSecond;
 

@@ -43,7 +43,7 @@ public  class DummyRepo {
     {
         List<StudySubject> studySubjects = new ArrayList<>();
 
-        int[] subjects={101,102,121,231,232,233,311,312,314,451,503,565};
+        int[] subjects={101,102,121,231,232,233,311,312,314,451,503,565,999};
         for(int i:subjects)
             studySubjects.add(findBySubjectCode(i));
 //        studySubjects.addAll(listCompulsory());
@@ -112,6 +112,7 @@ public  class DummyRepo {
         studySubjects.add(new StudySubject(504, "Sign Language", "Sign Lang"));
         studySubjects.add(new StudySubject(511, "Music", "MUSIC"));
         studySubjects.add(new StudySubject(565, "Business Studies", "BST"));
+        studySubjects.add(new StudySubject(999, "PE", "PE"));
 //        studySubjects.add(ne);
 
 

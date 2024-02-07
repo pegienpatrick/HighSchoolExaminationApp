@@ -5,6 +5,7 @@ import com.pegien.HighSchoolExamination.Examination.Examination;
 import com.pegien.HighSchoolExamination.Examination.ExaminationRepository;
 import com.pegien.HighSchoolExamination.Examination.models.requests.NewExaminationRequest;
 import com.pegien.HighSchoolExamination.Examination.models.responses.CreateExaminationResponse;
+import com.pegien.HighSchoolExamination.Examination.models.responses.Term;
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,10 @@ public class ExaminationService {
                 .year(newExaminationRequest.getYear())
                 .term(newExaminationRequest.getTerm())
                 .date(MyUtils.formatDate(new Date().getTime()))
+                .deleted(false)
                 .build();
+
+        examination.setGrade(newExaminationRequest.getGrades());
 
         examinationRepository.saveAndFlush(examination);
         CreateExaminationResponse response= CreateExaminationResponse.builder()
@@ -58,4 +62,27 @@ public class ExaminationService {
             return ResponseEntity.ok(optionalExamination.get());
 
     }
+
+    public ResponseEntity<List<Term>> listTerms() {
+        return ResponseEntity.ok(examinationRepository.listTerms());
+    }
+
+
+    public ResponseEntity<List<Examination>> findTermExams(int year, int term) {
+        return ResponseEntity.ok(examinationRepository.listTermExams(year,term));
+    }
+
+    public ResponseEntity<String> deleteExam(Long examinationId) {
+        Optional<Examination> optionalExamination=examinationRepository.findById(examinationId);
+        if(optionalExamination.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        Examination examination=optionalExamination.get();
+        examination.setDeleted(true);
+        examinationRepository.save(examination);
+        logService.recordLog("Deleted Exam "+examination);
+
+        return ResponseEntity.status( HttpStatus.OK ).body("Deleted Successfully");
+    }
+
 }

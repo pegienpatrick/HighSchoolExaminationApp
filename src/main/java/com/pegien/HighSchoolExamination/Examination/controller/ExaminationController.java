@@ -4,6 +4,7 @@ package com.pegien.HighSchoolExamination.Examination.controller;
 import com.pegien.HighSchoolExamination.Examination.Examination;
 import com.pegien.HighSchoolExamination.Examination.models.requests.NewExaminationRequest;
 import com.pegien.HighSchoolExamination.Examination.models.responses.CreateExaminationResponse;
+import com.pegien.HighSchoolExamination.Examination.models.responses.Term;
 import com.pegien.HighSchoolExamination.Examination.service.ExaminationService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,24 @@ public class ExaminationController {
     {
         return examinationService.viewExamination(num);
     }
+
+    @GetMapping("/listTerms")
+    public ResponseEntity<List<Term>> listTerms(){
+        return examinationService.listTerms();
+    }
+
+    @GetMapping("/listTermExaminations")
+    public ResponseEntity<List<Examination>> findTermExams(@RequestParam("year") int year,@RequestParam("term") int term)
+    {
+        return examinationService.findTermExams(year,term);
+    }
+
+    @DeleteMapping("/delete/{examinationId}")
+    public ResponseEntity<String> deleteExamination(@PathVariable("examinationId") Long examinationId)
+    {
+        return examinationService.deleteExam(examinationId);
+    }
+
+
 
 }

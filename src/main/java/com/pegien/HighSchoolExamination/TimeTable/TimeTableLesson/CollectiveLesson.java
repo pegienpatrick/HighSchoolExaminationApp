@@ -13,7 +13,7 @@ import java.lang.reflect.Array;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+//@Entity
 
 public class CollectiveLesson {
 

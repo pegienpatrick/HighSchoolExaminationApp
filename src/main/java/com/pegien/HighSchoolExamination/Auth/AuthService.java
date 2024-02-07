@@ -51,8 +51,10 @@ public class AuthService {
         if(tmpToken.isPresent()) {
             Token token=tmpToken.get();
             if (token.isUsable()) {
-                token.setLastAccess(new Date().getTime());
-                tokenRepository.save(token);
+                if(!request.getRequestURL().toString().contains("/api/v1/user/checkUser")) {
+                    token.setLastAccess(new Date().getTime());
+                    tokenRepository.save(token);
+                }
                 MyUserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

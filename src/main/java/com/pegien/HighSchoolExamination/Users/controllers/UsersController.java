@@ -130,6 +130,18 @@ public class UsersController {
             return ResponseEntity.ok(usr);
     }
 
+    @GetMapping("/checkUser")
+    public ResponseEntity<User> checkUser()
+    {
+        User usr=usersService.currentUser();
+        if(usr==null)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(usr);
+        else
+            return ResponseEntity.ok(usr);
+    }
+
+
+
     @PreAuthorize("hasAuthority('user:read')")
     @GetMapping("/viewUser/{username}")
     public ResponseEntity<User> viewUser(@PathVariable("username") String username)

@@ -50,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         ,"/api/v1/user/login"
                         ,"/api/v1/user/possibleGenders"
 
+
                 )
                 .permitAll()
                 .antMatchers("/api/v1/**").authenticated()
