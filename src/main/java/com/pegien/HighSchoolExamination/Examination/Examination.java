@@ -44,6 +44,8 @@ public class Examination {
 
     private String grades;
 
+    private String reportCardMsg;
+
     public void setGrade(List<Integer> grades) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();

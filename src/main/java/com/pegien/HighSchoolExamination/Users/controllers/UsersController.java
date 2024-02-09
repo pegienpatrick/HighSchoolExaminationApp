@@ -62,7 +62,7 @@ public class UsersController {
     @PostMapping("/emailForgotPassword")
     public ResponseEntity<String> emailForgotPassword(@RequestBody @Valid ForgotPasswordEMailRequest forgotPasswordEMailRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.emailForgotPassword(forgotPasswordEMailRequest);
     }
@@ -70,7 +70,7 @@ public class UsersController {
     @PostMapping("/smsForgotPassword")
     public ResponseEntity<String> smsForgotPassword(@RequestBody @Valid ForgotPasswordSmsRequest forgotPasswordSmsRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.smsForgotPassword(forgotPasswordSmsRequest);
     }
@@ -78,7 +78,7 @@ public class UsersController {
     @PostMapping("/passwordReset")
     public ResponseEntity<String> passwordReset(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest,BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.passwordReset(resetPasswordRequest);
     }
@@ -88,7 +88,7 @@ public class UsersController {
     @PutMapping("/updateUser")
     public ResponseEntity<String> updateUser(@RequestBody @Valid UpdateRequest updateRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updateUser(updateRequest);
     }
@@ -96,7 +96,7 @@ public class UsersController {
     @PutMapping("/updatePassword")
     public ResponseEntity<String> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updatePassword(updatePasswordRequest);
     }
@@ -106,7 +106,7 @@ public class UsersController {
     @PutMapping("/adminUpdateUser/{num}")
     public ResponseEntity<String> adminUpdateUser(@PathVariable("num") Long num,@RequestBody @Valid UpdateRequest updateRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updateUser(updateRequest,num);
     }
@@ -115,7 +115,7 @@ public class UsersController {
     @PutMapping("/adminUpdatePassword/{num}")
     public ResponseEntity<String> adminUpdatePassword(@PathVariable("num") Long num,@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest, BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return usersService.updatePassword(updatePasswordRequest,num);
     }
@@ -176,7 +176,7 @@ public class UsersController {
     @GetMapping("/assignRoles/{num}")
     public ResponseEntity<String> assignUserRoles(@PathVariable("num") Long num,@RequestBody @Valid AssignRoleRequest assignRoleRequest,BindingResult bindingResult)
     {
-        if(bindingResult.hasGlobalErrors())
+        if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
 
         Optional<User> usr=userRepository.findById(num);
@@ -209,6 +209,13 @@ public class UsersController {
     public ResponseEntity<String> logOut(HttpServletRequest request)
     {
         return usersService.logOut(request);
+    }
+
+
+    @GetMapping("/logOutAllDevices")
+    public ResponseEntity<String> logOutAllDevices()
+    {
+        return usersService.logOutAllDevices();
     }
 
 

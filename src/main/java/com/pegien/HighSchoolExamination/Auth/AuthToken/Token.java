@@ -38,5 +38,7 @@ public class Token {
         return (!loggedOut&&new Date().before(new Date(expiryTime)));
     }
 
+    private Long userId;
+
 
 }

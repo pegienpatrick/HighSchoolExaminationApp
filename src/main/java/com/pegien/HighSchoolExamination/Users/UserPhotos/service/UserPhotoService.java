@@ -1,8 +1,9 @@
-package com.pegien.HighSchoolExamination.Students.StudentPhotos.service;
+package com.pegien.HighSchoolExamination.Users.UserPhotos.service;
 
 
-import com.pegien.HighSchoolExamination.Students.Student;
-import com.pegien.HighSchoolExamination.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.Auth.AuthService;
+import com.pegien.HighSchoolExamination.Users.User;
+import com.pegien.HighSchoolExamination.Users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -14,28 +15,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 @Service
-public class StudentPhotoService {
+public class UserPhotoService {
 
     @Autowired
-    private StudentRepository studentRepository;
+    private UserRepository UserRepository;
+
+    @Autowired
+    private AuthService authService;
 
 
-    @Value("studentPhotosFolder")
-    private String studentPhotosFolder;
+    @Value("UserPhotosFolder")
+    private String UserPhotosFolder;
 
 
-    public ResponseEntity<String> upload(int admNo, MultipartFile multipartFile) {
-        Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
-        if(optionalStudent.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cant Find Student");
-
-        File saveFolder=new File(studentPhotosFolder);
+    public ResponseEntity<String> upload(MultipartFile multipartFile) {
+        File saveFolder=new File(UserPhotosFolder);
         try{
             if(!saveFolder.exists())
                 saveFolder.mkdirs();
@@ -44,7 +43,7 @@ public class StudentPhotoService {
             es.printStackTrace();
         }
         try {
-            File saveFile = new File(saveFolder, "Student" + optionalStudent.get().getNum());
+            File saveFile = new File(saveFolder, "User" + authService.getActiveUser().getNum());
             Files.copy(multipartFile.getInputStream(), saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             return ResponseEntity.ok("Uploaded Successfully");
         }catch (Exception es)
@@ -54,12 +53,10 @@ public class StudentPhotoService {
 
     }
 
-    public ResponseEntity<byte[]> download(int admNo) {
-        Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
-        if(optionalStudent.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        File saveFolder=new File(studentPhotosFolder);
-        File saveFile = new File(saveFolder, "Student" + optionalStudent.get().getNum());
+    public ResponseEntity<byte[]> download() {
+
+        File saveFolder=new File(UserPhotosFolder);
+        File saveFile = new File(saveFolder, "User" +authService.getActiveUser().getNum());
 
         try {
             byte[] imageBytes;
@@ -83,13 +80,13 @@ public class StudentPhotoService {
     }
 
 
-    public File getStudentImage(int admNo)
+    public File getUserImage(Long userId)
     {
-        Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
-        if(optionalStudent.isEmpty())
+        Optional<User> optionalUser=UserRepository.findById(userId);
+        if(optionalUser.isEmpty())
            return (null);
-        File saveFolder=new File(studentPhotosFolder);
-        File saveFile = new File(saveFolder, "Student" + optionalStudent.get().getNum());
+        File saveFolder=new File(UserPhotosFolder);
+        File saveFile = new File(saveFolder, "User" + userId);
         if(saveFile.exists())
             return saveFile;
         else

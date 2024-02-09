@@ -3,6 +3,7 @@ package com.pegien.HighSchoolExamination.Examination.controller;
 
 import com.pegien.HighSchoolExamination.Examination.Examination;
 import com.pegien.HighSchoolExamination.Examination.models.requests.NewExaminationRequest;
+import com.pegien.HighSchoolExamination.Examination.models.requests.UpdateReportCardMessageRequest;
 import com.pegien.HighSchoolExamination.Examination.models.responses.CreateExaminationResponse;
 import com.pegien.HighSchoolExamination.Examination.models.responses.Term;
 import com.pegien.HighSchoolExamination.Examination.service.ExaminationService;
@@ -60,6 +61,15 @@ public class ExaminationController {
     public ResponseEntity<String> deleteExamination(@PathVariable("examinationId") Long examinationId)
     {
         return examinationService.deleteExam(examinationId);
+    }
+
+
+    @PutMapping("/updateReportCardMessage")
+    public ResponseEntity<String> updateReportCardMsg(@RequestBody @Valid UpdateReportCardMessageRequest updateReportCardMessageRequest,BindingResult bindingResult)
+    {
+        if(bindingResult.hasErrors())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
+        return examinationService.updateReportCardMessage(updateReportCardMessageRequest);
     }
 
 

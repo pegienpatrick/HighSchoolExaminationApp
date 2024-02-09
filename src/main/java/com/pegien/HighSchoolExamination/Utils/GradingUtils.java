@@ -2,6 +2,8 @@ package com.pegien.HighSchoolExamination.Utils;
 
 import com.itextpdf.text.pdf.PdfPCell;
 
+import java.util.HashMap;
+
 public class GradingUtils {
 
 
@@ -32,7 +34,7 @@ public class GradingUtils {
             "C+","C","C-",
             "D+","D","D-",
             "E",
-            "Z"
+            "X"
     };
 
     public static String gradeChar(int grade) {
@@ -73,4 +75,40 @@ public class GradingUtils {
             return performanceComments[word];
         }
     }
+
+    // Klass teachers' remarks
+    public static HashMap<String, String> klassRemarks = new HashMap<>();
+    public static HashMap<String, String> principlesRemarks = new HashMap<>();
+
+    static {
+        klassRemarks.put("A", "Good performance maintain that.");
+        klassRemarks.put("A-", "Good. Work towards grade A.");
+        klassRemarks.put("B+", "Good performance. Aim for A-.");
+        klassRemarks.put("B", "Good work. Aim grade B+.");
+        klassRemarks.put("B-", "Do extra to get B.");
+        klassRemarks.put("C+", "You can do better. Aim higher.");
+        klassRemarks.put("C", "You can achieve grade C+.");
+        klassRemarks.put("C-", "Aim for top grades.");
+        klassRemarks.put("D+", " Aim for grade C and above.");
+        klassRemarks.put("D", "Improve your areas of weakness.");
+        klassRemarks.put("D-", "Don`t loose hope keep on trying.");
+        klassRemarks.put("E", "You need more remedial.");
+
+        // Principles' remarks
+
+        principlesRemarks.put("A", "Outstanding performance.");
+        principlesRemarks.put("A-", "Quality grade aim higher.");
+        principlesRemarks.put("B+", "Good performance.");
+        principlesRemarks.put("B", "Good progress.");
+        principlesRemarks.put("B-", "Keep on trying.");
+        principlesRemarks.put("C+", "Keep aiming higher.");
+        principlesRemarks.put("C", "Aim for top grades.");
+        principlesRemarks.put("C-", "You can get good grade work hard.");
+        principlesRemarks.put("D+", "Do more consultation. You can do better.");
+        principlesRemarks.put("D", "A bit low. Put more effort.");
+        principlesRemarks.put("D-", "Aim for the next grade.");
+        principlesRemarks.put("E", "Create time for extra remedial.");
+
+    }
+
 }

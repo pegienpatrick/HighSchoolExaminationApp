@@ -1,4 +1,4 @@
-//package com.pegien.HighSchoolExamination.TimeTable;
+package com.pegien.HighSchoolExamination.TimeTable;//package com.pegien.HighSchoolExamination.TimeTable;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.PageSize;
@@ -16,7 +16,7 @@ import java.util.*;
 public class TimeTableUtils {
 
 //    private static DummyRepo DummyRepo=new DummyRepo();
-    private static HashMap<String, HashMap<Integer,Long>> subjectTeachers=new HashMap<>();
+    public static HashMap<String, HashMap<Integer,Long>> subjectTeachers=new HashMap<>();
 
     private static HashMap<String,HashMap<Integer,TimeTableLesson[]>> classesTimeTables=new HashMap<>();
 
@@ -47,7 +47,7 @@ public class TimeTableUtils {
     public static void main(String[] args)
     {
         addTeachers();
-        addSubjectTeachers();
+//        addSubjectTeachers();
 
         printAllTeachers();
         printClassesAndTeachers();

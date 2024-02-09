@@ -28,6 +28,10 @@ public class SubjectTeacherService {
     private UserRepository userRepository;
 
     public ResponseEntity<ClassSubjectTeachers> getSubjectTeachers(Double grade, String stream) {
+        return ResponseEntity.ok(getSubjectTeacher(grade,stream));
+    }
+
+    public ClassSubjectTeachers getSubjectTeacher(Double grade, String stream) {
 
         ClassSubjectTeachers classSubjectTeachers=new ClassSubjectTeachers();
         classSubjectTeachers.setGrade(grade);
@@ -39,11 +43,11 @@ public class SubjectTeacherService {
             subjects.put(i.getSubjectName(),forceGetSUbjectTeacher(grade,stream,i.getSubjectCode()));
 
         classSubjectTeachers.setSubjectTeachers(subjects);
-        return ResponseEntity.ok(classSubjectTeachers);
+        return classSubjectTeachers;
     }
 
 
-    SubjectTeacher forceGetClassTeacher(Double grade,String stream)
+    public SubjectTeacher forceGetClassTeacher(Double grade,String stream)
     {
         Optional<SubjectTeacher> optionalSubjectTeacher=subjectTeacherRepository.findByIsClassTeacherTrueAndGradeAndStream(grade,stream);
         if(optionalSubjectTeacher.isPresent())
@@ -101,10 +105,14 @@ public class SubjectTeacherService {
     }
 
     public ResponseEntity<HashMap<Long, String>> allTeachers() {
-        HashMap<Long, String> teachers=new HashMap<>();
-        for(User s: userRepository.findAll())
-            teachers.put(s.getNum(),s.getFname()==null||s.getFname().length()==0?s.getUsername():s.getFname());
 
-        return ResponseEntity.ok(teachers);
+        return ResponseEntity.ok(allTeacher());
+    }
+
+    public HashMap<Long, String> allTeacher() {
+        HashMap<Long, String> teachers = new HashMap<>();
+        for (User s : userRepository.findAll())
+            teachers.put(s.getNum(), s.getFname() == null || s.getFname().length() == 0 ? s.getUsername() : s.getFname());
+        return teachers;
     }
 }

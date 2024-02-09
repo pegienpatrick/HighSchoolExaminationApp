@@ -279,7 +279,7 @@ public class MeritListService {
 
 
             document.setMargins(20,10,10,20);
-            ReportCardService.addSchoolHeader(document);
+            addSchoolHeader(document);
 
             Optional<Examination> examination1=examinationRepository.findById(examination);
             if(examination1.isEmpty())
@@ -476,6 +476,78 @@ public class MeritListService {
         cell.setNoWrap(true); // Disable word wrap
         return cell;
     }
+
+    public static void addSchoolHeader(Document document) throws Exception {
+
+        int ident=100;
+        int identLeft=ident;
+
+        Boolean isPortrait=true;
+
+        if(document.getPageSize().getWidth()>document.getPageSize().getHeight()) {
+            identLeft += 100;
+            isPortrait=false;
+        }
+
+
+
+
+        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+        Paragraph hh=new Paragraph(ReportCardService.schoolName,boldFont);
+        hh.setAlignment(Element.ALIGN_LEFT);
+//        hh.setFont(new Font(Font.FontFamily.COURIER,48, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
+        hh.setIndentationLeft(identLeft);
+
+        document.add(hh);
+//        document.setMargins(0,0,0,0);
+
+        boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+        Paragraph box=new Paragraph(ReportCardService.addr,boldFont);
+        box.setAlignment(Element.ALIGN_LEFT);
+        box.setIndentationLeft(identLeft);
+        document.add(box);
+
+        boldFont = new Font(Font.FontFamily.COURIER, 13, Font.BOLD);
+        Paragraph email=new Paragraph("E-MAIL: "+ ReportCardService.schoolEmail+"    TEL: "+ ReportCardService.schoolPhone,boldFont);
+        email.setAlignment(Element.ALIGN_LEFT);
+        email.setIndentationLeft(identLeft);
+        document.add(email);
+
+        boldFont = new Font(Font.FontFamily.COURIER, 16, Font.BOLD);
+        Paragraph phone=new Paragraph("SCHOOL MOTTO : "+ReportCardService.schoolMotto,boldFont);
+        phone.setAlignment(Element.ALIGN_LEFT);
+        phone.setIndentationLeft(identLeft);
+        document.add(phone);
+
+        try{
+            int width=ident;
+
+
+            if(logo==null){
+                logo=Image.getInstance(ReportCardService.class.getResourceAsStream("/images/logo.png").readAllBytes());
+
+                float height=logo.getHeight()*width/logo.getWidth();
+                logo.scaleAbsolute(width,height );
+                logo.setAbsolutePosition(isPortrait?20:100, document.getPageSize().getHeight()-height*4/3);
+            }
+
+            document.add(logo);
+
+
+
+        }catch (Exception es)
+        {
+            es.printStackTrace();
+        }
+
+
+
+
+
+    }
+
+
+    public static Image logo=null;
 
 
 }

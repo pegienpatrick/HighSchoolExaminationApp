@@ -90,7 +90,7 @@ public class EmailUtils {
             });
 
             try {
-                MimeMessage mimeMessage=createMimeMessage(session,recipientEmail,subject,message);
+                MimeMessage mimeMessage=createMimeMessage(session,recipientEmail,subject,generateHtmlMessage(message));
 
                 Transport.send(mimeMessage);
 
@@ -108,7 +108,7 @@ public class EmailUtils {
         }
     }
 
-    private static String generateHtmlMessage(String verificationCode) {
+    private static String generateHtmlMessage(String message) {
         StringBuilder htmlBuilder = new StringBuilder();
 
         htmlBuilder.append("<!DOCTYPE html>\n");
@@ -134,8 +134,8 @@ public class EmailUtils {
         htmlBuilder.append("<body>\n");
         htmlBuilder.append("\n");
         htmlBuilder.append("<div class=\"message-container\">\n");
-        htmlBuilder.append("    <p>Your Lendr verification code is <strong>").append(verificationCode).append("</strong>.<br>\n");
-        htmlBuilder.append("        Do not share it with anyone. The verification code is valid for 30 minutes.</p>\n");
+        htmlBuilder.append("    <p>").append(message).append(".<br>\n");
+        htmlBuilder.append("      </p> \n");
         htmlBuilder.append("</div>\n");
         htmlBuilder.append("\n");
         htmlBuilder.append("</body>\n");

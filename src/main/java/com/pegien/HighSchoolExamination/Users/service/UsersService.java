@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UsersService {
@@ -109,6 +110,7 @@ public class UsersService {
                 .userId(user.getNum())
                 .created(new Date().getTime())
                 .passwordResetCode(resetCode)
+                .expiryTime(TimeUnit.MINUTES.toMillis(10))
                 .build();
 
         passwordResetCodeRepository.save(passwordResetCode);
@@ -135,6 +137,7 @@ public class UsersService {
                 .userId(user.getNum())
                 .created(new Date().getTime())
                 .passwordResetCode(resetCode)
+                .expiryTime(TimeUnit.MINUTES.toMillis(10))
                 .build();
 
         passwordResetCodeRepository.save(passwordResetCode);
@@ -234,5 +237,9 @@ public class UsersService {
 
     public ResponseEntity<String> logOut(HttpServletRequest request) {
         return ResponseEntity.ok(authService.logOut(request));
+    }
+
+    public ResponseEntity<String> logOutAllDevices() {
+        return ResponseEntity.ok(authService.logOutAllDevices());
     }
 }

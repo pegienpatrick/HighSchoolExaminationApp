@@ -18,6 +18,7 @@ public class SMSUtils {
     public static void sendMesage(String message, String phone) {
 
         System.out.println("sending message : "+message+" to "+phone);
+        sendSms(phone,message);
     }
 
     private static String apiKey="117d6d6bb8e32867a6c0f69a49607ff8";

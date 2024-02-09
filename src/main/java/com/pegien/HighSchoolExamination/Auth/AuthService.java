@@ -13,8 +13,6 @@ import io.jsonwebtoken.Jwts;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -94,6 +93,7 @@ public class AuthService {
                 .loggedOut(false)
                 .inActiveTime(TimeUnit.MINUTES.toMillis(10))
                 .value(token)
+                .userId(num)
                 .build();
 
         tokenRepository.saveAndFlush(authorizationTokens);
@@ -125,4 +125,17 @@ public class AuthService {
         else
             throw new UnsupportedOperationException("no such authorization");
     }
+
+    public String logOutAllDevices()
+    {
+            List<Token> allActiveUserTokens = tokenRepository.findByUserId(getActiveUser().getNum());
+            for(Token authorizationTokens:allActiveUserTokens) {
+                //perform the logout action
+                authorizationTokens.setLoggedOut(true);
+                tokenRepository.save(authorizationTokens);
+            }
+            return "Success";
+    }
+
+
 }

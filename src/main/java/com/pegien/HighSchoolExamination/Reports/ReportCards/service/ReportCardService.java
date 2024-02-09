@@ -2,7 +2,10 @@ package com.pegien.HighSchoolExamination.Reports.ReportCards.service;
 
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.*;
 import com.pegien.HighSchoolExamination.Examination.Examination;
 import com.pegien.HighSchoolExamination.Examination.ExaminationRepository;
 import com.pegien.HighSchoolExamination.Examination.Marks.MarksRepository;
@@ -16,15 +19,17 @@ import com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem.MeritLis
 import com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem.MeritListLineRepository;
 import com.pegien.HighSchoolExamination.Reports.MeritList.service.MeritListService;
 import com.pegien.HighSchoolExamination.Students.Student;
+import com.pegien.HighSchoolExamination.Students.StudentPhotos.service.StudentPhotoService;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import com.pegien.HighSchoolExamination.Students.service.StudentsService;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubjectsRepository;
-import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.SubjectGrading;
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.service.SubjectGradingService;
+import com.pegien.HighSchoolExamination.Teachers.model.responses.ClassSubjectTeachers;
+import com.pegien.HighSchoolExamination.Teachers.service.SubjectTeacherService;
 import com.pegien.HighSchoolExamination.Utils.GradingUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.jfree.chart.ChartFactory;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,16 +39,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -89,6 +91,13 @@ public class ReportCardService {
 
     @Autowired
     private SMSLogRepository smsLogRepository;
+
+
+    @Autowired
+    private StudentPhotoService studentPhotoService;
+
+    @Autowired
+    private SubjectTeacherService subjectTeacherService;
 
 
 
@@ -177,7 +186,7 @@ public class ReportCardService {
            addTables(document,meritListLine,classStudents,streamStudents);
 
 
-            addFooter(document);
+            addFooter(document,meritListLine,examination1.get());
             document.close();
 
             return byteArrayOutputStream.toByteArray();
@@ -229,7 +238,7 @@ public class ReportCardService {
 
                 addTables(document,meritListLine,classStudents,streamStudents);
 
-                addFooter(document);
+                addFooter(document,meritListLine,examination1.get());
 
                 document.newPage();
             }
@@ -250,18 +259,37 @@ public class ReportCardService {
         }
     }
 
-    private void addFooter(Document document) throws Exception {
+    private static Image principle=null;
 
+    private static Image stamp=null;
+
+
+
+    private void addFooter(Document document,MeritListLine meritListLine,Examination examination) throws Exception {
+        if(principle==null)
+            principle=Image.getInstance(getClass().getResourceAsStream("/signatures/principle.png").readAllBytes());
+
+        if(stamp==null)
+            stamp=Image.getInstance(getClass().getResourceAsStream("/stamps/takaba.png").readAllBytes());
+
+        Font boldFont = new Font(Font.FontFamily.COURIER, 11, Font.NORMAL);
         //class teacher sign
-        PdfPTable pdfPTable=new PdfPTable(2);
+        PdfPTable pdfPTable=new PdfPTable(1);
         pdfPTable.setWidthPercentage(100);
-        pdfPTable.setWidths(new int[]{80, 20});
+
+
 
         int rowHeight=40;
-        pdfPTable.addCell( CreateHeaderCell("ClassTeacher`s Remarks") );
-        pdfPTable.addCell(CreateHeaderCell("Signature"));
-        addEmptyCell(pdfPTable,rowHeight);
-        addEmptyCell(pdfPTable,rowHeight);
+        String tt="ClassTeacher`s Remarks ";
+
+        Long teach=subjectTeacherService.forceGetClassTeacher(meritListLine.getStage(),meritListLine.getStream()).getTeacher();
+        if(teach!=null)
+            tt+=" ("+subjectTeacherService.allTeacher().get(teach)+")";
+
+        pdfPTable.addCell( CreateHeaderCell(tt) );
+        pdfPTable.addCell(new Paragraph(GradingUtils.klassRemarks.getOrDefault(meritListLine.getAggregateGrade(),"Problem with your Results"),boldFont));
+
+
 
         pdfPTable.setSpacingBefore(10);
 
@@ -274,13 +302,32 @@ public class ReportCardService {
         pdfPTable.setWidths(new int[]{80, 20});
 
 
-        pdfPTable.addCell( CreateHeaderCell("HeadTeacher`s Remarks") );
-        pdfPTable.addCell(CreateHeaderCell("Signature"));
-        addEmptyCell(pdfPTable,rowHeight);
-        addEmptyCell(pdfPTable,rowHeight);
 
+        pdfPTable.addCell( CreateHeaderCell("Principle`s Remarks") );
+        pdfPTable.addCell(CreateHeaderCell("Signature"));
+//        addEmptyCell(pdfPTable,rowHeight);
+//        addEmptyCell(pdfPTable,rowHeight);
+        pdfPTable.addCell(new Paragraph(GradingUtils.principlesRemarks.getOrDefault(meritListLine.getAggregateGrade(),"Problem with your Results"),boldFont));
+
+        pdfPTable.addCell(principle);
         pdfPTable.setSpacingBefore(10);
         document.add(pdfPTable);
+
+
+        PdfPTable msg=new PdfPTable(1);
+        msg.setWidthPercentage(100);
+        msg.addCell(CreateHeaderCell("Message"));
+        msg.addCell(new Paragraph(examination.getReportCardMsg(),boldFont));
+
+        msg.setSpacingBefore(10);
+
+        document.add(msg);
+
+        stamp.setAbsolutePosition(document.getPageSize().getWidth()/4,80);
+        stamp.scalePercent(30);
+
+        document.add(stamp);
+
 
     }
 
@@ -293,25 +340,29 @@ public class ReportCardService {
 
     private void addTables(Document document, MeritListLine meritListLine, int classStudents, int streamStudents) throws Exception {
         PdfPTable table = new PdfPTable(5);
-        table.setWidthPercentage(100);
-        table.addCell("Aggregate Grade");
-        table.addCell("Aggregate Points");
-        table.addCell("Stream Position");
-        table.addCell("Overall Class Position");
-        table.addCell("KCPE MArks");
+        Font boldFont = new Font(Font.FontFamily.COURIER, 12, Font.BOLD);
 
-        table.addCell(meritListLine.getAggregateGrade());
-        table.addCell(meritListLine.getPoints()+"");
+
+        table.setWidthPercentage(100);
+        table.addCell(createPhrase("Aggregate Grade",boldFont));
+        table.addCell(createPhrase("Aggregate Points",boldFont));
+        table.addCell(createPhrase("Stream Position",boldFont));
+        table.addCell(createPhrase("Overall Class Position",boldFont));
+        table.addCell(createPhrase("KCPE Marks",boldFont));
+
+        table.addCell(createPhrase(meritListLine.getAggregateGrade(),boldFont));
+        table.addCell(createPhrase(meritListLine.getPoints()+"",boldFont));
         if(meritListLine.getPoints()>1) {
-            table.addCell(meritListLine.getStreamRank() + " / " + streamStudents);
-            table.addCell(meritListLine.getClassRank() + " / " + classStudents);
+            table.addCell(createPhrase(meritListLine.getStreamRank() + " / " + streamStudents,boldFont));
+            table.addCell(createPhrase(meritListLine.getClassRank() + " / " + classStudents,boldFont));
         }
         else{
-            table.addCell( "- / " + streamStudents);
-            table.addCell( "- / " + classStudents);
+            table.addCell( createPhrase("- / " + streamStudents,boldFont));
+            table.addCell( createPhrase("- / " + classStudents,boldFont));
 
         }
-        table.addCell(meritListLine.getKcpeMarks()+" / 500");
+        table.addCell(createPhrase(meritListLine.getKcpeMarks()+" / 500",boldFont));
+        table.setHorizontalAlignment(Element.ALIGN_CENTER);
 
 
         document.add(new Paragraph(" "));
@@ -321,26 +372,37 @@ public class ReportCardService {
 
 
 
-        String[] columns={"SUBJECTS","MARKS","GRADE","RANK","COMMENT","TEACHERS COMMENTS"};
+        String[] columns={"SUBJECTS","MARKS","GRADE","RANK","COMMENT","TEACHER"};
         PdfPTable tableMarks=new PdfPTable(6);
         for(String i:columns)
             tableMarks.addCell(CreateHeaderCell(i));
 
-        float[] columnWidths = {20f, 10f, 10f,10f,20f,30f};
+        float[] columnWidths = {20f, 10f, 10f,10f,20f,20f};
         tableMarks.setWidths(columnWidths);
 
-        for(SubjectGrading i:subjectGradingService.viewGradings())
+        HashMap<Long, String> allTeachers = subjectTeacherService.allTeacher();
+        ClassSubjectTeachers subjectTeachers = subjectTeacherService.getSubjectTeacher(meritListLine.getStage(),meritListLine.getStream());
+
+//        System.out.println(subjectTeachers);
+
+        for(StudySubject i:studySubjectsRepository.allAvailable())
         {
             Double marks=meritListLine.getSubjectMarks().get(i.getSubjectCode());
             if(marks==null)
-                marks=0.0;
+                continue;
             int rank=marksRepository.countRank(meritListLine.getExamination(), meritListLine.getStage(), i.getSubjectCode(),marks)+1;
-            tableMarks.addCell(studySubjectsRepository.findBySubjectCode(i.getSubjectCode()).getSubjectName());
-            tableMarks.addCell(marks>0?marks+" % ":" __ ");
-            tableMarks.addCell(marks>0?meritListLine.getSubjectGrades().get(i.getSubjectCode()):" __ ");
-            tableMarks.addCell(marks>0?rank+" / "+classStudents:" __ ");
-            tableMarks.addCell(GradingUtils.getComment(marks));
-            tableMarks.addCell(" ");
+            tableMarks.addCell(createMarks(i.getSubjectName()));
+            tableMarks.addCell(createMarks(marks>0?marks+" % ":" __ "));
+            tableMarks.addCell(createMarks(marks>0?meritListLine.getSubjectGrades().get(i.getSubjectCode()):" __ "));
+            tableMarks.addCell(createMarks(marks>0?rank+" / "+classStudents:" __ "));
+            tableMarks.addCell(createMarks(GradingUtils.getComment(marks)));
+            try {
+                tableMarks.addCell(createMarks(allTeachers.get(subjectTeachers.getSubjectTeachers().get(i.getSubjectName()).getTeacher()),8,true));
+            }catch (Exception es)
+            {
+                es.printStackTrace();
+                tableMarks.addCell("");
+            }
 
         }
 
@@ -351,25 +413,107 @@ public class ReportCardService {
 
     }
 
+    
+
+    private Paragraph createMarks(String s, int i, boolean b) {
+        Font boldFont = new Font(Font.FontFamily.COURIER, i, b?Font.BOLD:Font.NORMAL);
+        Paragraph paragraph=new Paragraph(s,boldFont);
+        return paragraph;
+    }
+
+    private Paragraph createMarks(String subjectName) {
+        Font boldFont = new Font(Font.FontFamily.COURIER, 11, Font.NORMAL);
+        Paragraph paragraph=new Paragraph(subjectName,boldFont);
+        return paragraph;
+    }
+
+    private PdfPCell createPhrase(String s, Font boldFont) {
+
+        Paragraph phrase=new Paragraph(s,boldFont);
+        phrase.setAlignment(Element.ALIGN_CENTER);
+        PdfPCell pdfPCell=new PdfPCell(phrase);
+        pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return pdfPCell;
+    }
+
+
+
     private void addStudentInfo(Document document, Student student, MeritListLine meritListLine) throws Exception {
 
+        PdfPTable studentDetails=new PdfPTable(3);
 
-        addBold(document,15,"Adm No : "+student.getAdmNo());
-        addBold(document,15,"Name : "+student.getName());
-        addBold(document,15,"Form : "+((int)(meritListLine.getStage()/1))+" "+meritListLine.getStream());
-        addBold(document,15,"Kcpe Marks : "+meritListLine.getKcpeMarks());
-        addBold(document,15,"Gender : "+student.getGender());
-        if(student.getDateOfBirth()!=null&&false) {
-            Long ageDays = TimeUnit.MILLISECONDS.toDays(new Date().getTime()-new Date(student.getDateOfBirth()).getTime());
-            float age=Float.valueOf(ageDays)/365f;
-            if(age<100f&&age>1f)
-                addBold(document, 15, "Age : " +age);
-        }
+        Image leftImage = Image.getInstance(studentPhotoService.getStudentImage(student.getAdmNo()).toURL());
+        leftImage.scaleToFit(100, 100); // Adjust image size as needed
+        PdfPCell pdfPCell=new PdfPCell(leftImage);
+        pdfPCell.setRowspan(5);
+        pdfPCell.setBorder(Rectangle.NO_BORDER);
+        studentDetails.addCell(pdfPCell);
+
+        Font boldFont = new Font(Font.FontFamily.COURIER, 12, Font.BOLD);
+
+
+        addBold(studentDetails,13,"Adm No : "+student.getAdmNo());
+
+
+//        studentDetails.addCell(subjectGraph(meritListLine));
+
+        addBold(studentDetails,13,"Name : "+student.getName());
+        addBold(studentDetails,13,"Form : "+((int)(meritListLine.getStage()/1))+" "+meritListLine.getStream());
+        addBold(studentDetails,13,"Kcpe Marks : "+meritListLine.getKcpeMarks());
+        addBold(studentDetails,13,"Gender : "+student.getGender());
+
+
+
+        studentDetails.setWidthPercentage(100);
+        studentDetails.setSpacingBefore(20);
+
+        document.add(studentDetails);
+    }
+
+//    private PdfPCell subjectGraph(MeritListLine meritListLine) {
+//
+//        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+//
+//        // Add data to the dataset
+//        dataset.addValue(5, "Series1", "Category1");
+//        dataset.addValue(8, "Series1", "Category2");
+//        dataset.addValue(3, "Series1", "Category3");
+//        dataset.addValue(12, "Series1", "Category4");
+//
+//        ChartFactory.createBarChart(
+//                "", // Chart title
+//                "Subjects",         // X-axis label
+//                "Marks",            // Y-axis label
+//                dataset
+//        );
+//    }
+
+    private void addBold(PdfPTable studentDetails, int i, String s) {
+        Font boldFont = new Font(Font.FontFamily.COURIER, i, Font.BOLD);
+//        Paragraph hh=new Paragraph(s,boldFont);
+
+//        hh.setFont(new Font(Font.FontFamily.COURIER,i, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
+        PdfPCell pdfPCell=new PdfPCell();
+        pdfPCell.setPhrase(new Phrase(s,boldFont));
+        pdfPCell.setBorder(Rectangle.NO_BORDER);
+        pdfPCell.setColspan(2);
+
+        studentDetails.addCell(pdfPCell);
+    }
+
+    private void addBold(Paragraph studentDetails, int i, String s) {
+        Font boldFont = new Font(Font.FontFamily.COURIER, i, Font.BOLD);
+//        Paragraph hh=new Paragraph(s,boldFont);
+
+//        hh.setFont(new Font(Font.FontFamily.COURIER,i, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
+        studentDetails.add(s+"\n");
     }
 
     public static void addExamTitle(Document document, Examination examination) throws Exception{
-        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD | Font.UNDERLINE);
+        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD | Font.UNDERLINE ,new BaseColor(0,0,128) );
+//        f2=new Font(boldFont.getFamily(), 15, Font.NORMAL, BaseColor.BLUE);
         Paragraph hh2=new Paragraph(examination.getTitle()+"  Term ("+examination.getTerm()+") Year : "+examination.getYear(),boldFont);
+
         document.addTitle(examination.getTitle()+"  Term ("+examination.getTerm()+") Year : "+examination.getYear());
         hh2.setAlignment(Element.ALIGN_CENTER);
 //        hh2.setFont(new Font(Font.FontFamily.COURIER,30, Font.UNDERLINE | Font.BOLD,BaseColor.BLACK));
@@ -383,15 +527,20 @@ public class ReportCardService {
 
     private PdfPCell CreateHeaderCell(String i) {
         PdfPCell headerCell = new PdfPCell();
-        headerCell.addElement(new com.itextpdf.text.Paragraph(i));
-        headerCell.setGrayFill(0.7f); // Set background color
+        Font boldFont = new Font(Font.FontFamily.COURIER, 12, Font.BOLD);
+        Paragraph paragraph=new com.itextpdf.text.Paragraph(i,boldFont);
+        paragraph.setAlignment(Element.ALIGN_CENTER);
+        headerCell.addElement(paragraph);
+//        headerCell.setGrayFill(0.7f); // Set background color
+        headerCell.setBackgroundColor(BaseColor.CYAN);
         headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
+
         return headerCell;
     }
 
     private void addBold(Document document, int i, String s) throws Exception {
-        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, i, Font.BOLD);
+        Font boldFont = new Font(Font.FontFamily.COURIER, i, Font.BOLD);
         Paragraph hh=new Paragraph(s,boldFont);
 
 //        hh.setFont(new Font(Font.FontFamily.COURIER,i, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
@@ -410,11 +559,7 @@ public class ReportCardService {
             identLeft += 100;
             isPortrait=false;
         }
-
-
-
-
-        Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+        Font boldFont = new Font(Font.FontFamily.COURIER, 18, Font.BOLD);
         Paragraph hh=new Paragraph(schoolName,boldFont);
         hh.setAlignment(Element.ALIGN_LEFT);
 //        hh.setFont(new Font(Font.FontFamily.COURIER,48, Font.FontStyle.BOLD.ordinal(),BaseColor.BLACK));
@@ -423,7 +568,7 @@ public class ReportCardService {
         document.add(hh);
 //        document.setMargins(0,0,0,0);
 
-        boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+        boldFont = new Font(Font.FontFamily.COURIER, 14, Font.BOLD);
         Paragraph box=new Paragraph(addr,boldFont);
         box.setAlignment(Element.ALIGN_LEFT);
         box.setIndentationLeft(identLeft);
