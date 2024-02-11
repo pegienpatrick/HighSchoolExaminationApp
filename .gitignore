@@ -34,3 +34,4 @@ build/
 *.jar
 /out/**
 out/artifacts/High_School_Examination_App_jar/High-School-Examination-App.jar
+/target/**
