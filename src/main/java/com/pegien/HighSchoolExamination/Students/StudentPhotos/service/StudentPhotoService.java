@@ -1,6 +1,7 @@
 package com.pegien.HighSchoolExamination.Students.StudentPhotos.service;
 
 
+import com.itextpdf.text.Image;
 import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.CopyOption;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
@@ -82,19 +84,39 @@ public class StudentPhotoService {
         }
     }
 
-
-    public File getStudentImage(int admNo)
-    {
+    public InputStream getStudentImage(int admNo) throws FileNotFoundException {
         Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
         if(optionalStudent.isEmpty())
            return (null);
         File saveFolder=new File(studentPhotosFolder);
         File saveFile = new File(saveFolder, "Student" + optionalStudent.get().getNum());
         if(saveFile.exists())
-            return saveFile;
+            return new FileInputStream(saveFile);
         else
-            return new File(StudentPhotoService.class.getResource("/defaultPerson/default.png").getFile());
+            return StudentPhotoService.class.getResourceAsStream("/defaultPerson/default.png");
     }
+
+    public Image getStudentImageSafe(int admNo) throws Exception {
+        Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
+        if(optionalStudent.isEmpty())
+            return (null);
+        File saveFolder=new File(studentPhotosFolder);
+        File saveFile = new File(saveFolder, "Student" + optionalStudent.get().getNum());
+        try {
+            if (saveFile.exists())
+                return Image.getInstance(new FileInputStream(saveFile).readAllBytes());
+        }catch (Exception es)
+        {
+            es.printStackTrace();
+        }
+        if(defaultImage==null)
+            defaultImage=Image.getInstance(StudentPhotoService.class.getResourceAsStream("/defaultPerson/default.png").readAllBytes());
+
+        return defaultImage;
+
+    }
+
+    public static Image defaultImage=null;
 
 
 

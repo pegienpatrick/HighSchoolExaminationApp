@@ -442,7 +442,7 @@ public class ReportCardService {
 
         PdfPTable studentDetails=new PdfPTable(3);
 
-        Image leftImage = Image.getInstance(studentPhotoService.getStudentImage(student.getAdmNo()).toURL());
+        Image leftImage = studentPhotoService.getStudentImageSafe(student.getAdmNo());
         leftImage.scaleToFit(100, 100); // Adjust image size as needed
         PdfPCell pdfPCell=new PdfPCell(leftImage);
         pdfPCell.setRowspan(5);
@@ -531,8 +531,8 @@ public class ReportCardService {
         Paragraph paragraph=new com.itextpdf.text.Paragraph(i,boldFont);
         paragraph.setAlignment(Element.ALIGN_CENTER);
         headerCell.addElement(paragraph);
-//        headerCell.setGrayFill(0.7f); // Set background color
-        headerCell.setBackgroundColor(BaseColor.CYAN);
+        headerCell.setGrayFill(0.9f); // Set background color
+//        headerCell.setBackgroundColor(new BaseColor(191,191,191));
         headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
 

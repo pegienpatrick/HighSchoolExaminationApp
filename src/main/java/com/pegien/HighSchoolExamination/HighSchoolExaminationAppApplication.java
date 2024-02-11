@@ -24,6 +24,8 @@ public class HighSchoolExaminationAppApplication {
 			SpringApplication.run(HighSchoolExaminationAppApplication.class, args);
 		}catch (Exception es) {
 		}
+		Boolean launcher=false;
+		if(launcher)
 		{
 
 			//Create a new CefAppBuilder instance

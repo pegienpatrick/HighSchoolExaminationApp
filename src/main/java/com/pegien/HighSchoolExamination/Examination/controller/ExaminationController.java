@@ -3,6 +3,7 @@ package com.pegien.HighSchoolExamination.Examination.controller;
 
 import com.pegien.HighSchoolExamination.Examination.Examination;
 import com.pegien.HighSchoolExamination.Examination.models.requests.NewExaminationRequest;
+import com.pegien.HighSchoolExamination.Examination.models.requests.UpdateExamTitleRequest;
 import com.pegien.HighSchoolExamination.Examination.models.requests.UpdateReportCardMessageRequest;
 import com.pegien.HighSchoolExamination.Examination.models.responses.CreateExaminationResponse;
 import com.pegien.HighSchoolExamination.Examination.models.responses.Term;
@@ -70,6 +71,15 @@ public class ExaminationController {
         if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
         return examinationService.updateReportCardMessage(updateReportCardMessageRequest);
+    }
+
+
+    @PutMapping("/updateExamTitle")
+    public ResponseEntity<String> updateExamTitle(@RequestBody @Valid UpdateExamTitleRequest updateExamTitleRequest,BindingResult bindingResult)
+    {
+        if(bindingResult.hasErrors())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
+        return examinationService.updateExamTitle(updateExamTitleRequest);
     }
 
 

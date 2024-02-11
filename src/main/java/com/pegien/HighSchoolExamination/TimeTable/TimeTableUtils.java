@@ -9,7 +9,10 @@ import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 //import com.pegien.HighSchoolExamination.StudySubjects.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableLesson.TimeTableLesson;
+import org.springframework.beans.factory.annotation.Value;
 
+import javax.persistence.Table;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
@@ -30,7 +33,7 @@ public class TimeTableUtils {
     static List<StudySubject> subjects=DummyRepo.allAvailable();
 
 
-    private static HashMap<Long,String> teachersName=new HashMap<>();
+    public static HashMap<Long,String> teachersName=new HashMap<>();
 
     private static HashMap<Long, int[]> teacherSubjects=new HashMap<Long, int[]>();
 
@@ -46,7 +49,7 @@ public class TimeTableUtils {
 
     public static void main(String[] args)
     {
-        addTeachers();
+//        addTeachers();
 //        addSubjectTeachers();
 
         printAllTeachers();
@@ -91,8 +94,10 @@ public class TimeTableUtils {
     private static void printAllTeachers() {
         for(Long i:teachersName.keySet()) {
             System.out.print(String.format("\n%d. Teacher Name : %s Teaching Subjects : ", i,teachersName.get(i)));
-            for(int j:teacherSubjects.get(i))
-                System.out.print(String.format(" %s , ", DummyRepo.findBySubjectCode(j).getSubjectRep()));
+            try {
+                for (int j : teacherSubjects.get(i))
+                    System.out.print(String.format(" %s , ", DummyRepo.findBySubjectCode(j).getSubjectRep()));
+            }catch (Exception es){}
         }
     }
 
@@ -257,15 +262,41 @@ public class TimeTableUtils {
             "FRIDAY"
     };
 
+
+    public static String timetablefolder="./timetableFolder/";
+
     private static void printTimeTable() {
+        List<Integer> repreSentedSubject=new ArrayList<>();
+
+        HashMap<Integer,List<Integer>> representing=new HashMap<>();
+
+        for(int form=1;form<=4;form++) {
+            if (selectedSubjectsGrades.contains(form)) {
+                for (String catg : DummyRepo.selectionOptions().keySet()) {
+                    StudySubject[] all = DummyRepo.selectionOptions().get(catg);
+                    int index = all[0].getSubjectCode();
+                    List<Integer> represented = new ArrayList<>();
+                    for (int m = 1; m < all.length; m++)
+                        represented.add(all[m].getSubjectCode());
+                    repreSentedSubject.addAll(represented);
+                    representing.put(index, represented);
+                }
+            }
+        }
+
         try{
-            FileOutputStream fileOutputStream=new FileOutputStream("/home/patrick/Documents/trashes/timeTable.pdf");
+            try{
+                new File(timetablefolder).mkdirs();
+
+            }catch (Exception esss){}
+            FileOutputStream fileOutputStream=new FileOutputStream(new File(timetablefolder,"classtimeTable.pdf"));
             Document document=new Document(PageSize.A4.rotate());
             PdfWriter.getInstance(document,fileOutputStream);
 
             document.open();
             document.newPage();
             for(int i:grades) {
+
                 for (String j : streams) {
                     document.newPage();
                     PdfPTable timeTable=new PdfPTable(10);
@@ -279,8 +310,19 @@ public class TimeTableUtils {
 
                         for(TimeTableLesson l:classTimeTable.get(d))
                         {
-                            if(l!=null)
-                                timeTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
+                            if(l!=null) {
+                                if(selectedSubjectsGrades.contains((int)(l.getGrade()/1))&&representing.containsKey(l.getSubjectCode()))
+                                {
+                                   PdfPTable dmTable=new PdfPTable(1);
+                                   dmTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
+                                   for(Integer ll:representing.get(l.getSubjectCode()))
+                                       dmTable.addCell(DummyRepo.findBySubjectCode(ll).getSubjectRep());
+
+                                   timeTable.addCell(dmTable);
+                                }
+                                else
+                                    timeTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
+                            }
                             else
                                 timeTable.addCell("UnAvailable");
                         }
@@ -305,7 +347,7 @@ public class TimeTableUtils {
 
     private static void printTeacherTimeTable() {
         try{
-            FileOutputStream fileOutputStream=new FileOutputStream("/home/patrick/Documents/trashes/TeachersTimeTable.pdf");
+            FileOutputStream fileOutputStream=new FileOutputStream(new File(timetablefolder,"TeachersTimeTable.pdf"));
             Document document=new Document(PageSize.A4.rotate());
             PdfWriter.getInstance(document,fileOutputStream);
             document.open();
@@ -351,7 +393,7 @@ public class TimeTableUtils {
     private static void printVenuesTimeTable() {
 
         try{
-            FileOutputStream fileOutputStream=new FileOutputStream("/home/patrick/Documents/trashes/venuesTimeTable.pdf");
+            FileOutputStream fileOutputStream=new FileOutputStream(new File(timetablefolder,"venuesTimeTable.pdf"));
             Document document=new Document(PageSize.A4.rotate());
             PdfWriter.getInstance(document,fileOutputStream);
             document.open();
@@ -576,7 +618,7 @@ public class TimeTableUtils {
 
         Random random=new Random();
 
-        int fmaxTrials=100;
+        int fmaxTrials=10;
         int ftrial=0;
 
         int bestdefects=156;
@@ -637,13 +679,17 @@ public class TimeTableUtils {
 
                             if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
                                 continue;
-                            int day, lesson, trial = 0, matTrials = 500000;
+                            int day, lesson, trial = 0, matTrials = 50000;
                             Long teacher;
                             String joint = form + stream;
                             String venue;
                             Boolean inValidFirst, inValidSecond,otherStreams;
                             venue = practicalSubjects.get(subj);
-                            teacher = subjectTeachers.get(joint).get(subj);
+                            try {
+                                teacher = subjectTeachers.get(joint).get(subj);
+                            }catch (Exception es){
+                                teacher=null;
+                            }
 
                             List<Integer> subjectsToCheck=new ArrayList<>();
                             subjectsToCheck.add(subj);
@@ -664,7 +710,13 @@ public class TimeTableUtils {
                                 otherStreams=false;
 
                                 for(int subjectToCheck:subjectsToCheck) {
-                                    Long newTeacher=subjectTeachers.get(joint).get(subjectToCheck);
+                                    Long newTeacher;
+                                    try {
+
+                                        newTeacher = subjectTeachers.get(joint).get(subjectToCheck);
+                                    }catch (Exception es){
+                                        newTeacher=null;
+                                    }
                                     String newVenue="";
                                     if(practicalSubjects.containsKey(subjectToCheck))
                                         newVenue=practicalSubjects.get(subjectToCheck);
@@ -719,8 +771,10 @@ public class TimeTableUtils {
                                     }
 
                                     Long newTeacher=null;
-                                    if(subjectTeachers.get(joint).containsKey(subjectToVenue))
-                                        newTeacher=subjectTeachers.get(joint).get(subjectToVenue);
+                                    try {
+                                        if (subjectTeachers.get(joint).containsKey(subjectToVenue))
+                                            newTeacher = subjectTeachers.get(joint).get(subjectToVenue);
+                                    }catch (Exception es){}
                                     if (newTeacher != null) {//set Teacher Occupied
                                         teachersTimeTables.get(newTeacher).get(day)[lesson] = abve;
                                         teachersTimeTables.get(newTeacher).get(day)[nextLesson] = abve1;
@@ -757,7 +811,12 @@ public class TimeTableUtils {
                         String venue;
                         Boolean inValidFirst, inValidSecond,otherStreams;
                         venue = practicalSubjects.get(subj);
-                        teacher = subjectTeachers.get(joint).get(subj);
+                        try {
+                            teacher = subjectTeachers.get(joint).get(subj);
+                        }catch (Exception es)
+                        {
+                            teacher=null;
+                        }
 
                         List<Integer> subjectsToCheck=new ArrayList<>();
                         subjectsToCheck.add(subj);
@@ -778,7 +837,10 @@ public class TimeTableUtils {
                             otherStreams=false;
 
                             for(int subjectToCheck:subjectsToCheck) {
-                                Long newTeacher=subjectTeachers.get(joint).get(subjectToCheck);
+                                Long newTeacher=null;
+                                try {
+                                    newTeacher = subjectTeachers.get(joint).get(subjectToCheck);
+                                }catch (Exception es){}
                                 String newVenue="";
                                 if(practicalSubjects.containsKey(subjectToCheck))
                                     newVenue=practicalSubjects.get(subjectToCheck);
@@ -833,8 +895,10 @@ public class TimeTableUtils {
                                 }
 
                                 Long newTeacher=null;
-                                if(subjectTeachers.get(joint).containsKey(subjectToVenue))
-                                    newTeacher=subjectTeachers.get(joint).get(subjectToVenue);
+                                try {
+                                    if (subjectTeachers.get(joint).containsKey(subjectToVenue))
+                                        newTeacher = subjectTeachers.get(joint).get(subjectToVenue);
+                                }catch (Exception es){}
                                 if (newTeacher != null) {//set Teacher Occupied
                                     teachersTimeTables.get(newTeacher).get(day)[lesson] = abve;
                                     teachersTimeTables.get(newTeacher).get(day)[nextLesson] = abve1;

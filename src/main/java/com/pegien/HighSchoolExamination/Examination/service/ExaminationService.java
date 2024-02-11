@@ -4,6 +4,7 @@ package com.pegien.HighSchoolExamination.Examination.service;
 import com.pegien.HighSchoolExamination.Examination.Examination;
 import com.pegien.HighSchoolExamination.Examination.ExaminationRepository;
 import com.pegien.HighSchoolExamination.Examination.models.requests.NewExaminationRequest;
+import com.pegien.HighSchoolExamination.Examination.models.requests.UpdateExamTitleRequest;
 import com.pegien.HighSchoolExamination.Examination.models.requests.UpdateReportCardMessageRequest;
 import com.pegien.HighSchoolExamination.Examination.models.responses.CreateExaminationResponse;
 import com.pegien.HighSchoolExamination.Examination.models.responses.Term;
@@ -98,4 +99,19 @@ public class ExaminationService {
         logService.recordLog("Updated ReportCard Message from"+prev+"  to "+examination);
         return ResponseEntity.status( HttpStatus.OK ).body("Updated Successfully");
     }
+
+    public ResponseEntity<String> updateExamTitle(UpdateExamTitleRequest updateExamTitleRequest) {
+        Optional<Examination> optionalExamination=examinationRepository.findById(updateExamTitleRequest.getNum());
+        if(optionalExamination.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        Examination examination=optionalExamination.get();
+        String prev=examination.toString();
+        examination.setTitle(updateExamTitleRequest.getTitle());
+        examinationRepository.save(examination);
+        logService.recordLog("Updated ReportCard Title from"+prev+"  to "+examination);
+        return ResponseEntity.status( HttpStatus.OK ).body("Updated Successfully");
+    }
+
+
 }
