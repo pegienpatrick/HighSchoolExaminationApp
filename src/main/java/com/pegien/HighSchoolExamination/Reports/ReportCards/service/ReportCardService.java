@@ -267,10 +267,10 @@ public class ReportCardService {
 
     private void addFooter(Document document,MeritListLine meritListLine,Examination examination) throws Exception {
         if(principle==null)
-            principle=Image.getInstance(getClass().getResourceAsStream("/signatures/principle.png").readAllBytes());
+            principle=Image.getInstance(ReportCardService.class.getResourceAsStream("/signatures/principle.png").readAllBytes());
 
         if(stamp==null)
-            stamp=Image.getInstance(getClass().getResourceAsStream("/stamps/takaba.png").readAllBytes());
+            stamp=Image.getInstance(ReportCardService.class.getResourceAsStream("/stamps/takaba.png").readAllBytes());
 
         Font boldFont = new Font(Font.FontFamily.COURIER, 11, Font.NORMAL);
         //class teacher sign

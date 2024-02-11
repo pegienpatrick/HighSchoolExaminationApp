@@ -33,4 +33,6 @@ public class SUbjectPerWeek {
     @NotNull
     private int lessonsPerWeek;
 
+    private String subjectName;
+
 }

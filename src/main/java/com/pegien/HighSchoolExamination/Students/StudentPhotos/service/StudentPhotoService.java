@@ -67,7 +67,7 @@ public class StudentPhotoService {
                 imageBytes = new FileInputStream(saveFile).readAllBytes();
 
             else
-                imageBytes=getClass().getResourceAsStream("/defaultPerson/default.png").readAllBytes();
+                imageBytes=StudentPhotoService.class.getResourceAsStream("/defaultPerson/default.png").readAllBytes();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
@@ -93,7 +93,7 @@ public class StudentPhotoService {
         if(saveFile.exists())
             return saveFile;
         else
-            return new File(getClass().getResource("/defaultPerson/default.png").getFile());
+            return new File(StudentPhotoService.class.getResource("/defaultPerson/default.png").getFile());
     }
 
 

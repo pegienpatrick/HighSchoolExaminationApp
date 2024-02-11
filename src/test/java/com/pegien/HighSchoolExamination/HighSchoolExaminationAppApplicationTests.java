@@ -63,6 +63,8 @@ class HighSchoolExaminationAppApplicationTests {
 
 	public static void main(String[] args) {
 
+
+
 //		HashMap<UserRoles,Set<String>> all= new HashMap<>();
 //		for(UserRoles r:UserRoles.values())
 //		{
