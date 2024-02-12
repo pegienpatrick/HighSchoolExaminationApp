@@ -17,4 +17,6 @@ public interface ExaminationRepository extends JpaRepository<Examination,Long> {
 
     @Query("select e from Examination e where e.deleted=false and e.year=?1 and e.term=?2 order by e.num desc")
     List<Examination> listTermExams(int year,int term);
+
+    int countByDeletedFalse();
 }

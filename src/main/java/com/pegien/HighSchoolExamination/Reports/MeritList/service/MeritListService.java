@@ -14,6 +14,7 @@ import com.pegien.HighSchoolExamination.Reports.ReportCards.service.ReportCardSe
 import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import com.pegien.HighSchoolExamination.Students.service.StudentsService;
+import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubjectsRepository;
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.SubjectGrading;
 import com.pegien.HighSchoolExamination.StudySubjects.SubjectGrade.service.SubjectGradingService;
@@ -550,4 +551,238 @@ public class MeritListService {
     public static Image logo=null;
 
 
+    public ResponseEntity<byte[]> viewAnalysis(Long examination, Double stage) {
+
+        try {
+            // Generate the PDF report
+            byte[] pdfBytes = generateAnalysis(examination,stage);
+
+            // Set the response headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            String fileName = examination + " Form" + stage + stage + " Analysis.pdf";
+            headers.setContentDispositionFormData("attachment", fileName);
+
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    private byte[] generateAnalysis(Long examination, Double stage) throws Exception {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4.rotate());
+        PdfWriter.getInstance(document, byteArrayOutputStream);
+
+        document.open();
+
+
+
+        //counting stats
+        HashMap<String,HashMap<Integer,HashMap<String,Integer>>> stats=new HashMap<>();
+        String[] classes={"All","A","B","C"};
+
+        //aggr Hashmap
+        HashMap<String,HashMap<String,Integer>> aggrStats=new HashMap<>();
+
+
+
+        //counting values
+        HashMap<String,HashMap<Integer,List<Integer>>> valueStats=new HashMap<>();
+
+        //aggr Hashmap
+        HashMap<String,List<Integer>> valueAggrStats=new HashMap<>();
+
+        //feed skeleton
+        for(String cc:classes)
+        {
+            HashMap<Integer,HashMap<String,Integer>> tmp=new HashMap<>();
+            HashMap<Integer,List<Integer>> tmpV=new HashMap<>();
+            for(StudySubject s:studySubjectsRepository.allAvailable())
+            {
+                HashMap<String,Integer> ss=new HashMap<>();
+                for(String gr:GradingUtils.grades)
+                    ss.put(gr,0);
+                tmp.put(s.getSubjectCode(),ss);
+                tmpV.put(s.getSubjectCode(),new ArrayList<>());
+            }
+            stats.put(cc,tmp);
+            valueStats.put(cc,tmpV);
+            HashMap<String,Integer> aggrTmp=new HashMap<>();
+            for(String gr:GradingUtils.grades)
+                aggrTmp.put(gr,0);
+            aggrStats.put(cc,aggrTmp);
+            valueAggrStats.put(cc,new ArrayList<>());
+        }
+
+        for(MeritListLine meritListLine:viewMeritList(examination,stage))
+        {
+            //for grades
+            for(int grd:meritListLine.getSubjectGrades().keySet()) {
+                String val=meritListLine.getSubjectGrades().get(grd);
+                //increment count of all
+                int initCount=stats.get("All").get(grd).get(val);
+                stats.get("All").get(grd).put(val,initCount+1);
+
+                //for values
+                int grad= GradingUtils.grades.length-Arrays.asList(GradingUtils.grades).indexOf(val)-1;
+                if(grad>0) {
+                    valueStats.get("All").get(grd).add(grad);
+                    valueStats.get(meritListLine.getStream()).get(grd).add(grad);
+                }
+
+
+                //increment count of Stream
+                int initSCount=stats.get(meritListLine.getStream()).get(grd).get(val);
+                stats.get(meritListLine.getStream()).get(grd).put(val,initSCount+1);
+            }
+
+
+            //increment the Aggregate points
+            {
+                String idn=meritListLine.getAggregateGrade();
+
+                int aggrCount=aggrStats.get("All").get(idn);
+                int aggrSCount=aggrStats.get(meritListLine.getStream()).get(idn);
+
+                aggrStats.get("All").put(idn,aggrCount+1);
+                aggrStats.get(meritListLine.getStream()).put(idn,aggrSCount+1);
+
+                //for values
+                int grad=GradingUtils.agregateGrading(meritListLine.getPoints());
+                if(grad>0)
+                {
+                    valueAggrStats.get("All").add(grad);
+                    valueAggrStats.get(meritListLine.getStream()).add(grad);
+                }
+            }
+
+//            //increment count of all
+//            int initCount=0;
+//            int initSCount=0;
+//                    try {
+//                        initCount = stats.get("All").get(999).get(val);
+//                    }catch (Exception es)
+//            stats.get("All").get(grd).put(val,initCount+1);
+//
+//            //increment count of Stream
+//
+//            initSCount = stats.get(meritListLine.getStream()).get(grd).get(val);
+//            stats.get(meritListLine.getStream()).get(grd).put(val,initSCount+1);
+
+
+        }
+
+        Optional<Examination> examinationOptional=examinationRepository.findById(examination);
+        document.addTitle(examinationOptional.get().getTitle()+" Form "+stage+" Analysis");
+        //draw Tables
+        for(String stre:stats.keySet())
+        {
+            addSchoolHeader(document);
+
+//            document.addTitle(stage+stre);
+//            document.add(new Paragraph(stage+stre));
+            if(examinationOptional.isPresent())
+                addExamTitle(document,examinationOptional.get(),stage,stre);
+            PdfPTable table=new PdfPTable(GradingUtils.grades.length+1);
+
+            //add grades
+            table.addCell("");
+            for(String k:GradingUtils.grades)
+                table.addCell(k);
+
+            //for each subject
+            for(StudySubject studySubject:studySubjectsRepository.allAvailable())
+            {
+                table.addCell(studySubject.getSubjectName());
+                for(String k:GradingUtils.grades)
+                    table.addCell(stats.get(stre).get(studySubject.getSubjectCode()).get(k)+"");
+            }
+            PdfPCell blank=new PdfPCell();
+            blank.setPhrase(new Phrase("  == "));
+            blank.setColspan(GradingUtils.grades.length+1);
+            table.addCell(blank);
+
+            table.addCell(" Aggr ");
+            for(String k:GradingUtils.grades)
+                table.addCell(aggrStats.get(stre).get(k)+"");
+
+
+
+            table.setWidthPercentage(100);
+            autoSizeTable2(table);
+            table.setSpacingBefore(30);
+            document.add(table);
+
+
+            document.newPage();
+        }
+
+        //add page for value stats
+        {
+            document.newPage();
+            addSchoolHeader(document);
+            addExamTitle(document,examinationOptional.get(),stage," Analysis ");
+            List<StudySubject> subjects=studySubjectsRepository.allAvailable();
+            PdfPTable statTable=new PdfPTable(subjects.size()+2);
+
+            statTable.addCell("");
+            for(StudySubject s:subjects)
+                statTable.addCell(s.getSubjectRep());
+            statTable.addCell("Aggr");
+
+            String[] strss={"A","B","C","All"};
+            for(String stre:strss)
+            {
+                statTable.addCell(stre);
+                for(StudySubject s:subjects)
+                    statTable.addCell(String.format("%.3f",valueStats.get(stre).get(s.getSubjectCode()).stream().mapToDouble(Integer::doubleValue).average().orElse(0)));
+                statTable.addCell(String.format("%.3f",valueAggrStats.get(stre).stream().mapToDouble(Integer::doubleValue).average().orElse(0)));
+            }
+            statTable.setWidthPercentage(100);
+//            autoSizeTable2(statTable);
+            statTable.setSpacingBefore(30);
+
+            document.add(statTable);
+
+        }
+
+
+
+        document.close();
+
+        return byteArrayOutputStream.toByteArray();
+
+    }
+
+    private void autoSizeTable2(PdfPTable table) throws DocumentException {
+
+        int numColumns = table.getNumberOfColumns();
+        float[] columnWidths = new float[numColumns];
+
+        // Initialize column widths
+        for (int i = 0; i < numColumns; i++) {
+            columnWidths[i] = 0f;
+        }
+
+        // Iterate through each row and cell to find the maximum content width in each column
+        for (int row = 0; row < table.getRows().size()&&row<3; row++) {
+            PdfPRow pdfPRow = table.getRow(row);
+            for (int col = 0; col < numColumns; col++) {
+                PdfPCell cell = pdfPRow.getCells()[col];
+                if (cell != null) {
+                    float contentWidth = getContentWidth(cell);
+                    columnWidths[col] = contentWidth;//Math.max(columnWidths[col], contentWidth);
+                }
+            }
+        }
+
+//        System.out.println(Arrays.toString(columnWidths));
+        // Set calculated column widths to the table
+        table.setWidths(columnWidths);
+    }
 }

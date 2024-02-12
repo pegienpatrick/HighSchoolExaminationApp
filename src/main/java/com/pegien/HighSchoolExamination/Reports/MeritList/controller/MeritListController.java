@@ -44,6 +44,14 @@ public class MeritListController {
 
 
 
+    @GetMapping("/viewAnalysis/{examination}/{stage}")
+    public ResponseEntity<byte[]> viewAnalysis(@PathVariable("examination") Long examination, @PathVariable("stage") Double stage)
+    {
+        return meritListService.viewAnalysis(examination,stage);
+    }
+
+
+
 
 
 }
