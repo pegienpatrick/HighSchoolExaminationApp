@@ -632,13 +632,24 @@ public class MeritListService {
                 int grad= GradingUtils.grades.length-Arrays.asList(GradingUtils.grades).indexOf(val)-1;
                 if(grad>0) {
                     valueStats.get("All").get(grd).add(grad);
-                    valueStats.get(meritListLine.getStream()).get(grd).add(grad);
+                    try{
+                        valueStats.get(meritListLine.getStream().trim()).get(grd).size();
+                    }catch (Exception es){
+                        valueStats.get(meritListLine.getStream().trim()).put(grd,new ArrayList<>());
+                    }
+                    valueStats.get(meritListLine.getStream().trim()).get(grd).add(grad);
                 }
 
 
                 //increment count of Stream
-                int initSCount=stats.get(meritListLine.getStream()).get(grd).get(val);
-                stats.get(meritListLine.getStream()).get(grd).put(val,initSCount+1);
+                try {
+                    int initSCount = stats.get(meritListLine.getStream().trim()).get(grd).get(val);
+                    stats.get(meritListLine.getStream().trim()).get(grd).put(val, initSCount + 1);
+                }catch (Exception es)
+                {
+                    System.out.println("Stream : "+meritListLine.getStream());
+                    es.printStackTrace();
+                }
             }
 
 
@@ -647,17 +658,17 @@ public class MeritListService {
                 String idn=meritListLine.getAggregateGrade();
 
                 int aggrCount=aggrStats.get("All").get(idn);
-                int aggrSCount=aggrStats.get(meritListLine.getStream()).get(idn);
+                int aggrSCount=aggrStats.get(meritListLine.getStream().trim()).get(idn);
 
                 aggrStats.get("All").put(idn,aggrCount+1);
-                aggrStats.get(meritListLine.getStream()).put(idn,aggrSCount+1);
+                aggrStats.get(meritListLine.getStream().trim()).put(idn,aggrSCount+1);
 
                 //for values
                 int grad=GradingUtils.agregateGrading(meritListLine.getPoints());
                 if(grad>0)
                 {
                     valueAggrStats.get("All").add(grad);
-                    valueAggrStats.get(meritListLine.getStream()).add(grad);
+                    valueAggrStats.get(meritListLine.getStream().trim()).add(grad);
                 }
             }
 

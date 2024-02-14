@@ -24,6 +24,7 @@ public class HighSchoolExaminationAppApplication {
 			SpringApplication.run(HighSchoolExaminationAppApplication.class, args);
 		}catch (Exception es) {
 		}
+		new Thread(()->{
 		Boolean launcher=false;
 		if(launcher)
 		{
@@ -112,6 +113,7 @@ public class HighSchoolExaminationAppApplication {
 			}
 
 		}
+		}).start();
 	}
 
 }
