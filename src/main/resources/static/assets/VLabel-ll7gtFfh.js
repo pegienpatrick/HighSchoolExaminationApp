@@ -1,0 +1,1 @@
+import{x as s,y as o,C as c,D as n,L as r,n as b}from"./index-WKjbL8T9.js";const m=s({text:String,clickable:Boolean,...o(),...c()},"VLabel"),k=n()({name:"VLabel",props:m(),setup(e,t){let{slots:a}=t;return r(()=>{var l;return b("label",{class:["v-label",{"v-label--clickable":e.clickable},e.class],style:e.style},[e.text,(l=a.default)==null?void 0:l.call(a)])}),{}}});export{k as V};
