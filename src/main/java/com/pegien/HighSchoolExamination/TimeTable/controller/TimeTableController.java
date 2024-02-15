@@ -5,9 +5,10 @@ import com.pegien.HighSchoolExamination.TimeTable.service.TimeTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 
@@ -36,10 +37,25 @@ public class TimeTableController {
     }
 
     @GetMapping("/regenerate")
- public ResponseEntity<String> regenerate()
+    public ResponseEntity<String> regenerate()
     {
      return timeTableService.regenerate();
     }
+
+    @PostMapping("/setSpecializedGrades")
+    public ResponseEntity<String> setSpecializedGrades(@RequestBody @Valid Integer[] specialized)
+    {
+        return timeTableService.setSpecializedGrades(specialized);
+    }
+
+    @GetMapping("/getSpecializedGrades")
+    public ResponseEntity<Integer[]> getSpecializedGrades()
+    {
+        return timeTableService.getSpecializedgrades();
+    }
+
+
+
 
 
  }

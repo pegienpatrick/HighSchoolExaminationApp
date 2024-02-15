@@ -1,6 +1,7 @@
 package com.pegien.HighSchoolExamination.TimeTable.SubjectsPerWeek;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,11 +39,19 @@ public class SUbjectPerWeek {
     @Column(columnDefinition = "Boolean default false")
     private Boolean hasDouble;
 
+    @JsonIgnore
+    private Long doubleVenueId;
+
+    @Transient
     private String doubleVenue;
 
     @Column(columnDefinition = "Boolean default false")
     private Boolean hasDedicatedVenue;
 
+    @JsonIgnore
+    private Long dedicatedVenueId;
+
+    @Transient
     private String DedicatedVenues;
 
 }

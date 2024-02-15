@@ -1,6 +1,8 @@
 package com.pegien.HighSchoolExamination.TimeTable.service;
 
 
+import com.pegien.HighSchoolExamination.Settings.Setting;
+import com.pegien.HighSchoolExamination.Settings.service.SettingsService;
 import com.pegien.HighSchoolExamination.Teachers.SubjectTeacher;
 import com.pegien.HighSchoolExamination.Teachers.SubjectTeacherRepository;
 import com.pegien.HighSchoolExamination.Teachers.service.SubjectTeacherService;
@@ -28,8 +30,14 @@ public class TimeTableService {
     @Value("timetableFolder")
     private String timetablefolder;
 
+    private static String SPECIALIZED_GRADES_SETTINGS="SPECIALIZEDGRADESETTING";
+
     @Autowired
     private SubjectTeacherService subjectTeacherService;
+
+
+    @Autowired
+    private SettingsService settingsService;
 
     public ResponseEntity<byte[]> viewClassTimeTable() {
         try {
@@ -106,4 +114,21 @@ public class TimeTableService {
         TimeTableUtils.main(new String[]{"pats"});
         return ResponseEntity.ok("Completed Successfully");
     }
+
+
+    public ResponseEntity<String> setSpecializedGrades(Integer[] specialized) {
+
+        Setting setting= Setting.builder()
+                .integerArrayValue(specialized)
+                .settingName(SPECIALIZED_GRADES_SETTINGS)
+                .build();
+
+        settingsService.set(setting);
+        return ResponseEntity.ok("Saved Successfully");
+    }
+
+    public ResponseEntity<Integer[]> getSpecializedgrades() {
+        return ResponseEntity.ok(settingsService.getSetting(SPECIALIZED_GRADES_SETTINGS, Setting.builder().integerArrayValue(new Integer[]{3,4}).build()).getIntegerArrayValue());
+    }
+
 }

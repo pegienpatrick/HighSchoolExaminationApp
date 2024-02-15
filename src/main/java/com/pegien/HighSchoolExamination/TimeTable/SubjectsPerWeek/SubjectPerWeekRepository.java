@@ -12,4 +12,8 @@ public interface SubjectPerWeekRepository extends JpaRepository<SUbjectPerWeek,L
     List<SUbjectPerWeek> findByGrade(Double grade);
 
     Optional<SUbjectPerWeek> findByGradeAndSubjectCode(Double grade,int subjectCode);
+
+
+//    List<SUbjectPerWeek> find
+
 }
