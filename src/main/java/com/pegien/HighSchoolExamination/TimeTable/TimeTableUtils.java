@@ -682,7 +682,7 @@ public class TimeTableUtils {
 
         Random random=new Random();
 
-        int fmaxTrials=3;
+        int fmaxTrials=20;
         int ftrial=0;
 
         int bestdefects=156;
@@ -764,14 +764,26 @@ public class TimeTableUtils {
 
                             do {
                                 trial++;
-//                            int space=random.nextInt(spaces);
-//                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
+                                otherStreams=false;
+
+//                                int space=PGen.nextInt(spaces);
+//                                int space=random.nextInt(spaces);
+//                                day=space/9;
+//                                lesson=space%9;
                                 day = random.nextInt(days);
                                 lesson = random.nextInt(lessonsPerDay - 1);
-                                nextLesson=lesson+1;
+                                if(lesson<lessonsPerDay-1)
+                                    nextLesson=lesson+1;
+                                else
+                                    nextLesson=lesson;
+                                if(lesson==lessonsPerDay-1)
+                                    continue;
+//                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
+//
 
 
-                                otherStreams=false;
+
+
 
                                 for(int subjectToCheck:subjectsToCheck) {
                                     Long newTeacher;
@@ -869,7 +881,7 @@ public class TimeTableUtils {
 
                         if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
                             continue;
-                        int day, lesson, trial = 0, matTrials = 1000;
+                        int day, lesson, trial = 0, matTrials = 500;
                         Long teacher;
                         String joint = form + stream;
                         String venue;
@@ -892,9 +904,14 @@ public class TimeTableUtils {
                         do {
                             trial++;
 //                            int space=random.nextInt(spaces);
+//                            int space=PGen.nextInt(spaces);
+//                            day=space/9;
+//                            lesson=space%9;
 //                            System.out.println("Subject : "+DummyRepo.findBySubjectCode(subj).getSubjectRep()+" Class "+form+stream+" Space "+space);
                             day = random.nextInt(days);
                             lesson = random.nextInt(lessonsPerDay);
+
+
                             nextLesson=lesson;
 
 
@@ -1039,7 +1056,22 @@ public class TimeTableUtils {
                     }
                 }
             }
-            {//find best timetable version
+            {
+
+//                calculate defects
+                defects=0;
+                hasDefect=false;
+                for(String s:streams)
+                    for(int day=0;day<days;day++)
+                    {
+                        for(TimeTableLesson l:classesTimeTables.get(form+s).get(day))
+                            if(l==null)
+                            {
+                                hasDefect=true;
+                                defects++;
+                            }
+                    }
+                //find best timetable version
                 if(defects<bestdefects)
                 {
                         bestdefects=defects;
@@ -1053,8 +1085,10 @@ public class TimeTableUtils {
                 }
 
             }
+            System.out.println(" Finished  "+form+" defects : "+defects);
             if(hasDefect)
             {
+//                System.out.println(" Finished  "+form+" defects : "+defects);
 
                 if(ftrial<fmaxTrials)
                 {//delete data
