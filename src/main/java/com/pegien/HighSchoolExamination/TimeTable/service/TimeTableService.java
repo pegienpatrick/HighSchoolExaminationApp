@@ -3,9 +3,13 @@ package com.pegien.HighSchoolExamination.TimeTable.service;
 
 import com.pegien.HighSchoolExamination.Settings.Setting;
 import com.pegien.HighSchoolExamination.Settings.service.SettingsService;
+import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.Teachers.SubjectTeacher;
 import com.pegien.HighSchoolExamination.Teachers.SubjectTeacherRepository;
 import com.pegien.HighSchoolExamination.Teachers.service.SubjectTeacherService;
+import com.pegien.HighSchoolExamination.TimeTable.DummyRepo;
+import com.pegien.HighSchoolExamination.TimeTable.SubjectsPerWeek.SUbjectPerWeek;
+import com.pegien.HighSchoolExamination.TimeTable.SubjectsPerWeek.service.SubjectsPerWeekService;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableUtils;
 import com.pegien.HighSchoolExamination.Users.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class TimeTableService {
@@ -38,6 +44,9 @@ public class TimeTableService {
 
     @Autowired
     private SettingsService settingsService;
+
+    @Autowired
+    private SubjectsPerWeekService subjectsPerWeekService;
 
     public ResponseEntity<byte[]> viewClassTimeTable() {
         try {
@@ -111,6 +120,43 @@ public class TimeTableService {
         }
         TimeTableUtils.timetablefolder=timetablefolder;
         TimeTableUtils.teachersName=subjectTeacherService.allTeacher();
+
+
+        //set grades that have selected subjects
+        TimeTableUtils.selectedSubjectsGrades= List.of(settingsService.getSetting(SPECIALIZED_GRADES_SETTINGS, Setting.builder().integerArrayValue(new Integer[]{3, 4}).build()).getIntegerArrayValue());
+
+
+        //set subjects per week
+       for(int grd=1;grd<=4;grd++)
+       {
+           TimeTableUtils.streamJointSubjects.put(grd,new ArrayList<>());
+           TimeTableUtils.lessonsPerWeek.put(grd,new HashMap<>());
+           TimeTableUtils.subjectVenues.put(grd,new HashMap<>());
+           TimeTableUtils.practicalSubjects.put(grd,new HashMap<>());
+
+            for(StudySubject s: DummyRepo.allAvailable()) {
+                SUbjectPerWeek sUbjectPerWeek=subjectsPerWeekService.forceGet((double) grd, s.getSubjectCode(), s.getSubjectName());
+                if(sUbjectPerWeek.getJoinStreams()!=null&&sUbjectPerWeek.getJoinStreams())
+                    TimeTableUtils.streamJointSubjects.get(grd).add(sUbjectPerWeek.getSubjectCode());
+                TimeTableUtils.lessonsPerWeek.get(grd).put(sUbjectPerWeek.getSubjectCode(),sUbjectPerWeek.getLessonsPerWeek());
+                if(sUbjectPerWeek.getHasDedicatedVenue()!=null&&sUbjectPerWeek.getHasDedicatedVenue())
+                    TimeTableUtils.subjectVenues.get(grd).put(sUbjectPerWeek.getSubjectCode(),sUbjectPerWeek.getDedicatedVenues());
+                if(sUbjectPerWeek.getHasDouble()!=null&&sUbjectPerWeek.getHasDouble())
+                    TimeTableUtils.practicalSubjects.get(grd).put(sUbjectPerWeek.getSubjectCode(),sUbjectPerWeek.getDoubleVenue());
+
+            }
+       }
+
+
+
+
+
+
+
+
+
+
+
         TimeTableUtils.main(new String[]{"pats"});
         return ResponseEntity.ok("Completed Successfully");
     }
