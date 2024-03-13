@@ -8,6 +8,7 @@ import com.itextpdf.text.pdf.VerticalText;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 //import com.pegien.HighSchoolExamination.StudySubjects.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableLesson.TimeTableLesson;
+import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import org.springframework.security.access.method.P;
 
 import java.io.File;
@@ -559,7 +560,9 @@ public class TimeTableUtils {
         if (lesson > 0 &&lessonsInDay[lesson - 1]!=null&& lessonsInDay[lesson - 1].getSubjectCode() == subj)
             return true;
 
-        if(subjectsInADay>5) {
+        int lessonsPWeek=lessonsPerWeek.get(ConvertionUtils.getInt(s.charAt(0)+"")).get(subj);
+
+        if(lessonsPWeek>5) {
             return (subjectsInADay>1);
         }
         else
@@ -679,7 +682,7 @@ public class TimeTableUtils {
 
         Random random=new Random();
 
-        int fmaxTrials=0;
+        int fmaxTrials=3;
         int ftrial=0;
 
         int bestdefects=156;
@@ -727,7 +730,7 @@ public class TimeTableUtils {
                 System.out.println(lessonsPerWeek.keySet());
                 continue;
             }
-            for(int subj:lessons.keySet()) {
+            for(int subj:lessons.keySet()) {//Double Lessons
                 if(repreSentedSubject.contains(subj))
                     continue;
 
@@ -740,7 +743,7 @@ public class TimeTableUtils {
 
                             if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
                                 continue;
-                            int day, lesson, trial = 0, matTrials = 1500;
+                            int day, lesson, trial = 0, matTrials = 500;
                             Long teacher;
                             String joint = form + stream;
                             String venue;
@@ -850,7 +853,7 @@ public class TimeTableUtils {
                     }
                 }
             }
-            for(int subj:lessons.keySet())
+            for(int subj:lessons.keySet())//Other Subjects
             {
                 if(repreSentedSubject.contains(subj))
                     continue;
@@ -866,7 +869,7 @@ public class TimeTableUtils {
 
                         if(joint_subjects.contains(subj)&&!stream.equals(streams[0]))
                             continue;
-                        int day, lesson, trial = 0, matTrials = 600;
+                        int day, lesson, trial = 0, matTrials = 1000;
                         Long teacher;
                         String joint = form + stream;
                         String venue;
