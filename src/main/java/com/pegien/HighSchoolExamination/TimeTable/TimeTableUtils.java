@@ -1,17 +1,19 @@
 package com.pegien.HighSchoolExamination.TimeTable;//package com.pegien.HighSchoolExamination.TimeTable;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.VerticalText;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 //import com.pegien.HighSchoolExamination.StudySubjects.DummyRepo;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableLesson.TimeTableLesson;
+import org.springframework.security.access.method.P;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
+import java.util.List;
 
 public class TimeTableUtils {
 
@@ -310,27 +312,70 @@ public class TimeTableUtils {
                     if(classTimeTable==null)
                         continue;
 
+
+
                     for (int d:classTimeTable.keySet())
                     {
                         timeTable.addCell(dayNames[d]);
-
+                        Boolean lastDouble=false;
                         for(TimeTableLesson l:classTimeTable.get(d))
                         {
+                            if(lastDouble)
+                            {
+                                lastDouble=false;
+                                continue;
+                            }
+
                             if(l!=null) {
+                                PdfPCell pdfPCell=null;
                                 if(selectedSubjectsGrades.contains((int)(l.getGrade()/1))&&representing.containsKey(l.getSubjectCode()))
                                 {
+                                    int height=60/(representing.get(l.getSubjectCode()).size()+1);
                                    PdfPTable dmTable=new PdfPTable(1);
-                                   dmTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
-                                   for(Integer ll:representing.get(l.getSubjectCode()))
-                                       dmTable.addCell(DummyRepo.findBySubjectCode(ll).getSubjectRep());
+                                   PdfPCell rep;
+                                   Phrase phrase=new Phrase(Phrase.getInstance(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()));
+//                                   Cell cell
+                                    rep = new PdfPCell(phrase);
+                                    rep.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                   rep.setVerticalAlignment(Element.ALIGN_CENTER);
+                                   rep.setFixedHeight(height);
+                                   dmTable.addCell(rep);
+                                    rep.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//                                   int all=1;
+                                   for(Integer ll:representing.get(l.getSubjectCode())) {
+//                                       (DummyRepo.findBySubjectCode(ll).getSubjectRep());
+//                                       PdfPCell rep;
+                                       rep = new PdfPCell(Phrase.getInstance(DummyRepo.findBySubjectCode(ll).getSubjectRep()));
 
-                                   timeTable.addCell(dmTable);
+                                       rep.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                       rep.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                                       rep.setFixedHeight(height);
+                                       dmTable.addCell(rep);
+                                   }
+
+//                                   timeTable.addCell(dmTable);
+//                                    dmTable.set
+                                    pdfPCell=new PdfPCell(dmTable);
+//                                   pdfPCell.setFixedHeight();
                                 }
                                 else
-                                    timeTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep());
+                                    pdfPCell=new PdfPCell(Phrase.getInstance(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()));
+
+                                if(l.getIsDouble()) {
+                                    pdfPCell.setColspan(2);
+                                    lastDouble=true;
+                                }
+                                pdfPCell.setFixedHeight(60);
+                                pdfPCell.setMinimumHeight(60);
+
+                                pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                                pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                pdfPCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+                                timeTable.addCell(pdfPCell);
                             }
                             else
-                                timeTable.addCell("");
+                                timeTable.addCell("XXXXXXXXXXXXXXXXX");
                         }
                     }
                     document.add(new Paragraph("Class "+i+j));
@@ -634,7 +679,7 @@ public class TimeTableUtils {
 
         Random random=new Random();
 
-        int fmaxTrials=15;
+        int fmaxTrials=0;
         int ftrial=0;
 
         int bestdefects=156;
