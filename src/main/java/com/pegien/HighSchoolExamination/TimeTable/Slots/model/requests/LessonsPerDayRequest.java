@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class LessonsPerDayRequest {
     private int lessons;
     private int duration;
+    private int startHour;
+    private int startMinute;
 }

@@ -38,7 +38,7 @@ public class Student {
 
     private String birthCertno;
 
-    private String ifmisNo;
+    private String nemisNo;
 
     private Gender gender;
 

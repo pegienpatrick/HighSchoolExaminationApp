@@ -31,6 +31,10 @@ public class TimeTableSlotService {
 
     private static String KEY_LESSONS_DURATION="lESSSONSDURATION";
 
+    private static String KEY_START_HOUR="startHour";
+
+    private static String KEY_START_MINUTE="startMinute";
+
 
     public ResponseEntity<LessonsPerDayResponse> getLessonsPerDay() {
         return ResponseEntity.ok(LessonsPerDayResponse.builder().lessons(lessonsPerDay()).duration(lessonsDuration()).build());
@@ -45,9 +49,21 @@ public class TimeTableSlotService {
         return settingsService.getSetting(KEY_LESSONS_DURATION, Setting.builder().integerValue(40).build()).getIntegerValue();
     }
 
+    public int lessonsStartHour()
+    {
+        return settingsService.getSetting(KEY_START_HOUR, Setting.builder().integerValue(8).build()).getIntegerValue();
+    }
+
+    public int lessonsStartMinute()
+    {
+        return settingsService.getSetting(KEY_START_MINUTE, Setting.builder().integerValue(0).build()).getIntegerValue();
+    }
+
     public ResponseEntity<String> updateLessonsPerWeek(LessonsPerDayRequest lessonsPerDayRequest) {
         settingsService.set(Setting.builder().settingName(KEY_LESSONS_PER_DAY).integerValue(lessonsPerDayRequest.getLessons()).build());
         settingsService.set(Setting.builder().settingName(KEY_LESSONS_DURATION).integerValue(lessonsPerDayRequest.getDuration()).build());
+        settingsService.set(Setting.builder().settingName(KEY_START_HOUR).integerValue(lessonsPerDayRequest.getStartHour()).build());
+        settingsService.set(Setting.builder().settingName(KEY_START_MINUTE).integerValue(lessonsPerDayRequest.getStartMinute()).build());
         return ResponseEntity.ok("Saved Successfully");
     }
 

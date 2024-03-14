@@ -67,9 +67,10 @@ public class StudentsService {
                 .cohort(studentRegisterRequest.getCohort())
                 .dateOfBirth(studentRegisterRequest.getDateOfBirth().getTime())
                 .kcpeMarks(studentRegisterRequest.getKcpeMarks())
-                .ifmisNo(studentRegisterRequest.getIfmisNo())
+                .nemisNo(studentRegisterRequest.getNemisNo())
                 .stage(studentRegisterRequest.getStage())
                 .stream(studentRegisterRequest.getStream())
+                .dateOfAdm(new Date().getTime())
                 .build();
 
         studentRepository.saveAndFlush(student);
@@ -106,7 +107,7 @@ public class StudentsService {
         student.setGender(studentUpdateRequest.getGender());
         student.setBirthCertno(studentUpdateRequest.getBirthCertno());
         student.setDateOfBirth(studentUpdateRequest.getDateOfBirth().getTime());
-        student.setIfmisNo(studentUpdateRequest.getIfmisNo());
+        student.setNemisNo(studentUpdateRequest.getNemisNo());
         student.setFirstName(studentUpdateRequest.getFirstName());
         student.setSurname(studentUpdateRequest.getSurname());
         student.setOtherName(studentUpdateRequest.getOtherName());

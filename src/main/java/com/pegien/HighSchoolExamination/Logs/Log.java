@@ -27,7 +27,7 @@ public class Log {
     @ManyToOne
     private User user;
 
-    @Column(columnDefinition = "TEXT",length = 10000)
+    @Column(columnDefinition = "TEXT")
     private String log;
 
 

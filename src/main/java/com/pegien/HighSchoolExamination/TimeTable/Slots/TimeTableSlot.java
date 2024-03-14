@@ -32,6 +32,19 @@ public class TimeTableSlot {
     @Column(length = 10000)
     private String title;
 
+    public String getStart()
+    {
+        return (startHour<10?"0":"")+startHour+":"+(startMinute<10?"0":"")+startMinute;
+    }
+
+    public String getEnd()
+    {
+        int exmin=startMinute+getDuration();
+        int stopHr=startHour+((int)(exmin/60));
+        int minStop=exmin%60;
+        return (stopHr<10?"0":"")+stopHr+":"+(minStop<10?"0":"")+minStop;
+    }
+
 
 }
 

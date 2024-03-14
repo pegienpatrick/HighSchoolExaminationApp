@@ -32,7 +32,7 @@ public class StudentUpdateRequest {
 
     private String birthCertno;
 
-    private String ifmisNo;
+    private String nemisNo;
 
     @NotNull(message = "You have to select Gender")
     private Gender gender;
