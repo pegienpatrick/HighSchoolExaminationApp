@@ -22,7 +22,7 @@ public class TimeTableSlot {
     private SlotType slotType;
 
 
-    private Long Duration;
+    private int Duration;
 
     private int startHour;
     private int startMinute;
@@ -36,7 +36,3 @@ public class TimeTableSlot {
 }
 
 
-enum SlotType{
-    BREAK,
-    LESSON
-}
