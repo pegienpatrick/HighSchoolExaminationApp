@@ -1,7 +1,5 @@
 package com.pegien.HighSchoolExamination.Utils;
 
-import com.itextpdf.text.pdf.PdfPCell;
-
 import java.util.HashMap;
 
 public class GradingUtils {
@@ -44,7 +42,7 @@ public class GradingUtils {
     }
 
 
-    public static int agregateGrading(int points)
+    public static int agregateGrading(Double points)
     {
         if(points>84||points<7)
             return 0;

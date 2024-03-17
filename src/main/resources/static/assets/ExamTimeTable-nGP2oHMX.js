@@ -1,1 +1,0 @@
-import{_ as a,c as t,b as e,w as r,o}from"./index-SGO5OOPy.js";import{a as c,V as s}from"./VCard-iwGy2QZm.js";import"./VAvatar-aQ_KeIL1.js";import"./VImg-nJ6DsKWr.js";const n={};function l(m,_){return o(),t("div",null,[e(c,null,{default:r(()=>[e(s)]),_:1})])}const u=a(n,[["render",l]]);export{u as default};

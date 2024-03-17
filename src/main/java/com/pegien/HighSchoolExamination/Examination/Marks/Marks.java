@@ -42,5 +42,8 @@ public class Marks {
     @Transient
     private String rep;
 
+    @Transient
+    private Long subjectTeacher;
+
 
 }

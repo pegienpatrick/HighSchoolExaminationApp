@@ -1,29 +1,32 @@
 package com.pegien.HighSchoolExamination.TimeTable;//package com.pegien.HighSchoolExamination.TimeTable;
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.VerticalText;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 //import com.pegien.HighSchoolExamination.StudySubjects.DummyRepo;
+import com.pegien.HighSchoolExamination.TimeTable.Slots.SlotType;
+import com.pegien.HighSchoolExamination.TimeTable.Slots.TimeTableSlot;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableLesson.TimeTableLesson;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
-import org.springframework.security.access.method.P;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 import java.util.List;
 
+import static com.pegien.HighSchoolExamination.TimeTable.PrintClassesTimetableUtils.printTimeTable;
+import static com.pegien.HighSchoolExamination.TimeTable.TeachersTimeTableUtils.printTeacherTimeTable;
+import static com.pegien.HighSchoolExamination.TimeTable.VenuesTimeTableUtils.printVenuesTimeTable;
+
 public class TimeTableUtils {
 
 //    private static DummyRepo DummyRepo=new DummyRepo();
     public static HashMap<String, HashMap<Integer,Long>> subjectTeachers=new HashMap<>();
 
-    private static HashMap<String,HashMap<Integer,TimeTableLesson[]>> classesTimeTables=new HashMap<>();
+    public static HashMap<String,HashMap<Integer,TimeTableLesson[]>> classesTimeTables=new HashMap<>();
 
-    private static HashMap<Long,HashMap<Integer,TimeTableLesson[]>> teachersTimeTables=new HashMap<>();
+    public static HashMap<Long,HashMap<Integer,TimeTableLesson[]>> teachersTimeTables=new HashMap<>();
 
     public static HashMap<String,HashMap<Integer,TimeTableLesson[]>> venues=new HashMap<>();
 
@@ -38,12 +41,12 @@ public class TimeTableUtils {
     public static HashMap<Long, int[]> teacherSubjects=new HashMap<Long, int[]>();
 
 
-    private static String[] streams={"A","B","C"};
+    public static String[] streams={"A","B","C"};
 
-    private static int[] grades={4,3,2,1};
+    public static int[] grades={4,3,2,1};
 
-    private static int days=5;
-    private static int lessonsPerDay=9;
+    public static int days=5;
+    public static int lessonsPerDay=9;
 
     public static HashMap<Integer,HashMap<Integer,Integer>> lessonsPerWeek=new HashMap<>();
 
@@ -263,230 +266,23 @@ public class TimeTableUtils {
         return true;
     }
 
-    private static  String[] dayNames={
-            "MONDAY",
-            "TUESDAY",
-            "WEDNESDAY",
-            "THURSDAY",
-            "FRIDAY"
+    public static  String[] dayNames={
+            "MON",
+            "TUE",
+            "WED",
+            "THUR",
+            "FRI"
     };
 
 
     public static String timetablefolder="./timetableFolder/";
 
-    private static void printTimeTable() {
-        List<Integer> repreSentedSubject=new ArrayList<>();
-
-        HashMap<Integer,List<Integer>> representing=new HashMap<>();
-
-        for(int form=1;form<=4;form++) {
-            if (selectedSubjectsGrades.contains(form)) {
-                for (String catg : DummyRepo.selectionOptions().keySet()) {
-                    StudySubject[] all = DummyRepo.selectionOptions().get(catg);
-                    int index = all[0].getSubjectCode();
-                    List<Integer> represented = new ArrayList<>();
-                    for (int m = 1; m < all.length; m++)
-                        represented.add(all[m].getSubjectCode());
-                    repreSentedSubject.addAll(represented);
-                    representing.put(index, represented);
-                }
-            }
-        }
-
-        try{
-            try{
-                new File(timetablefolder).mkdirs();
-
-            }catch (Exception esss){}
-            FileOutputStream fileOutputStream=new FileOutputStream(new File(timetablefolder,"classtimeTable.pdf"));
-            Document document=new Document(PageSize.A4.rotate());
-            PdfWriter.getInstance(document,fileOutputStream);
-
-            document.open();
-            document.newPage();
-            for(int i:grades) {
-
-                for (String j : streams) {
-                    document.newPage();
-                    PdfPTable timeTable=new PdfPTable(10);
-                    HashMap<Integer, TimeTableLesson[]> classTimeTable = classesTimeTables.get(i + j);
-                    if(classTimeTable==null)
-                        continue;
 
 
 
-                    for (int d:classTimeTable.keySet())
-                    {
-                        timeTable.addCell(dayNames[d]);
-                        Boolean lastDouble=false;
-                        for(TimeTableLesson l:classTimeTable.get(d))
-                        {
-                            if(lastDouble)
-                            {
-                                lastDouble=false;
-                                continue;
-                            }
-
-                            if(l!=null) {
-                                PdfPCell pdfPCell=null;
-                                if(selectedSubjectsGrades.contains((int)(l.getGrade()/1))&&representing.containsKey(l.getSubjectCode()))
-                                {
-                                    int height=60/(representing.get(l.getSubjectCode()).size()+1);
-                                   PdfPTable dmTable=new PdfPTable(1);
-                                   PdfPCell rep;
-                                   Phrase phrase=new Phrase(Phrase.getInstance(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()));
-//                                   Cell cell
-                                    rep = new PdfPCell(phrase);
-                                    rep.setHorizontalAlignment(Element.ALIGN_CENTER);
-                                   rep.setVerticalAlignment(Element.ALIGN_CENTER);
-                                   rep.setFixedHeight(height);
-                                   dmTable.addCell(rep);
-                                    rep.setVerticalAlignment(Element.ALIGN_MIDDLE);
-//                                   int all=1;
-                                   for(Integer ll:representing.get(l.getSubjectCode())) {
-//                                       (DummyRepo.findBySubjectCode(ll).getSubjectRep());
-//                                       PdfPCell rep;
-                                       rep = new PdfPCell(Phrase.getInstance(DummyRepo.findBySubjectCode(ll).getSubjectRep()));
-
-                                       rep.setHorizontalAlignment(Element.ALIGN_CENTER);
-                                       rep.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                                       rep.setFixedHeight(height);
-                                       dmTable.addCell(rep);
-                                   }
-
-//                                   timeTable.addCell(dmTable);
-//                                    dmTable.set
-                                    pdfPCell=new PdfPCell(dmTable);
-//                                   pdfPCell.setFixedHeight();
-                                }
-                                else
-                                    pdfPCell=new PdfPCell(Phrase.getInstance(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()));
-
-                                if(l.getIsDouble()) {
-                                    pdfPCell.setColspan(2);
-                                    lastDouble=true;
-                                }
-                                pdfPCell.setFixedHeight(60);
-                                pdfPCell.setMinimumHeight(60);
-
-                                pdfPCell.setVerticalAlignment(Element.ALIGN_CENTER);
-                                pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                                pdfPCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-
-                                timeTable.addCell(pdfPCell);
-                            }
-                            else
-                                timeTable.addCell("XXXXXXXXXXXXXXXXX");
-                        }
-                    }
-                    document.add(new Paragraph("Class "+i+j));
-                    timeTable.setWidthPercentage(100);
-                    timeTable.setSpacingBefore(40);
-                    document.add(timeTable);
-
-                }
-            }
 
 
 
-            document.close();
-        }catch (Exception es)
-        {
-            es.printStackTrace();
-        }
-    }
-
-
-    private static void printTeacherTimeTable() {
-        try{
-            FileOutputStream fileOutputStream=new FileOutputStream(new File(timetablefolder,"TeachersTimeTable.pdf"));
-            Document document=new Document(PageSize.A4.rotate());
-            PdfWriter.getInstance(document,fileOutputStream);
-            document.open();
-            document.newPage();
-
-            for(Long teacher:teachersTimeTables.keySet())
-            {
-                document.newPage();
-                document.add(new Paragraph(teachersName.get(teacher)));
-
-                PdfPTable teacherTable=new PdfPTable(10);
-                for(int day:teachersTimeTables.get(teacher).keySet())
-                {
-                    teacherTable.addCell(dayNames[day]);
-                    for(TimeTableLesson l:teachersTimeTables.get(teacher).get(day))
-                    {
-                        if(l!=null)
-                        {
-                            teacherTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()+"\n"+((int)(l.getGrade()/1))+l.getStream());
-                        }
-                        else
-                        {
-                            teacherTable.addCell(" ");
-                        }
-                    }
-                }
-                teacherTable.setWidthPercentage(100);
-                teacherTable.setSpacingBefore(40);
-
-                document.add(teacherTable);
-
-            }
-
-
-
-            document.close();
-        }catch (Exception es)
-        {
-            es.printStackTrace();
-        }
-    }
-
-    private static void printVenuesTimeTable() {
-
-        try{
-            FileOutputStream fileOutputStream=new FileOutputStream(new File(timetablefolder,"venuesTimeTable.pdf"));
-            Document document=new Document(PageSize.A4.rotate());
-            PdfWriter.getInstance(document,fileOutputStream);
-            document.open();
-            document.newPage();
-
-            for(String venue:venues.keySet())
-            {
-                document.newPage();
-                document.add(new Paragraph(venue));
-
-                PdfPTable teacherTable=new PdfPTable(10);
-                for(int day:venues.get(venue).keySet())
-                {
-                    teacherTable.addCell(dayNames[day]);
-                    for(TimeTableLesson l:venues.get(venue).get(day))
-                    {
-                        if(l!=null)
-                        {
-                            teacherTable.addCell(DummyRepo.findBySubjectCode(l.getSubjectCode()).getSubjectRep()+"\n"+((int)(l.getGrade()/1))+l.getStream());
-                        }
-                        else
-                        {
-                            teacherTable.addCell(" ");
-                        }
-                    }
-                }
-                teacherTable.setWidthPercentage(100);
-                teacherTable.setSpacingBefore(40);
-
-                document.add(teacherTable);
-
-            }
-
-
-
-            document.close();
-        }catch (Exception es)
-        {
-            es.printStackTrace();
-        }
-    }
 
 
 
@@ -798,7 +594,7 @@ public class TimeTableUtils {
                                         newVenue=practicalSubjects.get(form).get(subjectToCheck);
 
                                     inValidFirst = classEngaged(joint, day, lesson) || teacherEngaged(newTeacher, day, lesson) || venueEngaged(newVenue, day, lesson);
-                                    inValidSecond = classEngaged(joint, day, nextLesson) || teacherEngaged(newTeacher, day, nextLesson) || venueEngaged(newVenue, day, nextLesson);
+                                    inValidSecond = classEngaged(joint, day, nextLesson) || teacherEngaged(newTeacher, day, nextLesson) || venueEngaged(newVenue, day, nextLesson)||lessonsIndex[nextLesson]-lessonsIndex[lesson]>1;
 
                                     otherStreams = inValidFirst || inValidSecond;
 
@@ -842,8 +638,8 @@ public class TimeTableUtils {
                                         newVenue=practicalSubjects.get(form).get(subjectToVenue);
 
                                     if (newVenue != null) {
-                                        venues.get(newVenue).get(day)[lesson] = abve;
-                                        venues.get(newVenue).get(day)[nextLesson] = abve1;
+                                        venues.get(newVenue).get(day)[lesson] = new TimeTableLesson(teacher, form * 1.0, stream, subjectToVenue, day, lesson, 40.0 * 2, true, newVenue);;
+                                        venues.get(newVenue).get(day)[nextLesson] = venues.get(newVenue).get(day)[lesson];
                                     }
 
                                     Long newTeacher=null;
@@ -852,8 +648,9 @@ public class TimeTableUtils {
                                             newTeacher = subjectTeachers.get(joint).get(subjectToVenue);
                                     }catch (Exception es){}
                                     if (newTeacher != null) {//set Teacher Occupied
-                                        teachersTimeTables.get(newTeacher).get(day)[lesson] = abve;
-                                        teachersTimeTables.get(newTeacher).get(day)[nextLesson] = abve1;
+
+                                        teachersTimeTables.get(newTeacher).get(day)[lesson] = new TimeTableLesson(newTeacher, form * 1.0, stream, subjectToVenue, day, lesson, 40.0 * 2, true, newVenue);
+                                        teachersTimeTables.get(newTeacher).get(day)[nextLesson] = teachersTimeTables.get(newTeacher).get(day)[lesson];
                                     }
                                 }
                             } else {
@@ -971,8 +768,8 @@ public class TimeTableUtils {
                                     newVenue=subjectVenues.get(form).get(subjectToVenue);
 
                                 if (newVenue != null) {
-                                    venues.get(newVenue).get(day)[lesson] = abve;
-                                    venues.get(newVenue).get(day)[nextLesson] = abve1;
+                                    venues.get(newVenue).get(day)[lesson] = new TimeTableLesson(teacher, form * 1.0, stream, subjectToVenue, day, lesson, 40.0 , false, newVenue);
+                                    venues.get(newVenue).get(day)[nextLesson] = venues.get(newVenue).get(day)[lesson];
                                 }
 
                                 Long newTeacher=null;
@@ -981,8 +778,9 @@ public class TimeTableUtils {
                                         newTeacher = subjectTeachers.get(joint).get(subjectToVenue);
                                 }catch (Exception es){}
                                 if (newTeacher != null) {//set Teacher Occupied
-                                    teachersTimeTables.get(newTeacher).get(day)[lesson] = abve;
-                                    teachersTimeTables.get(newTeacher).get(day)[nextLesson] = abve1;
+                                    teachersTimeTables.get(newTeacher).get(day)[lesson] = new TimeTableLesson(newTeacher, form * 1.0, stream, subjectToVenue, day, lesson, 40.0 , false, newVenue);
+
+                                    teachersTimeTables.get(newTeacher).get(day)[nextLesson] = teachersTimeTables.get(newTeacher).get(day)[lesson];
                                 }
                             }
                         } else {
@@ -1129,4 +927,18 @@ public class TimeTableUtils {
     }
 
 
+    public static TimeTableSlot[] slots=new TimeTableSlot[lessonsPerDay];
+
+    private static int[] lessonsIndex=new int[lessonsPerDay];
+    public static void arrangeSlots(TimeTableSlot[] timeTableSlots) {
+        slots=timeTableSlots;
+        lessonsIndex=new int[lessonsPerDay];
+        int counter=0;
+        for(int i=0;i< slots.length;i++)
+            if(slots[i].getSlotType()== SlotType.LESSON)
+            {
+                lessonsIndex[counter]=i;
+                counter++;
+            }
+    }
 }

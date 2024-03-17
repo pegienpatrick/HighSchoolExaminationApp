@@ -11,6 +11,8 @@ import com.pegien.HighSchoolExamination.Examination.service.ExaminationService;
 import com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem.MeritListLine;
 import com.pegien.HighSchoolExamination.Reports.MeritList.MeritListItem.MeritListLineRepository;
 import com.pegien.HighSchoolExamination.Reports.ReportCards.service.ReportCardService;
+import com.pegien.HighSchoolExamination.Settings.Setting;
+import com.pegien.HighSchoolExamination.Settings.service.SettingsService;
 import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import com.pegien.HighSchoolExamination.Students.service.StudentsService;
@@ -29,6 +31,8 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.List;
+
+import static com.pegien.HighSchoolExamination.TimeTable.service.TimeTableService.SPECIALIZED_GRADES_SETTINGS;
 
 @Service
 public class MeritListService {
@@ -68,6 +72,9 @@ public class MeritListService {
     @Autowired
     private MarksRepository marksRepository;
 
+    @Autowired
+    private SettingsService settingsService;
+
 
 
     public List<MeritListLine> generateMeritList(Long examination,Double stage)
@@ -77,6 +84,9 @@ public class MeritListService {
         List<Integer> pointsList=new ArrayList<>();
         List<MeritListLine> meritListLines=new ArrayList<>();
         List<Integer> comPulsorysubjects= Arrays.asList(101, 102, 121);
+
+        List<Integer> specGrades = List.of(settingsService.getSetting(SPECIALIZED_GRADES_SETTINGS, Setting.builder().integerArrayValue(new Integer[]{3, 4}).build()).getIntegerArrayValue());
+
 
         for(Student student:studentRepository.findByStage(stage))
         {
@@ -105,13 +115,29 @@ public class MeritListService {
             for(int i=0;i<4;i++)
                 points+=choices.get(i);
 
-            meritListLine.setPoints(points);
-            meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading(points)));
+            meritListLine.setPoints((double) points);
+            meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading((double) points)));
             meritListLine.setSubjectGrades(subjectGrades);
             meritListLine.setSubjectMarks(subjectMarks);
             pointsList.add(points);
             meritListLine.setExamination(examination);
             meritListLine.setStage(stage);
+
+            if(!specGrades.contains((int)(stage/1)))
+            {
+                    Double pts=0.0;
+                    for(Double d:subjectMarks.values())
+                        if(d!=null)
+                            pts+=d;
+
+                    meritListLine.setPoints(pts);
+
+                    Double avg= (double) Math.round(pts/13.0);
+                    meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.getGrade(80,19,avg)));
+
+            }
+
+
             meritListLines.add(meritListLine);
         }
         setRanks(pointsList,meritListLines);
@@ -126,7 +152,7 @@ public class MeritListService {
         meritListLines.sort(Comparator.comparing(MeritListLine::getPoints, Collections.reverseOrder()));
 
         HashMap<String,Integer> lastStreamPosition=new HashMap<>();
-        HashMap<String,Integer> lastStreamPoints=new HashMap<>();
+        HashMap<String, Double> lastStreamPoints=new HashMap<>();
         HashMap<String,Integer> streamCounts=new HashMap<>();
 
         //set last positions
@@ -140,7 +166,7 @@ public class MeritListService {
 
         //set positions
         int lastPosition=0;
-        int lastPoints=0;
+        Double lastPoints=0.0;
         int count=0;
 
         for(MeritListLine meritListLine:meritListLines)
@@ -162,7 +188,7 @@ public class MeritListService {
             //streamWise Rank
             String stream=meritListLine.getStream().toUpperCase().trim();
             if(!lastStreamPoints.containsKey(stream)) {
-                lastStreamPoints.put(stream, 0);
+                lastStreamPoints.put(stream, 0.0);
                 lastStreamPosition.put(stream, 0);
                 streamCounts.put(stream,0);
             }
@@ -171,14 +197,15 @@ public class MeritListService {
             {
                 int streamCount=streamCounts.get(stream);
                 streamCount++;
-                int strlPoints = lastStreamPoints.get(stream);
+                Double strlPoints = lastStreamPoints.get(stream);
                 int strlPos=lastStreamPosition.get(stream);
                 if(meritListLine.getPoints()!=strlPoints) {
                     strlPos=streamCount;
                     lastStreamPoints.put(stream,meritListLine.getPoints());
                     lastStreamPosition.put(stream,strlPos);
-                    streamCounts.put(stream,streamCount);
+
                 }
+                streamCounts.put(stream,streamCount);
                 meritListLine.setStreamRank(strlPos);
             }
 
@@ -201,7 +228,7 @@ public class MeritListService {
                     .stream(student.getStream())
                     .studentId(student.getNum())
                     .stage(stage)
-                    .classRank(99999).streamRank(99999).points(0).kcpeMarks(0).build();
+                    .classRank(99999).streamRank(99999).points((double) 0).kcpeMarks(0).build();
         }
         meritListLine1.setStage(student.getStage());
         meritListLine1.setStream(student.getStream());
@@ -383,7 +410,7 @@ public class MeritListService {
                         pdfPTable.addCell(createCell(cellContent, smallFont));
                     }
                 }
-                pdfPTable.addCell(createCell(meritListLine.getPoints(), smallFont));
+                pdfPTable.addCell(createCell(String.valueOf(meritListLine.getPoints()), smallFont));
                 pdfPTable.addCell(createCell(meritListLine.getAggregateGrade(), smallFont));
                 pdfPTable.addCell(createCell(meritListLine.getKcpeMarks(), smallFont));
             }

@@ -1,1 +1,0 @@
-import{y as s,ac as t,z as e,s as n}from"./index-SGO5OOPy.js";function i(){const o=s(!1);return t(()=>{window.requestAnimationFrame(()=>{o.value=!0})}),{ssrBootStyles:e(()=>o.value?void 0:{transition:"none !important"}),isBooted:n(o)}}export{i as u};

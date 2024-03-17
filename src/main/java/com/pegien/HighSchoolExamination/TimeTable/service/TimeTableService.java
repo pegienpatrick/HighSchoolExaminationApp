@@ -8,6 +8,7 @@ import com.pegien.HighSchoolExamination.Teachers.SubjectTeacher;
 import com.pegien.HighSchoolExamination.Teachers.SubjectTeacherRepository;
 import com.pegien.HighSchoolExamination.Teachers.service.SubjectTeacherService;
 import com.pegien.HighSchoolExamination.TimeTable.DummyRepo;
+import com.pegien.HighSchoolExamination.TimeTable.Slots.service.TimeTableSlotService;
 import com.pegien.HighSchoolExamination.TimeTable.SubjectsPerWeek.SUbjectPerWeek;
 import com.pegien.HighSchoolExamination.TimeTable.SubjectsPerWeek.service.SubjectsPerWeekService;
 import com.pegien.HighSchoolExamination.TimeTable.TimeTableUtils;
@@ -36,7 +37,7 @@ public class TimeTableService {
     @Value("timetableFolder")
     private String timetablefolder;
 
-    private static String SPECIALIZED_GRADES_SETTINGS="SPECIALIZEDGRADESETTING";
+    public static String SPECIALIZED_GRADES_SETTINGS="SPECIALIZEDGRADESETTING";
 
     @Autowired
     private SubjectTeacherService subjectTeacherService;
@@ -47,6 +48,9 @@ public class TimeTableService {
 
     @Autowired
     private SubjectsPerWeekService subjectsPerWeekService;
+
+    @Autowired
+    private TimeTableSlotService timeTableSlotService;
 
     public ResponseEntity<byte[]> viewClassTimeTable() {
         try {
@@ -126,6 +130,8 @@ public class TimeTableService {
         TimeTableUtils.selectedSubjectsGrades= List.of(settingsService.getSetting(SPECIALIZED_GRADES_SETTINGS, Setting.builder().integerArrayValue(new Integer[]{3, 4}).build()).getIntegerArrayValue());
 
 
+        TimeTableUtils.lessonsPerDay = timeTableSlotService.lessonsPerDay();
+        TimeTableUtils.arrangeSlots(timeTableSlotService.listSlots());
         //set subjects per week
        for(int grd=1;grd<=4;grd++)
        {

@@ -12,6 +12,8 @@ import com.pegien.HighSchoolExamination.Students.Student;
 import com.pegien.HighSchoolExamination.Students.StudentRepository;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.StudySubjects.StudySubjectsRepository;
+import com.pegien.HighSchoolExamination.Teachers.SubjectTeacher;
+import com.pegien.HighSchoolExamination.Teachers.SubjectTeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,9 @@ public class MarksService {
 
     @Autowired
     private LogService logService;
+
+    @Autowired
+    private SubjectTeacherRepository subjectTeacherRepository;
 
 
 
@@ -66,6 +71,7 @@ public class MarksService {
 
         Student student1=getStudentByNum(student);
 
+
         Marks marks= Marks.builder()
                 .stage(student1.getStage())
                 .examination(examination)
@@ -90,6 +96,9 @@ public class MarksService {
             for(StudySubject i:studySubjectsRepository.allAvailable()) {
                 Marks tmpMarks=getMark(student.getNum(), examination, i.getSubjectCode());
                 tmpMarks.setRep(i.getSubjectRep());
+                Optional<SubjectTeacher> optionalSubjectTeacher=subjectTeacherRepository.findByGradeAndStreamAndSubjectCode(grade,student.getStream(),i.getSubjectCode());
+                if(optionalSubjectTeacher.isPresent())
+                    tmpMarks.setSubjectTeacher(optionalSubjectTeacher.get().getTeacher());
                 marks.put(i.getSubjectCode(), tmpMarks);
             }
 

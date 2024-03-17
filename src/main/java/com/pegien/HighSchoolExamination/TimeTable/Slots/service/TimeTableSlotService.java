@@ -6,13 +6,16 @@ import com.pegien.HighSchoolExamination.Settings.service.SettingsService;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.TimeTableSlot;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.TimeTableSlotRepository;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.model.requests.LessonsPerDayRequest;
+import com.pegien.HighSchoolExamination.TimeTable.Slots.model.requests.UpdateTimeTableSlotRequest;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.model.responses.LessonsPerDayResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.pegien.HighSchoolExamination.TimeTable.Slots.SlotType.BREAK;
 import static com.pegien.HighSchoolExamination.TimeTable.Slots.SlotType.LESSON;
@@ -37,7 +40,7 @@ public class TimeTableSlotService {
 
 
     public ResponseEntity<LessonsPerDayResponse> getLessonsPerDay() {
-        return ResponseEntity.ok(LessonsPerDayResponse.builder().lessons(lessonsPerDay()).duration(lessonsDuration()).build());
+        return ResponseEntity.ok(LessonsPerDayResponse.builder().lessons(lessonsPerDay()).duration(lessonsDuration()).startTime(new Time(lessonsStartHour(),lessonsStartMinute(),0)).build());
     }
 
     public int lessonsPerDay()
@@ -62,8 +65,8 @@ public class TimeTableSlotService {
     public ResponseEntity<String> updateLessonsPerWeek(LessonsPerDayRequest lessonsPerDayRequest) {
         settingsService.set(Setting.builder().settingName(KEY_LESSONS_PER_DAY).integerValue(lessonsPerDayRequest.getLessons()).build());
         settingsService.set(Setting.builder().settingName(KEY_LESSONS_DURATION).integerValue(lessonsPerDayRequest.getDuration()).build());
-        settingsService.set(Setting.builder().settingName(KEY_START_HOUR).integerValue(lessonsPerDayRequest.getStartHour()).build());
-        settingsService.set(Setting.builder().settingName(KEY_START_MINUTE).integerValue(lessonsPerDayRequest.getStartMinute()).build());
+        settingsService.set(Setting.builder().settingName(KEY_START_HOUR).integerValue(lessonsPerDayRequest.getStartTime().getHours()).build());
+        settingsService.set(Setting.builder().settingName(KEY_START_MINUTE).integerValue(lessonsPerDayRequest.getStartTime().getMinutes()).build());
         return ResponseEntity.ok("Saved Successfully");
     }
 
@@ -124,12 +127,24 @@ public class TimeTableSlotService {
         }
         //add Junkies
         for(TimeTableSlot ss:slots)
-            if(!addedKeys.contains(ss.getNum())) {
+            if(!addedKeys.contains(ss.getNum())&&(ss.getSlotType()==BREAK ||fine.size()<lessonsPerDay())) {
                 fine.add(ss);
                 addedKeys.add(ss.getNum());
 //                checkIfAfterExists(ss);
                 checkIfAfterExists(afters,ss,addedKeys,fine,allSlots);
             }
+
+        Time start=new Time(lessonsStartHour(),lessonsStartMinute(),00);
+        Long startCumm=start.getTime();
+        //setTime for all slots
+        for(TimeTableSlot tableSlot:fine)
+        {
+            Time startTime=new Time(startCumm);
+            tableSlot.setStartHour(startTime.getHours());
+            tableSlot.setStartMinute(startTime.getMinutes());
+            startCumm+= TimeUnit.MINUTES.toMillis(tableSlot.getDuration());
+        }
+
 
         return fine.toArray(new TimeTableSlot[0]);
     }
@@ -218,5 +233,22 @@ public class TimeTableSlotService {
         }
         return ResponseEntity.ok("Move Successful");
 
+    }
+
+    public ResponseEntity<String> updateSlot(UpdateTimeTableSlotRequest updateTimeTableSlotRequest) {
+        Optional<TimeTableSlot> timeTableSlotOptional=timeTableSlotRepository.findById(updateTimeTableSlotRequest.getNum());
+        if(timeTableSlotOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Such SLot");
+        if(timeTableSlotOptional.get().getSlotType()==LESSON)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot Edit Lesson here");
+
+        TimeTableSlot timeTableSlot=timeTableSlotOptional.get();
+        timeTableSlot.setTitle(updateTimeTableSlotRequest.getTitle());
+        timeTableSlot.setDuration(updateTimeTableSlotRequest.getDuration());
+
+        timeTableSlotRepository.save(timeTableSlot);
+
+
+        return ResponseEntity.ok("Updated Successfully");
     }
 }

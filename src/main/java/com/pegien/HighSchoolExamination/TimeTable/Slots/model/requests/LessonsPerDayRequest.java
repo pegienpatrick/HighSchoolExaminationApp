@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -12,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class LessonsPerDayRequest {
     private int lessons;
     private int duration;
-    private int startHour;
-    private int startMinute;
+
+    private Time startTime;
 }

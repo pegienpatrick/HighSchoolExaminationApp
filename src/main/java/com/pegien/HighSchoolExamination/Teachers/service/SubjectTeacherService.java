@@ -101,7 +101,9 @@ public class SubjectTeacherService {
             subjectTeacherRepository.save(subjectTeacher);
             return ResponseEntity.ok("Saved Successfully");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Select Teacher First");
+        subjectTeacherRepository.save(subjectTeacher);
+        return ResponseEntity.ok("Saved Successfully");
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Select Teacher First");
     }
 
     public ResponseEntity<HashMap<Long, String>> allTeachers() {

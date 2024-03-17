@@ -3,6 +3,7 @@ package com.pegien.HighSchoolExamination.TimeTable.Slots.controller;
 
 import com.pegien.HighSchoolExamination.TimeTable.Slots.TimeTableSlot;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.model.requests.LessonsPerDayRequest;
+import com.pegien.HighSchoolExamination.TimeTable.Slots.model.requests.UpdateTimeTableSlotRequest;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.model.responses.LessonsPerDayResponse;
 import com.pegien.HighSchoolExamination.TimeTable.Slots.service.TimeTableSlotService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
@@ -54,6 +55,16 @@ public class TimeTableSlotController {
     public ResponseEntity<String> move(@PathVariable("slot") Long slot,@PathVariable("direction") String direction)
     {
         return timeTableSlotService.move(slot,direction);
+    }
+
+
+    @PutMapping("/updateSlot")
+    public ResponseEntity<String> updateSlot(@RequestBody @Valid UpdateTimeTableSlotRequest updateTimeTableSlotRequest,BindingResult result)
+    {
+        if(result.hasErrors())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(result));
+
+        return timeTableSlotService.updateSlot(updateTimeTableSlotRequest);
     }
 
 

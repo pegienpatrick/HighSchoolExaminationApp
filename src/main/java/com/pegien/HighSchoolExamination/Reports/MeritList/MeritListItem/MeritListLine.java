@@ -42,7 +42,7 @@ public class MeritListLine {
 
     private int streamRank;
 
-    private int points;
+    private Double points;
 
     private String aggregateGrade;
 
