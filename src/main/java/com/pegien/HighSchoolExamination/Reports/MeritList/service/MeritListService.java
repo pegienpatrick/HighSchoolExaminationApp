@@ -95,35 +95,47 @@ public class MeritListService {
             HashMap<Integer,Double> subjectMarks=new HashMap<>();
             HashMap<Integer,String> subjectGrades=new HashMap<>();
             int points=0;
-            int pos=0;
+
             List<Integer> choices=new ArrayList<>();
             for(SubjectGrading subjectGrading:subjectGradings)
             {
-                pos++;
                 Marks marks=marksService.getMark(student.getNum(),examination,subjectGrading.getSubjectCode());
                 Double mark=marks.getMarks();
                 int grad= GradingUtils.getGrade(subjectGrading.getAMarks(),subjectGrading.getEMarks(),mark);
                 subjectMarks.put(subjectGrading.getSubjectCode(),mark);
                 subjectGrades.put(subjectGrading.getSubjectCode(),GradingUtils.gradeChar(grad));
-                if(comPulsorysubjects.contains(subjectGrading.getSubjectCode()))
-                    points+=grad;
-                else
-                    choices.add(grad);
+                if(stage>2) {
+                    if (comPulsorysubjects.contains(subjectGrading.getSubjectCode()))
+                        points += grad;
+                    else
+                        choices.add(grad);
+                } else {
+                    if(mark!=null&&mark>0)
+                    {
+                        points+=grad;
+                    }
+                }
             }
-            //add max 4 among subject choices
-            choices.sort(Collections.reverseOrder());
-            for(int i=0;i<4;i++)
-                points+=choices.get(i);
+            if(stage>2) {
+                //add max 4 among subject choices
+                choices.sort(Collections.reverseOrder());
+                for (int i = 0; i < 4; i++)
+                    points += choices.get(i);
+            }
 
             meritListLine.setPoints((double) points);
-            meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading((double) points)));
+            if(stage>2) {
+                meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading((double) points)));
+            } else  {
+                meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading(points*1.0,subjectGradings.size()*1.0)));
+            }
             meritListLine.setSubjectGrades(subjectGrades);
             meritListLine.setSubjectMarks(subjectMarks);
             pointsList.add(points);
             meritListLine.setExamination(examination);
             meritListLine.setStage(stage);
 
-            if(!specGrades.contains((int)(stage/1)))
+            if(!specGrades.contains((int)(stage/1))&&stage<2)
             {
                     Double pts=0.0;
                     for(Double d:subjectMarks.values())

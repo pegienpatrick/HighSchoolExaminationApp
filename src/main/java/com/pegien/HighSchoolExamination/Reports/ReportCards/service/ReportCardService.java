@@ -323,7 +323,7 @@ public class ReportCardService {
 
         document.add(msg);
 
-        stamp.setAbsolutePosition(document.getPageSize().getWidth()/4,80);
+        stamp.setAbsolutePosition(document.getPageSize().getWidth()-30-stamp.getWidth(),80);
         stamp.scalePercent(30);
 
         document.add(stamp);

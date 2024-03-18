@@ -50,6 +50,14 @@ public class GradingUtils {
         return (int)Math.round(points/7.0);
     }
 
+    public static int agregateGrading(Double points,Double subjects)
+    {
+        if(points>subjects*12||points<subjects)
+            return 0;
+        double tmp=points;
+        return (int)Math.round(points/subjects);
+    }
+
     public static String[] performanceComments = {
             "Extremely Poor",//0-9
             "Poor",//10-20
