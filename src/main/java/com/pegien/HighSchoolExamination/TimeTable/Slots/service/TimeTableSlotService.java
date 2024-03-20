@@ -251,4 +251,12 @@ public class TimeTableSlotService {
 
         return ResponseEntity.ok("Updated Successfully");
     }
+
+    public ResponseEntity<String> deleteBreak(Long breakId) {
+        Optional<TimeTableSlot> timeTableSlotOptional=timeTableSlotRepository.findById(breakId);
+        if(timeTableSlotOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Such SLot");
+        timeTableSlotRepository.delete(timeTableSlotOptional.get());
+        return ResponseEntity.ok("Deleted Successfully");
+    }
 }

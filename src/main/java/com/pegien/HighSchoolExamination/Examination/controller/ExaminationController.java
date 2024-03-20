@@ -61,7 +61,8 @@ public class ExaminationController {
     @DeleteMapping("/delete/{examinationId}")
     public ResponseEntity<String> deleteExamination(@PathVariable("examinationId") Long examinationId)
     {
-        return examinationService.deleteExam(examinationId);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unfortunately i fear for you");
+//        return examinationService.deleteExam(examinationId);
     }
 
 

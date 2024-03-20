@@ -104,7 +104,7 @@ public class MeritListService {
                 int grad= GradingUtils.getGrade(subjectGrading.getAMarks(),subjectGrading.getEMarks(),mark);
                 subjectMarks.put(subjectGrading.getSubjectCode(),mark);
                 subjectGrades.put(subjectGrading.getSubjectCode(),GradingUtils.gradeChar(grad));
-                if(stage>2) {
+                if(specGrades.contains((int)(stage/1))) {
                     if (comPulsorysubjects.contains(subjectGrading.getSubjectCode()))
                         points += grad;
                     else
@@ -116,7 +116,7 @@ public class MeritListService {
                     }
                 }
             }
-            if(stage>2) {
+            if(specGrades.contains((int)(stage/1))) {
                 //add max 4 among subject choices
                 choices.sort(Collections.reverseOrder());
                 for (int i = 0; i < 4; i++)
@@ -124,18 +124,16 @@ public class MeritListService {
             }
 
             meritListLine.setPoints((double) points);
-            if(stage>2) {
+
                 meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading((double) points)));
-            } else  {
-                meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.agregateGrading(points*1.0,subjectGradings.size()*1.0)));
-            }
+
             meritListLine.setSubjectGrades(subjectGrades);
             meritListLine.setSubjectMarks(subjectMarks);
             pointsList.add(points);
             meritListLine.setExamination(examination);
             meritListLine.setStage(stage);
 
-            if(!specGrades.contains((int)(stage/1))&&stage<2)
+            if(!specGrades.contains((int)(stage/1)))
             {
                     Double pts=0.0;
                     for(Double d:subjectMarks.values())
@@ -144,7 +142,7 @@ public class MeritListService {
 
                     meritListLine.setPoints(pts);
 
-                    Double avg= (double) Math.round(pts/13.0);
+                    Double avg= (double) Math.round(pts/10.0);
                     meritListLine.setAggregateGrade(GradingUtils.gradeChar(GradingUtils.getGrade(80,19,avg)));
 
             }
@@ -191,7 +189,7 @@ public class MeritListService {
             }
             count++;
             //set class position
-            if(meritListLine.getPoints()!=lastPoints)
+            if(!meritListLine.getPoints().equals(lastPoints))
             {
                 lastPoints=meritListLine.getPoints();
                 lastPosition=count;
@@ -211,7 +209,7 @@ public class MeritListService {
                 streamCount++;
                 Double strlPoints = lastStreamPoints.get(stream);
                 int strlPos=lastStreamPosition.get(stream);
-                if(meritListLine.getPoints()!=strlPoints) {
+                if(!Objects.equals(meritListLine.getPoints(), strlPoints)) {
                     strlPos=streamCount;
                     lastStreamPoints.put(stream,meritListLine.getPoints());
                     lastStreamPosition.put(stream,strlPos);
@@ -703,7 +701,8 @@ public class MeritListService {
                 aggrStats.get(meritListLine.getStream().trim()).put(idn,aggrSCount+1);
 
                 //for values
-                int grad=GradingUtils.agregateGrading(meritListLine.getPoints());
+//                int grad=GradingUtils.agregateGrading(meritListLine.getPoints());
+                int grad=GradingUtils.gradeToInt(meritListLine.getAggregateGrade());
                 if(grad>0)
                 {
                     valueAggrStats.get("All").add(grad);

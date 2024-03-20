@@ -37,7 +37,7 @@ public class GradingUtils {
 
     public static String gradeChar(int grade) {
         if(grade<0||grade>=grades.length)
-            return "Z";
+            return "X";
         return grades[grades.length-grade-1];
     }
 
@@ -58,33 +58,37 @@ public class GradingUtils {
         return (int)Math.round(points/subjects);
     }
 
-    public static String[] performanceComments = {
-            "Extremely Poor",//0-9
-            "Poor",//10-20
-            "A bit Poor",//20-30
-            "Improve",//30-40
-            "Below Average",//40-50
-            "Average",//50-60
-            "Good",//60-70
-            "Very Good",//70-80
-            "Excellent",//80-90
-            "Outstanding",//90-100
-            "Exceptional",
-            "Perfect"
-    };
+//    public static String[] performanceComments = {
+//            "Extremely Poor",//0-9
+//            "Poor",//10-20
+//            "A bit Poor",//20-30
+//            "Improve",//30-40
+//            "Below Average",//40-50
+//            "Average",//50-60
+//            "Good",//60-70
+//            "Very Good",//70-80
+//            "Excellent",//80-90
+//            "Outstanding",//90-100
+//            "Exceptional",
+//            "Perfect"
+//    };
 
-    public static String getComment(Double marks) {
-        if(marks==null||marks==0||marks>100)
-            return " ";
-        else{
-            int word= (int) (marks/10);
-            return performanceComments[word];
-        }
-    }
+//    public static String getComment(Double marks) {
+//        if(marks==null||marks==0||marks>100)
+//            return " ";
+//        else{
+//            int word= (int) (marks/10);
+//            return performanceComments[word];
+//        }
+//    }
 
     // Klass teachers' remarks
     public static HashMap<String, String> klassRemarks = new HashMap<>();
     public static HashMap<String, String> principlesRemarks = new HashMap<>();
+
+    public static HashMap<String, String> gradingOpinions = new HashMap<>();
+
+    public static HashMap<String,Integer> gradeInts=new HashMap<>();
 
     static {
         klassRemarks.put("A", "Good performance maintain that.");
@@ -115,6 +119,30 @@ public class GradingUtils {
         principlesRemarks.put("D-", "Aim for the next grade.");
         principlesRemarks.put("E", "Create time for extra remedial.");
 
+
+
+
+        // Adding entries to the HashMap
+        gradingOpinions.put("A", "Excellent maintain this");
+        gradingOpinions.put("A-", "Very good hit the next grade");
+        gradingOpinions.put("B+", "Good target the next grade");
+        gradingOpinions.put("B", "Good put more effort");
+        gradingOpinions.put("B-", "Above average");
+        gradingOpinions.put("C+", "Average");
+        gradingOpinions.put("C", "Aim higher");
+        gradingOpinions.put("C-", "Can do better");
+        gradingOpinions.put("D+", "Work on improvement");
+        gradingOpinions.put("D", "Put more effort");
+        gradingOpinions.put("D-", "Don't lose hope you still got a chance");
+        gradingOpinions.put("E", "You have potential to improve");
+
+
+        for(int i=0;i<=12;i++)
+            gradeInts.put(gradeChar(i),i);
+
     }
 
+    public static int gradeToInt(String aggregateGrade) {
+        return gradeInts.get(aggregateGrade);
+    }
 }

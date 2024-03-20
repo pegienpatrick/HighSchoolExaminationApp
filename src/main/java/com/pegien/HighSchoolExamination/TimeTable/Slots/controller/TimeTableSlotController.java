@@ -68,5 +68,12 @@ public class TimeTableSlotController {
     }
 
 
+    @DeleteMapping("/delete/{break}")
+    public ResponseEntity<String> deleteBreak(@PathVariable (value = "break") Long breakId)
+    {
+        return timeTableSlotService.deleteBreak(breakId);
+    }
+
+
 
 }

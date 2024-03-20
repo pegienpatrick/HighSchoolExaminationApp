@@ -323,7 +323,7 @@ public class ReportCardService {
 
         document.add(msg);
 
-        stamp.setAbsolutePosition(document.getPageSize().getWidth()-30-stamp.getWidth(),80);
+        stamp.setAbsolutePosition(document.getPageSize().getWidth()*2/3,80);
         stamp.scalePercent(30);
 
         document.add(stamp);
@@ -395,7 +395,10 @@ public class ReportCardService {
             tableMarks.addCell(createMarks(marks>0?marks+" % ":" __ "));
             tableMarks.addCell(createMarks(marks>0?meritListLine.getSubjectGrades().get(i.getSubjectCode()):" __ "));
             tableMarks.addCell(createMarks(marks>0?rank+" / "+classStudents:" __ "));
-            tableMarks.addCell(createMarks(GradingUtils.getComment(marks)));
+            try {
+                tableMarks.addCell(createMarks(GradingUtils.gradingOpinions.get(meritListLine.getSubjectGrades().get(i.getSubjectCode()))));
+            }catch (Exception es)
+            {}
             try {
                 tableMarks.addCell(createMarks(allTeachers.get(subjectTeachers.getSubjectTeachers().get(i.getSubjectName()).getTeacher()),8,true));
             }catch (Exception es)
