@@ -38,7 +38,7 @@ public class LogService {
 
     public ResponseEntity<List<Log>> listLogs() {
 
-        return ResponseEntity.ok(logRepository.findLastN(200));
+        return ResponseEntity.ok(logRepository.findTop200LastN(200));
 
     }
 

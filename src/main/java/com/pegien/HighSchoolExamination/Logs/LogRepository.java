@@ -11,5 +11,5 @@ import java.util.List;
 public interface LogRepository extends JpaRepository<Log,Long> {
 
     @Query("select l from Log l order by l.num desc")
-    List<Log> findLastN(int limit);
+    List<Log> findTop200LastN(int limit);
 }
