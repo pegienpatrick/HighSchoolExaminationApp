@@ -148,7 +148,7 @@ public class ReportCardService {
 
 
     private byte[] generateStudentReport(Long examination, int admNo) {
-
+        Long start=System.currentTimeMillis();
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             Document document = new Document();
@@ -188,7 +188,9 @@ public class ReportCardService {
 
             addFooter(document,meritListLine,examination1.get());
             document.close();
-
+            Long end=System.currentTimeMillis();
+            Long duration=end-start;
+            System.out.println(examination+" ,"+admNo+" Generate Report Took : "+duration);
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,7 +199,7 @@ public class ReportCardService {
     }
 
     public byte[] generatebulkReport(Long examination, Double stage,String stream) {
-
+        Long start=System.currentTimeMillis();
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             Document document = new Document();
@@ -242,16 +244,10 @@ public class ReportCardService {
 
                 document.newPage();
             }
-
-
-
-
-
-
-
-
             document.close();
-
+            Long end=System.currentTimeMillis();
+            Long duration=end-start;
+            System.out.println(examination+" ,"+stage+stream+" Generate Reports Took : "+duration);
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
@@ -286,12 +282,14 @@ public class ReportCardService {
         if(teach!=null)
             tt+=" ("+subjectTeacherService.allTeacher().get(teach)+")";
 
-        pdfPTable.addCell( CreateHeaderCell(tt) );
+        PdfPCell tchRemarks=CreateHeaderCell(tt);
+//        tchRemarks.setFixedHeight(16);
+        pdfPTable.addCell(  tchRemarks);
         pdfPTable.addCell(new Paragraph(GradingUtils.klassRemarks.getOrDefault(meritListLine.getAggregateGrade(),"Problem with your Results"),boldFont));
 
 
 
-        pdfPTable.setSpacingBefore(10);
+        pdfPTable.setSpacingBefore(4);
 
         document.add(pdfPTable);
 
@@ -303,23 +301,27 @@ public class ReportCardService {
 
 
 
-        pdfPTable.addCell( CreateHeaderCell("Principle`s Remarks") );
-        pdfPTable.addCell(CreateHeaderCell("Signature"));
+        pdfPTable.addCell( CreateHeaderCell2("Principle`s Remarks ( Mohamed Adan )") );
+        pdfPTable.addCell(CreateHeaderCell2("Signature"));
 //        addEmptyCell(pdfPTable,rowHeight);
 //        addEmptyCell(pdfPTable,rowHeight);
         pdfPTable.addCell(new Paragraph(GradingUtils.principlesRemarks.getOrDefault(meritListLine.getAggregateGrade(),"Problem with your Results"),boldFont));
 
-        pdfPTable.addCell(principle);
-        pdfPTable.setSpacingBefore(10);
+        PdfPCell principleCell=new PdfPCell(principle);
+        principleCell.setFixedHeight(30);
+        pdfPTable.addCell(principleCell);
+        pdfPTable.setSpacingBefore(4);
         document.add(pdfPTable);
 
 
         PdfPTable msg=new PdfPTable(1);
         msg.setWidthPercentage(100);
-        msg.addCell(CreateHeaderCell("Message"));
+        PdfPCell headerCell=CreateHeaderCell("Message");
+//        headerCell.setFixedHeight(10);
+        msg.addCell(headerCell);
         msg.addCell(new Paragraph(examination.getReportCardMsg(),boldFont));
 
-        msg.setSpacingBefore(10);
+        msg.setSpacingBefore(4);
 
         document.add(msg);
 
@@ -328,7 +330,12 @@ public class ReportCardService {
 
         document.add(stamp);
 
+    }
 
+    private PdfPCell CreateHeaderCell2(String s) {
+        PdfPCell pdfPCell=CreateHeaderCell(s);
+//        pdfPCell.setFixedHeight(16);
+        return pdfPCell;
     }
 
     private void addEmptyCell(PdfPTable pdfPTable, int rowHeight) {
@@ -344,11 +351,11 @@ public class ReportCardService {
 
 
         table.setWidthPercentage(100);
-        table.addCell(createPhrase("Aggregate Grade",boldFont));
-        table.addCell(createPhrase("Aggregate Points",boldFont));
-        table.addCell(createPhrase("Stream Position",boldFont));
-        table.addCell(createPhrase("Overall Class Position",boldFont));
-        table.addCell(createPhrase("KCPE Marks",boldFont));
+        table.addCell(createPhrase2("Aggregate Grade",boldFont));
+        table.addCell(createPhrase2("Aggregate Points",boldFont));
+        table.addCell(createPhrase2("Stream Position",boldFont));
+        table.addCell(createPhrase2("Overall Class Position",boldFont));
+        table.addCell(createPhrase2("KCPE Marks",boldFont));
 
         table.addCell(createPhrase(meritListLine.getAggregateGrade(),boldFont));
         table.addCell(createPhrase(meritListLine.getPoints()+"",boldFont));
@@ -365,19 +372,22 @@ public class ReportCardService {
         table.setHorizontalAlignment(Element.ALIGN_CENTER);
 
 
-        document.add(new Paragraph(" "));
+//        document.add(new Paragraph(" "));
         document.add(table);
 
-        document.add(new Paragraph(" "));
+//        document.add(new Paragraph(" "));
 
 
 
         String[] columns={"SUBJECTS","MARKS","GRADE","RANK","COMMENT","TEACHER"};
         PdfPTable tableMarks=new PdfPTable(6);
-        for(String i:columns)
-            tableMarks.addCell(CreateHeaderCell(i));
+        for(String i:columns) {
+            PdfPCell headerCell=CreateHeaderCell(i);
+//            headerCell.setFixedHeight(16);
+            tableMarks.addCell(headerCell);
+        }
 
-        float[] columnWidths = {20f, 10f, 10f,10f,20f,20f};
+        float[] columnWidths = {20f, 10f, 10f,12f,30f,20f};
         tableMarks.setWidths(columnWidths);
 
         HashMap<Long, String> allTeachers = subjectTeacherService.allTeacher();
@@ -394,9 +404,11 @@ public class ReportCardService {
             tableMarks.addCell(createMarks(i.getSubjectName()));
             tableMarks.addCell(createMarks(marks>0?marks+" % ":" __ "));
             tableMarks.addCell(createMarks(marks>0?meritListLine.getSubjectGrades().get(i.getSubjectCode()):" __ "));
-            tableMarks.addCell(createMarks(marks>0?rank+" / "+classStudents:" __ "));
+            tableMarks.addCell(createMarks(marks>0?rank+"/"+classStudents:" __ "));
             try {
-                tableMarks.addCell(createMarks(GradingUtils.gradingOpinions.get(meritListLine.getSubjectGrades().get(i.getSubjectCode()))));
+                Paragraph opinionCell=createMarks(GradingUtils.gradingOpinions.get(meritListLine.getSubjectGrades().get(i.getSubjectCode())));
+                opinionCell.getFont().setSize(10);
+                tableMarks.addCell(opinionCell);
             }catch (Exception es)
             {}
             try {
@@ -411,12 +423,15 @@ public class ReportCardService {
 
         tableMarks.setWidthPercentage(100);
 
+        tableMarks.setSpacingBefore(5);
         document.add(tableMarks);
-
-
     }
 
-    
+    private PdfPCell createPhrase2(String aggregateGrade, Font boldFont) {
+        PdfPCell pdfPCell=createPhrase(aggregateGrade,new Font(Font.FontFamily.COURIER, 10, Font.BOLD));
+        return pdfPCell;
+    }
+
 
     private Paragraph createMarks(String s, int i, boolean b) {
         Font boldFont = new Font(Font.FontFamily.COURIER, i, b?Font.BOLD:Font.NORMAL);
@@ -468,7 +483,7 @@ public class ReportCardService {
 
 
         studentDetails.setWidthPercentage(100);
-        studentDetails.setSpacingBefore(20);
+        studentDetails.setSpacingBefore(10);
 
         document.add(studentDetails);
     }
@@ -530,7 +545,7 @@ public class ReportCardService {
 
     private PdfPCell CreateHeaderCell(String i) {
         PdfPCell headerCell = new PdfPCell();
-        Font boldFont = new Font(Font.FontFamily.COURIER, 12, Font.BOLD);
+        Font boldFont = new Font(Font.FontFamily.COURIER, 10, Font.BOLD);
         Paragraph paragraph=new com.itextpdf.text.Paragraph(i,boldFont);
         paragraph.setAlignment(Element.ALIGN_CENTER);
         headerCell.addElement(paragraph);
@@ -538,7 +553,6 @@ public class ReportCardService {
 //        headerCell.setBackgroundColor(new BaseColor(191,191,191));
         headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
-
         return headerCell;
     }
 
