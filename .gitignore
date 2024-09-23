@@ -57,3 +57,8 @@ jcef-bundle/resources.pak
 jcef-bundle/snapshot_blob.bin
 jcef-bundle/v8_context_snapshot.bin
 jcef-bundle/vk_swiftshader_icd.json
+*.pdf
+timetableFolder/**
+studentPhotosFolder/**
+UserPhotosFolder/**
+
