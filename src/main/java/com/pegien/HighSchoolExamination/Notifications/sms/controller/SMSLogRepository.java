@@ -34,5 +34,8 @@ public interface SMSLogRepository extends JpaRepository<SMSLog,Long> {
     @Query("update SMSLog set ignored=true where sent=false")
     void ignoreFailed();
 
+    @Query("select s from SMSLog s where sent=false and (ignored=false or ignored is null)")
+    List<SMSLog> listFailed();
+
 
 }

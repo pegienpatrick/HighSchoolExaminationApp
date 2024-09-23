@@ -83,10 +83,8 @@ public class SmsService {
                             .build();
 
                     executorService.submit(()->{
-
-
-                    smsLog.trySending();
-                    smsLogRepository.save(smsLog);
+                        smsLog.trySending();
+                        smsLogRepository.save(smsLog);
                     });
                 }
             }
@@ -97,4 +95,18 @@ public class SmsService {
 
 
     private ExecutorService executorService= Executors.newCachedThreadPool();
+
+    public ResponseEntity<String> retryFailed() {
+        List<SMSLog> smsLogs=smsLogRepository.listFailed();
+        for(SMSLog smsLog:smsLogs)
+        {
+            if(!smsLog.getSent()) {
+                executorService.submit(() -> {
+                    smsLog.trySending();
+                    smsLogRepository.save(smsLog);
+                });
+            }
+        }
+        return ResponseEntity.ok("Retrying  ...");
+    }
 }

@@ -1,12 +1,15 @@
 package com.pegien.HighSchoolExamination.Notifications.sms.controller;
 
 
+import com.pegien.HighSchoolExamination.Notifications.sms.model.requests.SMSClassGuardiansRequest;
 import com.pegien.HighSchoolExamination.Notifications.sms.model.requests.SMSGuardiansRequest;
 import com.pegien.HighSchoolExamination.Notifications.sms.service.SmsService;
+import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import com.pegien.HighSchoolExamination.Utils.SMSUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -81,11 +84,27 @@ public class SMSController {
         return smsService.smsGuardians(smsGuardiansRequest);
     }
 
-    @PostMapping("/smsClassGuardians/{stage}/{stream}")
-    public ResponseEntity<String> smsClassGuardians(@RequestBody String message,@PathVariable("stage") Double stage,@PathVariable("stream") String stream){
-        if(message.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Message");
-        return smsService.smsClassGuardians(stage,stream,message);
+//    @PostMapping("/smsClassGuardians/{stage}/{stream}")
+//    public ResponseEntity<String> smsClassGuardians(@RequestBody String message,@PathVariable("stage") Double stage,@PathVariable("stream") String stream){
+//        if(message.isEmpty())
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Message");
+//        return smsService.smsClassGuardians(stage,stream,message);
+//    }
+
+    @PostMapping("/smsClassGuardians")
+    public ResponseEntity<String> smsClassGuardians(@RequestBody @Valid SMSClassGuardiansRequest smsClassGuardiansRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
+        return smsService.smsClassGuardians(smsClassGuardiansRequest.getStage(),smsClassGuardiansRequest.getStream(),smsClassGuardiansRequest.getMessage());
+    }
+
+
+
+    @GetMapping("/retryFailed")
+    public ResponseEntity<String> retryFailed()
+    {
+        return smsService.retryFailed();
+
     }
 
 

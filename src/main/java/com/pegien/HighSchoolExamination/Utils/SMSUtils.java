@@ -21,7 +21,7 @@ public class SMSUtils {
         sendSms(phone,message);
     }
 
-    private static String apiKey="117d6d6bb8e32867a6c0f69a49607ff8";
+    private static String apiKey="10ec4c160e563185e78ac6f6f8dae245";
 
 
     private static String partnerID="9541";
@@ -44,11 +44,12 @@ public class SMSUtils {
 
             String requestBody = "{ \"apikey\": \""+apiKey+"\", \"partnerID\": \""+partnerID+"\" }";
             StringEntity requestEntity = new StringEntity(requestBody);
+//            System.out.println(requestEntity);
             httpPost.setEntity(requestEntity);
 
 //            httpPost.setParams();
 
-
+//            System.out.println(httpPost);
             HttpResponse response = httpClient.execute(httpPost);
 
 //            System.out.println();
@@ -91,17 +92,27 @@ public class SMSUtils {
 
             httpPost.setHeader("Content-Type", "application/json");
 
-            String requestBody = "{ \"apikey\": \""+apiKey+"\"" +
-                    ", \"partnerID\": \""+partnerID+"\" " +
-                    ",\"shortcode\": \"TextSMS\"," +
-                    "\"mobile\": \"" +ConvertionUtils.formatPhone(phone)+"\","+
-                    "\"message\" : \"" +message+"\""+
-                            "}";
-            StringEntity requestEntity = new StringEntity(requestBody);
+//            String requestBody = "{ \"apikey\": \""+apiKey+"\"" +
+//                    ", \"partnerID\": \""+partnerID+"\" " +
+//                    ",\"shortcode\": \"TextSMS\"," +
+//                    "\"mobile\": \"" +ConvertionUtils.formatPhone(phone)+"\","+
+//                    "\"message\" : \"" +message+"\""+
+//                            "}";
+
+            MessageRequest messageRequest=new MessageRequest();
+            messageRequest.setApikey(apiKey);
+            messageRequest.setPartnerID(partnerID);
+            messageRequest.setShortcode("TextSMS");
+            messageRequest.setMobile(ConvertionUtils.formatPhone(phone));
+            messageRequest.setMessage(message);
+
+            StringEntity requestEntity = new StringEntity(messageRequest.toString());
+//            System.out.println(requestBody);
             httpPost.setEntity(requestEntity);
 
 //            httpPost.setParams();
 
+//            System.out.println(httpPost);
 
             HttpResponse response = httpClient.execute(httpPost);
 
