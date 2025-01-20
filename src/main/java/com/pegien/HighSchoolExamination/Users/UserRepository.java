@@ -6,6 +6,9 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User,Long> {
 
-    Optional<User> findByUsernameIgnoreCase(String username);
+//    @Query("SELECT u FROM User u WHERE u.added = true AND u.username ILIKE :username")
+//    Optional<User> findByUsernameIgnoreCase(@Param("username") String username);
 
+   
+    Optional<User> findByUsernameIgnoreCaseAndAddedTrue(String username);
 }

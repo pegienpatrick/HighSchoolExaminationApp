@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum UserRoles implements GrantedAuthority {
+
+
     ADMIN(new HashSet<>(Set.of("user:read", "user:write","logs:view"))),
     HOD(new HashSet<>(Set.of("subject:read", "subject:write"))),
     PRINCIPAL(new HashSet<>(Set.of("student:read", "student:write","student:register"))),

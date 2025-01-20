@@ -49,7 +49,7 @@ public class UsersService {
 
 
     public ResponseEntity<String> registerUser(RegisterUserRequest registerRequest) {
-        Optional<User> username=userRepository.findByUsernameIgnoreCase(registerRequest.getUsername().trim());
+        Optional<User> username=userRepository.findByUsernameIgnoreCaseAndAddedTrue(registerRequest.getUsername().trim());
         if(username.isPresent())
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already Exists");
 
@@ -96,7 +96,7 @@ public class UsersService {
     }
 
     public ResponseEntity<String> emailForgotPassword(ForgotPasswordEMailRequest forgotPasswordEMailRequest) {
-        Optional<User> optionalUser=userRepository.findByUsernameIgnoreCase(forgotPasswordEMailRequest.getUsername().trim());
+        Optional<User> optionalUser=userRepository.findByUsernameIgnoreCaseAndAddedTrue(forgotPasswordEMailRequest.getUsername().trim());
         if(optionalUser.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Username not found");
 
@@ -123,7 +123,7 @@ public class UsersService {
     }
 
     public ResponseEntity<String> smsForgotPassword(ForgotPasswordSmsRequest forgotPasswordSmsRequest) {
-        Optional<User> optionalUser=userRepository.findByUsernameIgnoreCase(forgotPasswordSmsRequest.getUsername().trim());
+        Optional<User> optionalUser=userRepository.findByUsernameIgnoreCaseAndAddedTrue(forgotPasswordSmsRequest.getUsername().trim());
         if(optionalUser.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Username not found");
 
@@ -151,7 +151,7 @@ public class UsersService {
 
     public ResponseEntity<String> passwordReset(ResetPasswordRequest resetPasswordRequest) {
 
-        Optional<User> usr=userRepository.findByUsernameIgnoreCase(resetPasswordRequest.getUsername().trim());
+        Optional<User> usr=userRepository.findByUsernameIgnoreCaseAndAddedTrue(resetPasswordRequest.getUsername().trim());
         if(usr.isEmpty())
             throw new UsernameNotFoundException(resetPasswordRequest.getUsername()+" does not exist");
 
@@ -213,7 +213,7 @@ public class UsersService {
     }
 
     public ResponseEntity<LoginResponseModel> loginUser(LoginRequest loginRequest) {
-        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername().trim());
+        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCaseAndAddedTrue(loginRequest.getUsername().trim());
         if (optionalUser.isEmpty())
             throw new UsernameNotFoundException("Invalid Username");
 

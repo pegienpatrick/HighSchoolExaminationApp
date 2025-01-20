@@ -39,4 +39,15 @@ public class User {
 
     private String phone;
 
+
+    @JsonIgnore
+    private Boolean deleted;
+
+    @JsonIgnore
+    private Boolean added;
+
+    private Long addedOn;
+
+    private Long actionBy;
+
 }

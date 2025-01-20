@@ -146,7 +146,7 @@ public class UsersController {
     @GetMapping("/viewUser/{username}")
     public ResponseEntity<User> viewUser(@PathVariable("username") String username)
     {
-        Optional<User> usr=userRepository.findByUsernameIgnoreCase(username);
+        Optional<User> usr=userRepository.findByUsernameIgnoreCaseAndAddedTrue(username);
         if(usr.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         else
