@@ -31,6 +31,9 @@ public class UserRoleUtils {
             adminRoles.add("sms:view");               // View sent SMS logs
             adminRoles.add("timetable:generate");      // Generate school timetable
             adminRoles.add("timetable:view");          // View school timetable
+            adminRoles.add("logs:view");
+            adminRoles.add("students:migrate");
+
 
             rolesMap.put(RolesCategory.ADMIN, adminRoles);
 

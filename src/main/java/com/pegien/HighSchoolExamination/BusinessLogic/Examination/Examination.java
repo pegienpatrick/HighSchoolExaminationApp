@@ -46,6 +46,10 @@ public class Examination {
 
     private String reportCardMsg;
 
+    private Boolean active=false;
+
+    private Boolean pinned=false;
+
     public void setGrade(List<Integer> grades) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();

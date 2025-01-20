@@ -2,7 +2,7 @@ package com.pegien.HighSchoolExamination.BusinessLogic.Dashboard.controller;
 
 import com.pegien.HighSchoolExamination.BusinessLogic.Dashboard.model.DashboardResponse;
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.ExaminationRepository;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

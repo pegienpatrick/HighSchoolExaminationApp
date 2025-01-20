@@ -1,9 +1,9 @@
-package com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentPhotos.service;
+package com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.StudentPhotos.service;
 
 
 import com.itextpdf.text.Image;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

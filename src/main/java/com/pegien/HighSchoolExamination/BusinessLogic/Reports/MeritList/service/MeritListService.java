@@ -13,8 +13,8 @@ import com.pegien.HighSchoolExamination.BusinessLogic.Reports.MeritList.MeritLis
 import com.pegien.HighSchoolExamination.BusinessLogic.Reports.ReportCards.service.ReportCardService;
 import com.pegien.HighSchoolExamination.Settings.Setting;
 import com.pegien.HighSchoolExamination.Settings.service.SettingsService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.service.StudentsService;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.StudySubjectsRepository;

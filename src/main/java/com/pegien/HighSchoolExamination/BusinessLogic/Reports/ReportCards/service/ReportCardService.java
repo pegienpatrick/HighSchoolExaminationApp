@@ -18,9 +18,9 @@ import com.pegien.HighSchoolExamination.BusinessLogic.Notifications.sms.controll
 import com.pegien.HighSchoolExamination.BusinessLogic.Reports.MeritList.MeritListItem.MeritListLine;
 import com.pegien.HighSchoolExamination.BusinessLogic.Reports.MeritList.MeritListItem.MeritListLineRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Reports.MeritList.service.MeritListService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentPhotos.service.StudentPhotoService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.StudentPhotos.service.StudentPhotoService;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.service.StudentsService;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.StudySubjectsRepository;

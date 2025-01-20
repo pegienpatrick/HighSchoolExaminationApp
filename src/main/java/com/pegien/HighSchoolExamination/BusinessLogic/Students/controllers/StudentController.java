@@ -1,7 +1,7 @@
 package com.pegien.HighSchoolExamination.BusinessLogic.Students.controllers;
 
 
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentRegisterRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentUpdateRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.responses.StudentRegisterResponse;

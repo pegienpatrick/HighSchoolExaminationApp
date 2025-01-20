@@ -6,8 +6,8 @@ import com.pegien.HighSchoolExamination.BusinessLogic.Guardian.GuardianRepositor
 import com.pegien.HighSchoolExamination.BusinessLogic.Notifications.sms.controller.SMSLog;
 import com.pegien.HighSchoolExamination.BusinessLogic.Notifications.sms.controller.SMSLogRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Notifications.sms.model.requests.SMSGuardiansRequest;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

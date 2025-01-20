@@ -2,8 +2,8 @@ package com.pegien.HighSchoolExamination.BusinessLogic.Students.service;
 
 import com.pegien.HighSchoolExamination.BusinessLogic.Guardian.service.GuardianService;
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentRegisterRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentUpdateRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.responses.StudentRegisterResponse;

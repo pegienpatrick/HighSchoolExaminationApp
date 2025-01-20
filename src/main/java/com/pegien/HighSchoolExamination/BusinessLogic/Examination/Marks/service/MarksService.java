@@ -7,8 +7,8 @@ import com.pegien.HighSchoolExamination.BusinessLogic.Examination.Marks.model.re
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.Marks.model.requests.UpdateMarksRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.Marks.model.responses.MarksSheetResponse;
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.StudySubject;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.StudySubjectsRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Teachers.SubjectTeacher;

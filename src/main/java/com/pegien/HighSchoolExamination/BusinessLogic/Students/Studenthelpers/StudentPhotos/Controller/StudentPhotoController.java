@@ -1,7 +1,7 @@
-package com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentPhotos.Controller;
+package com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.StudentPhotos.Controller;
 
 
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentPhotos.service.StudentPhotoService;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.StudentPhotos.service.StudentPhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

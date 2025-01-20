@@ -2,8 +2,8 @@ package com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.SubjectsSel
 
 
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.SubjectsSelection.SubjectSelection;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.SubjectsSelection.SubjectSelectionRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.StudySubjects.SubjectsSelection.models.requests.SubjectSelectionRequest;

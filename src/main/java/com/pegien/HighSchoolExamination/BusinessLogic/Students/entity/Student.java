@@ -1,4 +1,4 @@
-package com.pegien.HighSchoolExamination.BusinessLogic.Students;
+package com.pegien.HighSchoolExamination.BusinessLogic.Students.entity;
 
 
 import com.pegien.HighSchoolExamination.BusinessLogic.Guardian.Guardian;

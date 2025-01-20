@@ -1,20 +1,22 @@
-package com.pegien.HighSchoolExamination.BusinessLogic.Students.Importer.controller;
+package com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Importer.controller;
 
 
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.Student;
-import com.pegien.HighSchoolExamination.BusinessLogic.Students.StudentRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.enums.Gender;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.Scanner;
 
+@PreAuthorize("hasAuthority('students:write')")
 @RestController
 @RequestMapping("/api/v1/import")
 public class StudentsImporterController {

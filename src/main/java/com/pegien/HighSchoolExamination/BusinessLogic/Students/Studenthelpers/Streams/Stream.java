@@ -1,4 +1,4 @@
-package com.pegien.HighSchoolExamination.BusinessLogic.Students.Streams;
+package com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Streams;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
