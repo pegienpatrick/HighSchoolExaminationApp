@@ -50,6 +50,10 @@ public class Examination {
 
     private Boolean pinned=false;
 
+    private Double marksTo=100.0;
+
+    private ExaminationType examinationType;
+
     public void setGrade(List<Integer> grades) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
