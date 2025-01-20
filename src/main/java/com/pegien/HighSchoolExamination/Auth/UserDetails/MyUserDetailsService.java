@@ -1,7 +1,10 @@
 package com.pegien.HighSchoolExamination.Auth.UserDetails;
 
-import com.pegien.HighSchoolExamination.Users.User;
-import com.pegien.HighSchoolExamination.Users.UserRepository;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.Utils.UserRoleUtils;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.entity.UserRole;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.repository.UserRolesRepository;
+import com.pegien.HighSchoolExamination.Users.entity.User;
+import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +22,9 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserRolesRepository userRolesRepository;
 
     @Override
     public MyUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -27,6 +34,13 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User Not Found");
 
         User user=usr.get();
+        user.setRoles(
+            UserRoleUtils.rolesMap.get(user.getRolesCategory())
+        );
+
+        List<UserRole> userRoles = userRolesRepository.findByUserId(user.getNum());
+        for(UserRole r:userRoles)
+            user.getRoles().add(r.getRoleName());
 
         HashSet<GrantedAuthority> authorities=new HashSet<>();
         if(user.getRoles()!=null) {

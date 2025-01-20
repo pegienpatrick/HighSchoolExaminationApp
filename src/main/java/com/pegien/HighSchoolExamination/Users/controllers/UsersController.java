@@ -1,7 +1,7 @@
 package com.pegien.HighSchoolExamination.Users.controllers;
 
-import com.pegien.HighSchoolExamination.Users.User;
-import com.pegien.HighSchoolExamination.Users.UserRepository;
+import com.pegien.HighSchoolExamination.Users.entity.User;
+import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import com.pegien.HighSchoolExamination.Users.models.requests.*;
 
 import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
@@ -146,29 +146,21 @@ public class UsersController {
     @GetMapping("/viewUser/{username}")
     public ResponseEntity<User> viewUser(@PathVariable("username") String username)
     {
-        Optional<User> usr=userRepository.findByUsernameIgnoreCaseAndAddedTrue(username);
-        if(usr.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        else
-            return ResponseEntity.ok(usr.get());
+        return usersService.viewUser(username);
     }
 
     @PreAuthorize("hasAuthority('user:read')")
     @GetMapping("/viewUserId/{num}")
     public ResponseEntity<User> viewUserByNum(@PathVariable("num") Long num)
     {
-        Optional<User> usr=userRepository.findById(num);
-        if(usr.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        else
-            return ResponseEntity.ok(usr.get());
+        return usersService.viewUser(num);
     }
 
     @PreAuthorize("hasAuthority('user:read')")
     @GetMapping("/listUsers")
-    public List<User> listUsers()
+    public ResponseEntity<List<User>> listUsers()
     {
-        return userRepository.findAll();
+        return ResponseEntity.ok(usersService.listUsers());
     }
 
 
@@ -178,18 +170,7 @@ public class UsersController {
     {
         if(bindingResult.hasErrors())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(MyUtils.createErrorMessage(bindingResult));
-
-        Optional<User> usr=userRepository.findById(num);
-        if(usr.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        else
-        {
-            User user=usr.get();
-            user.setRoles(new HashSet<>());
-            user.getRoles().addAll(assignRoleRequest.getRoles());
-            userRepository.save(user);
-            return ResponseEntity.ok("Assigned Successfully");
-        }
+        return usersService.assignUserRoles(num,assignRoleRequest);
     }
 
     @GetMapping("/allRoles")

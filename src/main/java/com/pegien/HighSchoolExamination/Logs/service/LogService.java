@@ -4,7 +4,7 @@ package com.pegien.HighSchoolExamination.Logs.service;
 import com.pegien.HighSchoolExamination.Auth.AuthService;
 import com.pegien.HighSchoolExamination.Logs.Log;
 import com.pegien.HighSchoolExamination.Logs.LogRepository;
-import com.pegien.HighSchoolExamination.Users.UserRepository;
+import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

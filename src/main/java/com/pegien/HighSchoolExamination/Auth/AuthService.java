@@ -6,8 +6,11 @@ import com.pegien.HighSchoolExamination.Auth.AuthToken.TokenRepository;
 import com.pegien.HighSchoolExamination.Auth.UserDetails.MyUserDetails;
 import com.pegien.HighSchoolExamination.Auth.UserDetails.MyUserDetailsService;
 import com.pegien.HighSchoolExamination.Configurations.SecurityConfig;
-import com.pegien.HighSchoolExamination.Users.User;
-import com.pegien.HighSchoolExamination.Users.UserRepository;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.Utils.UserRoleUtils;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.entity.UserRole;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.repository.UserRolesRepository;
+import com.pegien.HighSchoolExamination.Users.entity.User;
+import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import io.jsonwebtoken.Jwts;
 
@@ -42,6 +45,9 @@ public class AuthService {
 //    @Autowired
 //    private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UserRolesRepository userRolesRepository;
+
 
 
     public void authorizeRequest(String tokenString, HttpServletRequest request,String username)
@@ -68,6 +74,13 @@ public class AuthService {
         Optional<User> optionalUser=userRepository.findById(userId);
         if(optionalUser.isPresent()) {
             User currUser = optionalUser.get();
+            currUser.setRoles(
+                    UserRoleUtils.rolesMap.get(currUser.getRolesCategory())
+            );
+
+            List<UserRole> userRoles = userRolesRepository.findByUserId(currUser.getNum());
+            for(UserRole r:userRoles)
+                currUser.getRoles().add(r.getRoleName());
             return currUser;
         }
         else{

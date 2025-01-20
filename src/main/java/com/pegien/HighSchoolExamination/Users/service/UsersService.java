@@ -2,10 +2,13 @@ package com.pegien.HighSchoolExamination.Users.service;
 
 import com.pegien.HighSchoolExamination.Auth.AuthService;
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
-import com.pegien.HighSchoolExamination.Users.ForgotPassword.PasswordResetCode;
-import com.pegien.HighSchoolExamination.Users.ForgotPassword.PasswordResetCodeRepository;
-import com.pegien.HighSchoolExamination.Users.User;
-import com.pegien.HighSchoolExamination.Users.UserRepository;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.ForgotPassword.PasswordResetCode;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.ForgotPassword.PasswordResetCodeRepository;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.Utils.UserRoleUtils;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.entity.UserRole;
+import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.repository.UserRolesRepository;
+import com.pegien.HighSchoolExamination.Users.entity.User;
+import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import com.pegien.HighSchoolExamination.Users.models.requests.*;
 
 import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
@@ -22,7 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +52,9 @@ public class UsersService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserRolesRepository userRolesRepository;
 
 
     public ResponseEntity<String> registerUser(RegisterUserRequest registerRequest) {
@@ -234,6 +243,16 @@ public class UsersService {
     public User currentUser() {
         return authService.getActiveUser();
     }
+    private User uploadRoles(User user) {
+        user.setRoles(
+                UserRoleUtils.rolesMap.get(user.getRolesCategory())
+        );
+
+        List<UserRole> userRoles = userRolesRepository.findByUserId(user.getNum());
+        for(UserRole r:userRoles)
+            user.getRoles().add(r.getRoleName());
+        return user;
+    }
 
     public ResponseEntity<String> logOut(HttpServletRequest request) {
         return ResponseEntity.ok(authService.logOut(request));
@@ -241,5 +260,68 @@ public class UsersService {
 
     public ResponseEntity<String> logOutAllDevices() {
         return ResponseEntity.ok(authService.logOutAllDevices());
+    }
+
+    public ResponseEntity<User> viewUser(String username) {
+        Optional<User> usr=userRepository.findByUsernameIgnoreCaseAndAddedTrue(username);
+        if(usr.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        else
+            return ResponseEntity.ok(uploadRoles(usr.get()));
+    }
+
+
+    public ResponseEntity<User> viewUser(Long num) {
+        Optional<User> usr=userRepository.findById(num);
+        if(usr.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        else
+            return ResponseEntity.ok(uploadRoles(usr.get()));
+    }
+
+    public List<User> listUsers() {
+        List<User> users = userRepository.findAll();
+        for(int i=0;i<users.size();i++)
+            uploadRoles(users.get(i));
+        return users;
+    }
+
+    public ResponseEntity<String> assignUserRoles(Long num, @Valid AssignRoleRequest assignRoleRequest) {
+        Optional<User> usr=userRepository.findById(num);
+        if(usr.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        User user= usr.get();
+        uploadRoles(user);
+
+        HashSet<String> toAdd=new HashSet<>();
+        toAdd.addAll(assignRoleRequest.getRoles());
+        for(String role: user.getRoles())
+            toAdd.remove(role);
+
+
+        HashSet<String> toRemove= new HashSet<>();
+        toRemove.addAll(user.getRoles());
+        for(String role:assignRoleRequest.getRoles())
+            toRemove.remove(role);
+
+        for(String role:toAdd)
+        {
+            UserRole userRole = UserRole.builder()
+                    .roleName(role)
+                    .userId(user.getNum())
+                    .assignedOn(System.currentTimeMillis())
+                    .assignedBy(authService.getActiveUser().getNum())
+                    .build();
+            userRolesRepository.save(userRole);
+        }
+
+        for(String role:toRemove)
+        {
+            Optional<UserRole> optionalUserRole = userRolesRepository.findByUserIdAndRoleName(user.getNum(),role);
+            if(optionalUserRole.isPresent())
+                userRolesRepository.delete(optionalUserRole.get());
+        }
+        return ResponseEntity.ok("Updated Successfully");
     }
 }

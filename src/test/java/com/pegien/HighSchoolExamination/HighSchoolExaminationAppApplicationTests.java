@@ -1,25 +1,9 @@
 package com.pegien.HighSchoolExamination;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.pegien.HighSchoolExamination.Reports.ReportCards.service.ReportCardService;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
-import com.pegien.HighSchoolExamination.Users.enums.UserRoles;
-import com.pegien.HighSchoolExamination.Utils.GradingUtils;
-import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import com.pegien.HighSchoolExamination.Utils.SMSUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Set;
 
 
 //@SpringBootTest

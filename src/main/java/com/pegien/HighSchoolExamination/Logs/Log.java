@@ -1,7 +1,7 @@
 package com.pegien.HighSchoolExamination.Logs;
 
 
-import com.pegien.HighSchoolExamination.Users.User;
+import com.pegien.HighSchoolExamination.Users.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
