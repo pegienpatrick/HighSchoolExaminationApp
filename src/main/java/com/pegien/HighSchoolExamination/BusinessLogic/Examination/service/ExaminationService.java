@@ -3,6 +3,7 @@ package com.pegien.HighSchoolExamination.BusinessLogic.Examination.service;
 
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.Examination;
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.ExaminationRepository;
+import com.pegien.HighSchoolExamination.BusinessLogic.Examination.ExaminationType;
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.models.requests.NewExaminationRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.models.requests.UpdateExamTitleRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Examination.models.requests.UpdateReportCardMessageRequest;
@@ -35,6 +36,8 @@ public class ExaminationService {
                 .title(newExaminationRequest.getTitle())
                 .year(newExaminationRequest.getYear())
                 .term(newExaminationRequest.getTerm())
+                .examinationType(newExaminationRequest.getExaminationType()!=null?newExaminationRequest.getExaminationType(): ExaminationType.Exam)
+                .marksTo((newExaminationRequest.getMarksTo()!=null&&newExaminationRequest.getMarksTo()>0.0)? newExaminationRequest.getMarksTo() : 100.0)
                 .date(MyUtils.formatDate(new Date().getTime()))
                 .deleted(false)
                 .build();
