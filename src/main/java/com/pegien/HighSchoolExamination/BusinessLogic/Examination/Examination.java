@@ -75,4 +75,21 @@ public class Examination {
         }
     }
 
+    public Double getMarksTo() {
+        if(marksTo!=null&& !marksTo.isNaN())
+            return marksTo;
+        else
+            return 100.0;
+    }
+
+
+
+    public ExaminationType getExaminationType() {
+        if(examinationType!=null)
+            return examinationType;
+        else
+            return ExaminationType.Exam;
+    }
+
+
 }

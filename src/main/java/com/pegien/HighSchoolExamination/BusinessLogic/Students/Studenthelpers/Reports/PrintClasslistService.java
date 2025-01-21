@@ -38,6 +38,8 @@ public class PrintClasslistService {
         if (stageV == null || stageV <= 0) {
             if (stream == null || stream.isEmpty()) {
                 studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
+            } else {
+                studentsList = studentRepository.findByStreamOrderByAdmNo(stream);
             }
         } else {
             if (stream == null || stream.isEmpty()) {
@@ -60,8 +62,9 @@ public class PrintClasslistService {
         String sanitizedStream = (stream != null && !stream.isEmpty()) ? stream : "All";
         String formattedDateTime = new SimpleDateFormat("ddMMMyyyyHHmmss").format(new Date());
         String fileName = "Students_List_" + sanitizedStage + "_" + sanitizedStream + "_AddDate_" + formattedDateTime + ".pdf";
-
+        headers.add("Access-Control-Expose-Headers", "Content-Disposition");
         headers.setContentDispositionFormData("attachment", fileName);
+
 
         return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
     }
@@ -77,16 +80,19 @@ public class PrintClasslistService {
 //            document.setMargins(20,10,10,20);
             addSchoolHeader(document);
 
+            String sanitizedStage = (stage != null && !stage.isEmpty()) ? stage : "All";
+            String sanitizedStream = (stream != null && !stream.isEmpty()) ? stream : "All";
+
             // Add Title
             Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD | Font.UNDERLINE);
-            Paragraph title = new Paragraph("Class List - Stage: " + stage + ", Stream: " + stream, titleFont);
+            Paragraph title = new Paragraph("Class List - Form : " + sanitizedStage + ", Stream: " + sanitizedStream, titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             title.setSpacingAfter(20);
             document.add(title);
 
             // Define Headers
             String[] defaultHeaders = {"Sr. No.", "Adm No", "Surname", "First Name", "Other Name"};
-            HashSet<String> extraColumns = printClassListRequest.getExtraColumns();
+            List<String> extraColumns = printClassListRequest.getExtraColumns();
             List<String> headers = new ArrayList<>(List.of(defaultHeaders));
             if (extraColumns != null) {
                 headers.addAll(extraColumns);
@@ -98,9 +104,17 @@ public class PrintClasslistService {
 
             // Add Table Header
             for (String header : headers) {
-                PdfPCell headerCell = CreateHeaderCell(header);
+                PdfPCell headerCell = CreateHeaderCell2(header);
                 table.addCell(headerCell);
             }
+
+//            float[] columnWidths = new float[headers.size()];
+//            columnWidths[0]=10;
+//            columnWidths[1]=15;
+//            columnWidths[2]=30;
+//
+//
+//            table.setWidths(columnWidths);
 
             // Fetch Students and Populate Table
             List<Student> students = fetchStudentsList(stage, stream);
@@ -123,6 +137,7 @@ public class PrintClasslistService {
                 }
             }
 
+
             // Add Table to Document
             document.add(table);
 
@@ -135,6 +150,7 @@ public class PrintClasslistService {
     }
 
     private String getStudentFieldValue(Student student, String fieldName) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy");
         try {
             switch (fieldName.toLowerCase()) {
                 case "birthcertno":
@@ -142,7 +158,7 @@ public class PrintClasslistService {
                 case "nemisno":
                     return student.getNemisNo();
                 case "dateofbirth":
-                    return student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : null;
+                    return (student.getDateOfBirth() != null && student.getDateOfBirth()>0L) ? dateFormatter.format( new Date(student.getDateOfBirth())) : null;
                 case "gender":
                     return student.getGender() != null ? student.getGender().toString() : null;
                 case "stream":
@@ -160,16 +176,14 @@ public class PrintClasslistService {
         }
     }
 
-    public PdfPCell CreateHeaderCell(String i) {
+    public PdfPCell CreateHeaderCell2(String i) {
         PdfPCell headerCell = new PdfPCell();
-        headerCell.addElement(new com.itextpdf.text.Paragraph(i,new Font(Font.FontFamily.TIMES_ROMAN, 5)));
+        headerCell.addElement(new com.itextpdf.text.Paragraph(i,new Font(Font.FontFamily.TIMES_ROMAN, 10)));
         headerCell.setGrayFill(0.7f); // Set background color
         headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerCell.setVerticalAlignment(Element.ALIGN_CENTER);
         headerCell.setNoWrap(false);
         headerCell.setFixedHeight(20);
-        if(!i.contains("ame"))
-            headerCell.setRotation(90);
         return headerCell;
     }
 

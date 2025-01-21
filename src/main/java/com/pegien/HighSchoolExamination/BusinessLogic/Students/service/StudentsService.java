@@ -165,18 +165,18 @@ public class StudentsService {
         return ResponseEntity.ok(studentsList);
     }
 
-   /* public List<Student> fetchStudentsList(String stage, String stream) {
-        Double stageV= ConvertionUtils.getDouble(stage);
-        List<Student> studentsList = Collections.emptyList();
-        if(stageV<=0&&(stream ==null|| stream.isEmpty()))
-            studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
-        else if (stageV>0&&(stream ==null|| stream.isEmpty()))
-            studentsList = studentRepository.findByStageOrderByadmNo(stageV);
-        else if (stageV>0&&(stream !=null&&!stream.isEmpty()))
-            studentsList = studentRepository.findByStageAndStreamOrderByadmNo(stageV, stream);
-
-        return studentsList;
-    }*/
+//    public List<Student> fetchStudentsList(String stage, String stream) {
+//        Double stageV= ConvertionUtils.getDouble(stage);
+//        List<Student> studentsList = Collections.emptyList();
+//        if(stageV<=0&&(stream ==null|| stream.isEmpty()))
+//            studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
+//        else if (stageV>0&&(stream ==null|| stream.isEmpty()))
+//            studentsList = studentRepository.findByStageOrderByAdmNo(stageV);
+//        else if (stageV>0&&(stream !=null&&!stream.isEmpty()))
+//            studentsList = studentRepository.findByStageAndStreamOrderByAdmNo(stageV, stream);
+//
+//        return studentsList;
+//    }
 
     public List<Student> fetchStudentsList(String stage, String stream) {
         Double stageV = ConvertionUtils.getDouble(stage);
@@ -185,6 +185,8 @@ public class StudentsService {
         if (stageV == null || stageV <= 0) {
             if (stream == null || stream.isEmpty()) {
                 studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
+            } else {
+                studentsList = studentRepository.findByStreamOrderByAdmNo(stream);
             }
         } else {
             if (stream == null || stream.isEmpty()) {

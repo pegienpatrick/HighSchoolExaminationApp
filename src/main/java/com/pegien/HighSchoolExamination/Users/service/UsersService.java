@@ -11,6 +11,7 @@ import com.pegien.HighSchoolExamination.Users.entity.User;
 import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import com.pegien.HighSchoolExamination.Users.models.requests.*;
 
+import com.pegien.HighSchoolExamination.Users.models.responses.ListUserModel;
 import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import com.pegien.HighSchoolExamination.Utils.EmailUtils;
@@ -26,10 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -58,7 +56,7 @@ public class UsersService {
 
 
     public ResponseEntity<String> registerUser(RegisterUserRequest registerRequest) {
-        Optional<User> username=userRepository.findByUsernameIgnoreCaseAndAddedTrue(registerRequest.getUsername().trim());
+        Optional<User> username=userRepository.findByUsernameIgnoreCase(registerRequest.getUsername().trim());
         if(username.isPresent())
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already Exists");
 
@@ -222,11 +220,26 @@ public class UsersService {
     }
 
     public ResponseEntity<LoginResponseModel> loginUser(LoginRequest loginRequest) {
-        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCaseAndAddedTrue(loginRequest.getUsername().trim());
+        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername().trim());
         if (optionalUser.isEmpty())
             throw new UsernameNotFoundException("Invalid Username");
 
+
         User user = optionalUser.get();
+
+        if(user.getAdded()==null||!user.getAdded())
+        {
+            if(user.getUsername().equalsIgnoreCase("admin"))
+            {
+                user.setAdded(true);
+                userRepository.saveAndFlush(user);
+            } else {
+                user.setAdded(false);
+                userRepository.saveAndFlush(user);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponseModel.builder().message("User Not Authorized").build());
+            }
+
+        }
 
         String authorization = authService.loginUser(user.getNum(), loginRequest.getPassword(),authenticationManager);
 
@@ -323,5 +336,77 @@ public class UsersService {
                 userRolesRepository.delete(optionalUserRole.get());
         }
         return ResponseEntity.ok("Updated Successfully");
+    }
+
+    public List<ListUserModel> usersListing() {
+        List<User> users = userRepository.findAllOrderByNum();
+
+        List<ListUserModel> listing = new LinkedList<>();
+        for(int i=0;i<users.size();i++) {
+            User user = users.get(i);
+            uploadRoles(user);
+
+            ListUserModel listUserModel = getListUserModel(user);
+
+            listing.add(listUserModel);
+        }
+        return listing;
+    }
+
+    private static ListUserModel getListUserModel(User user) {
+        ListUserModel listUserModel = new ListUserModel();
+        listUserModel.setNum(user.getNum());
+        listUserModel.setUsername(user.getUsername());
+        listUserModel.setFname(user.getFname());
+        listUserModel.setGender(user.getGender());
+        listUserModel.setEmail(user.getEmail());
+        listUserModel.setPhone(user.getPhone());
+
+        listUserModel.setAuthorization(((user.getAdded()!=null&& user.getAdded())?"":"Not ")+"Authorized");
+        listUserModel.setRoles(user.getRoles());
+        listUserModel.setUserType(user.getRolesCategory().toString());
+        return listUserModel;
+    }
+
+    public ResponseEntity<ListUserModel> userListing(Long num) {
+        Optional<User> usr=userRepository.findById(num);
+        if(usr.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        User user = usr.get();
+        uploadRoles(user);
+        return ResponseEntity.ok(getListUserModel(user));
+    }
+
+    public ResponseEntity<ListUserModel> authorizeUser(Long num) {
+        Optional<User> usr=userRepository.findById(num);
+        if(usr.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        User user = usr.get();
+        if(user.getAdded()==null||!user.getAdded()) {
+            user.setAdded(true);
+            user.setAddedOn(System.currentTimeMillis());
+            user.setActionBy(authService.getActiveUser().getNum());
+            userRepository.save(user);
+        }
+        uploadRoles(user);
+        return ResponseEntity.ok(getListUserModel(user));
+    }
+
+    public ResponseEntity<ListUserModel> deAuthorizeUser(Long num) {
+        Optional<User> usr=userRepository.findById(num);
+        if(usr.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        User user = usr.get();
+        if(user.getAdded()!=null&&user.getAdded()) {
+            user.setAdded(false);
+            user.setAddedOn(System.currentTimeMillis());
+            user.setActionBy(authService.getActiveUser().getNum());
+            userRepository.save(user);
+        }
+        uploadRoles(user);
+        return ResponseEntity.ok(getListUserModel(user));
     }
 }

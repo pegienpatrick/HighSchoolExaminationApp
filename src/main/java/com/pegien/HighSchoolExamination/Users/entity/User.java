@@ -41,8 +41,6 @@ public class User {
 
     private String phone;
 
-
-
     private Boolean deleted;
 
 

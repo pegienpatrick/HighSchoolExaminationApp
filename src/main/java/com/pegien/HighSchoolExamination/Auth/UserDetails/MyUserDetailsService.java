@@ -5,6 +5,7 @@ import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.entity.User
 import com.pegien.HighSchoolExamination.Users.UsersHelpers.UserRoles.repository.UserRolesRepository;
 import com.pegien.HighSchoolExamination.Users.entity.User;
 import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
+import com.pegien.HighSchoolExamination.Users.enums.RolesCategory;
 import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +35,14 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User Not Found");
 
         User user=usr.get();
+        if(user.getRolesCategory()==null)
+        {
+            if(user.getUsername().equalsIgnoreCase("admin"))
+                user.setRolesCategory(RolesCategory.ADMIN);
+            else
+                user.setRolesCategory(RolesCategory.TEACHER);
+            userRepository.saveAndFlush(user);
+        }
         user.setRoles(
             UserRoleUtils.rolesMap.get(user.getRolesCategory())
         );

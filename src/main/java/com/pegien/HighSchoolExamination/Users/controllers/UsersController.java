@@ -4,6 +4,7 @@ import com.pegien.HighSchoolExamination.Users.entity.User;
 import com.pegien.HighSchoolExamination.Users.Repository.UserRepository;
 import com.pegien.HighSchoolExamination.Users.models.requests.*;
 
+import com.pegien.HighSchoolExamination.Users.models.responses.ListUserModel;
 import com.pegien.HighSchoolExamination.Users.models.responses.LoginResponseModel;
 import com.pegien.HighSchoolExamination.Users.service.UsersService;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
@@ -20,13 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")
-
 public class UsersController {
 
     @Autowired
@@ -156,11 +154,18 @@ public class UsersController {
         return usersService.viewUser(num);
     }
 
+//    @PreAuthorize("hasAuthority('user:view')")
+//    @GetMapping("/listUsers")
+//    public ResponseEntity<List<User>> listUsers()
+//    {
+//        return ResponseEntity.ok(usersService.listUsers());
+//    }
+
     @PreAuthorize("hasAuthority('user:view')")
     @GetMapping("/listUsers")
-    public ResponseEntity<List<User>> listUsers()
+    public ResponseEntity<List<ListUserModel>> listUsers()
     {
-        return ResponseEntity.ok(usersService.listUsers());
+        return ResponseEntity.ok(usersService.usersListing());
     }
 
 
@@ -197,6 +202,29 @@ public class UsersController {
     public ResponseEntity<String> logOutAllDevices()
     {
         return usersService.logOutAllDevices();
+    }
+
+
+    @PreAuthorize("hasAuthority('user:manage')")
+    @GetMapping("/authorizeUser/{num}")
+    public ResponseEntity<ListUserModel> authorizeUser(@PathVariable("num") Long num)
+    {
+        return usersService.authorizeUser(num);
+    }
+
+    @PreAuthorize("hasAuthority('user:manage')")
+    @GetMapping("/deAuthorizeUser/{num}")
+    public ResponseEntity<ListUserModel> deAuthorizeUser(@PathVariable("num") Long num)
+    {
+        return usersService.deAuthorizeUser(num);
+    }
+
+
+    @PreAuthorize("hasAuthority('user:view')")
+    @GetMapping("/listUser/{num}")
+    public ResponseEntity<ListUserModel> listUser(@PathVariable("num") Long num)
+    {
+        return usersService.userListing(num);
     }
 
 

@@ -35,4 +35,6 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     List<Student> findByStageOrderByAdmNo(Double stageV);
 
     List<Student> findByStageAndStreamOrderByAdmNo(Double stageV, String stream);
+
+    List<Student> findByStreamOrderByAdmNo(String stream);
 }

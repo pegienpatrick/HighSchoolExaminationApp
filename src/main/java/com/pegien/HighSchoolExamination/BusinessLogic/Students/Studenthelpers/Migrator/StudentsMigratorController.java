@@ -1,6 +1,8 @@
 package com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Migrator;
 
 
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Migrator.MigrationDetail.MigrationDetail;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Migrator.models.ListMigrationModel;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Migrator.models.MigrateStudentsRequest;
 import com.pegien.HighSchoolExamination.Utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,6 +36,13 @@ public class StudentsMigratorController {
     public ResponseEntity<String> undoMigration(@PathVariable("migrationId")UUID migrationId)
     {
         return studentsMigrationService.undoMigration(migrationId);
+    }
+
+
+    @GetMapping("/listMigrations")
+    public ResponseEntity<List<ListMigrationModel>> listMigrations()
+    {
+        return studentsMigrationService.listMigrationsModels();
     }
 
 }

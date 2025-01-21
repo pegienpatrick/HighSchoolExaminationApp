@@ -94,7 +94,7 @@ public class StudentController {
         return studentsService.exportStudents(stage,stream);
     }
 
-    @GetMapping("/printStudentsList")
+    @PostMapping("/printStudentsList")
     public ResponseEntity<byte[]> printStudentsList(@RequestParam(value = "stage",required = false) String stage, @RequestParam(value = "stream",required = false) String stream, @RequestBody @Valid PrintClassListRequest printClassListRequest,BindingResult bindingResult)
     {
         if(bindingResult.hasErrors())

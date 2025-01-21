@@ -6,10 +6,7 @@ import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -37,6 +34,8 @@ public class ExcelExportService {
         if (stageV == null || stageV <= 0) {
             if (stream == null || stream.isEmpty()) {
                 studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
+            } else {
+                studentsList = studentRepository.findByStreamOrderByAdmNo(stream);
             }
         } else {
             if (stream == null || stream.isEmpty()) {
@@ -60,6 +59,12 @@ public class ExcelExportService {
         String fileName = "Students_List_" + sanitizedStage + "_" + sanitizedStream + "_AddDate_" + formattedDateTime + ".xls";
 
         headers.setContentDispositionFormData("attachment", fileName);
+//        headers.setContentDisposit("attachment", fileName);
+//        headers.add("fileName",fileName);
+//        headers.setContentDisposition(ContentDisposition.attachment()
+//                        .filename(fileName)
+//                .build());
+        headers.add("Access-Control-Expose-Headers", "Content-Disposition");
 
         return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
     }
@@ -118,9 +123,15 @@ public class ExcelExportService {
             row.createCell(colIndex++).setCellValue(student.getSurname());
             row.createCell(colIndex++).setCellValue(student.getFirstName());
             row.createCell(colIndex++).setCellValue(student.getOtherName());
-            row.createCell(colIndex++).setCellValue(
-                    student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : ""
+
+            if( student.getDateOfBirth() != null && student.getDateOfBirth()>0L) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy");
+                row.createCell(colIndex++).setCellValue(
+                         dateFormatter.format(new Date(student.getDateOfBirth()))
             );
+            } else
+                row.createCell(colIndex++).setCellValue("");
+
             row.createCell(colIndex++).setCellValue(
                     student.getBirthCertno() != null ? student.getBirthCertno() : ""
             );

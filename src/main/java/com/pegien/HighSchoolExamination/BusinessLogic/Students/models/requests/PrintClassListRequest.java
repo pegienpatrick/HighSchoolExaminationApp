@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 public class PrintClassListRequest {
 
-    private HashSet<String> extraColumns;
+    private List<String> extraColumns;
 }
