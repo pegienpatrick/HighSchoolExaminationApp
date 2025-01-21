@@ -1,17 +1,23 @@
 package com.pegien.HighSchoolExamination.BusinessLogic.Students.service;
 
 import com.pegien.HighSchoolExamination.BusinessLogic.Guardian.service.GuardianService;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Reports.ExcelExportService;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.Studenthelpers.Reports.PrintClasslistService;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.PrintClassListRequest;
 import com.pegien.HighSchoolExamination.Logs.service.LogService;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.repository.StudentRepository;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentRegisterRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentUpdateRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.responses.StudentRegisterResponse;
+import com.pegien.HighSchoolExamination.Utils.ConvertionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +33,13 @@ public class StudentsService {
 
     @Autowired
     private LogService logService;
+
+
+    @Autowired
+    private ExcelExportService excelExportService;
+
+    @Autowired
+    private PrintClasslistService printClasslistService;
 
 
     public int getNextAdmission()
@@ -139,10 +152,55 @@ public class StudentsService {
         Optional<Student> optionalStudent=studentRepository.findByAdmNo(admNo);
 
         if(optionalStudent.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        else {
-            studentRepository.delete(optionalStudent.get());
-            return ResponseEntity.ok("Deleted Successfully");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student Not Found");
+
+        logService.recordLog("Delete Student : "+optionalStudent.get());
+        studentRepository.delete(optionalStudent.get());
+
+        return ResponseEntity.ok("Student Deleted Successfully");
+    }
+
+    public ResponseEntity<List<Student>> listStudents(String stage, String stream) {
+        List<Student> studentsList = fetchStudentsList(stage, stream);
+        return ResponseEntity.ok(studentsList);
+    }
+
+   /* public List<Student> fetchStudentsList(String stage, String stream) {
+        Double stageV= ConvertionUtils.getDouble(stage);
+        List<Student> studentsList = Collections.emptyList();
+        if(stageV<=0&&(stream ==null|| stream.isEmpty()))
+            studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
+        else if (stageV>0&&(stream ==null|| stream.isEmpty()))
+            studentsList = studentRepository.findByStageOrderByadmNo(stageV);
+        else if (stageV>0&&(stream !=null&&!stream.isEmpty()))
+            studentsList = studentRepository.findByStageAndStreamOrderByadmNo(stageV, stream);
+
+        return studentsList;
+    }*/
+
+    public List<Student> fetchStudentsList(String stage, String stream) {
+        Double stageV = ConvertionUtils.getDouble(stage);
+        List<Student> studentsList = Collections.emptyList();
+
+        if (stageV == null || stageV <= 0) {
+            if (stream == null || stream.isEmpty()) {
+                studentsList = studentRepository.findByStageInOrderByAdmNo(new double[]{1.0,2.0,3.0,4.0});
+            }
+        } else {
+            if (stream == null || stream.isEmpty()) {
+                studentsList = studentRepository.findByStageOrderByAdmNo(stageV);
+            } else {
+                studentsList = studentRepository.findByStageAndStreamOrderByAdmNo(stageV, stream);
+            }
         }
+        return studentsList;
+    }
+
+    public ResponseEntity<byte[]> exportStudents(String stage, String stream) {
+        return excelExportService.exportStudents(stage,stream);
+    }
+
+    public ResponseEntity<byte[]> printStudentsList(String stage, String stream, @Valid PrintClassListRequest printClassListRequest) {
+        return printClasslistService.printClassLists(stage,stream,printClassListRequest);
     }
 }

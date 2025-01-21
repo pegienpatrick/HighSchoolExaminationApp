@@ -4,6 +4,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.pegien.HighSchoolExamination.BusinessLogic.Examination.ExaminationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,12 @@ public class NewExaminationRequest {
 
     @NotNull
     private int term;
+
+
+    private ExaminationType examinationType;
+
+
+    private Double marksTo;
 
     @NotNull
     private List<Integer> grades;

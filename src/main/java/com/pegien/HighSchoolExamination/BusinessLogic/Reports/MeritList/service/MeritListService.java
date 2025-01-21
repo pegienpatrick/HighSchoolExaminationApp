@@ -452,7 +452,7 @@ public class MeritListService {
         document.add(hh2);
     }
 
-    private PdfPCell CreateHeaderCell(String i) {
+    public PdfPCell CreateHeaderCell(String i) {
         PdfPCell headerCell = new PdfPCell();
         headerCell.addElement(new com.itextpdf.text.Paragraph(i,new Font(Font.FontFamily.TIMES_ROMAN, 5)));
         headerCell.setGrayFill(0.7f); // Set background color
@@ -503,13 +503,13 @@ public class MeritListService {
         }
         return 1f;
     }
-    private static PdfPCell createCell(String content, Font font) {
+    public static PdfPCell createCell(String content, Font font) {
         PdfPCell cell = new PdfPCell(new Phrase(content, font));
         cell.setNoWrap(true); // Disable word wrap
         return cell;
     }
 
-    private static PdfPCell createCell(int content, Font font) {
+    public static PdfPCell createCell(int content, Font font) {
         PdfPCell cell = new PdfPCell(new Phrase(content+"", font));
         cell.setNoWrap(true); // Disable word wrap
         return cell;

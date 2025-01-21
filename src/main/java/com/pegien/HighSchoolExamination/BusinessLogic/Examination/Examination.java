@@ -46,13 +46,13 @@ public class Examination {
 
     private String reportCardMsg;
 
-    private Boolean active=false;
+    private Boolean active = false;
 
-    private Boolean pinned=false;
+    private Boolean pinned = false;
 
-    private Double marksTo=100.0;
+    private Double marksTo = 100.0;
 
-    private ExaminationType examinationType;
+    private ExaminationType examinationType = ExaminationType.Exam;
 
     public void setGrade(List<Integer> grades) {
         try {

@@ -22,7 +22,17 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
 
     List<Student> findByStageAndStream(Double stage, String stream);
 
-    List<Student> findByStageIn(@NotNull int[] stages);
+    List<Student> findByStageIn(@NotNull Double[] stages);
 
-    List<Student> findByStageInOrderByStage(@NotNull int[] stages);
+    List<Student> findByStageInOrderByStage(double[] stages);
+
+    List<Student> findByStageInOrderByAdmNo(double[] doubles);
+
+    List<Student> findByStageOrderByadmNo(Double stageV);
+
+    List<Student> findByStageAndStreamOrderByadmNo(Double stageV, String stream);
+
+    List<Student> findByStageOrderByAdmNo(Double stageV);
+
+    List<Student> findByStageAndStreamOrderByAdmNo(Double stageV, String stream);
 }

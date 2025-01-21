@@ -2,6 +2,7 @@ package com.pegien.HighSchoolExamination.BusinessLogic.Students.controllers;
 
 
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.entity.Student;
+import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.PrintClassListRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentRegisterRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.requests.StudentUpdateRequest;
 import com.pegien.HighSchoolExamination.BusinessLogic.Students.models.responses.StudentRegisterResponse;
@@ -78,6 +79,27 @@ public class StudentController {
     public ResponseEntity<Gender[]> possibleGenders()
     {
         return ResponseEntity.ok(Gender.values());
+    }
+
+    @GetMapping("/listStudents")
+    public ResponseEntity<List<Student>> listStudents(@RequestParam(value = "stage",required = false) String stage,@RequestParam(value = "stream",required = false) String stream)
+    {
+        return studentsService.listStudents(stage,stream);
+    }
+
+
+    @GetMapping("/exportStudents")
+    public ResponseEntity<byte[]> exportStudents(@RequestParam(value = "stage",required = false) String stage,@RequestParam(value = "stream",required = false) String stream)
+    {
+        return studentsService.exportStudents(stage,stream);
+    }
+
+    @GetMapping("/exportStudents")
+    public ResponseEntity<byte[]> printStudentsList(@RequestParam(value = "stage",required = false) String stage, @RequestParam(value = "stream",required = false) String stream, @RequestBody @Valid PrintClassListRequest printClassListRequest,BindingResult bindingResult)
+    {
+        if(bindingResult.hasErrors())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return studentsService.printStudentsList(stage,stream,printClassListRequest);
     }
 
 

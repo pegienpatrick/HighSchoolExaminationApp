@@ -34,7 +34,9 @@ public class StudentsMigrationService {
 
 
     public ResponseEntity<String> migrateStudents(@Valid MigrateStudentsRequest migrateStudentsRequest) {
-        List<Student> students = studentRepository.findByStageInOrderByStage(migrateStudentsRequest.getStages());
+        List<Student> students = studentRepository.findByStageInOrderByStage(Arrays.stream(migrateStudentsRequest.getStages())
+                .asDoubleStream()
+                .toArray());
 
         MigrationDetail migrationDetail = MigrationDetail.builder()
                 .title(migrateStudentsRequest.getTitle())
