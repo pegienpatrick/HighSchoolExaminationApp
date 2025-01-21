@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 import java.util.Scanner;
 
-@PreAuthorize("hasAuthority('students:write')")
+@PreAuthorize("hasAuthority('students:manage')")
 @RestController
 @RequestMapping("/api/v1/import")
 public class StudentsImporterController {

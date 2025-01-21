@@ -43,7 +43,7 @@ public class StudentController {
         return ResponseEntity.ok(studentsService.getNextAdmission());
     }
 
-    @PreAuthorize("hasAuthority(student:write)")
+    @PreAuthorize("hasAuthority(student:manage)")
     @PutMapping("/updateStudent/{oldAdm}")
     public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentUpdateRequest studentUpdateRequest, BindingResult bindingResult, @PathVariable("oldAdm") int oldAdm)
     {
@@ -52,14 +52,14 @@ public class StudentController {
         return studentsService.updateStudent(studentUpdateRequest,oldAdm);
     }
 
-    @PreAuthorize("hasAuthority('student:read')")
+    @PreAuthorize("hasAuthority('student:view')")
     @GetMapping("/allStudents")
     public ResponseEntity<List<Student>> allStudents()
     {
         return ResponseEntity.ok(studentsService.allStudents());
     }
 
-    @PreAuthorize("hasAuthority('student:read')")
+    @PreAuthorize("hasAuthority('student:view')")
     @GetMapping("/viewStudent/{admNo}")
     public ResponseEntity<ResponseEntity<Student>> viewStudent(@PathVariable("admNo") int admNo)
     {
@@ -67,7 +67,7 @@ public class StudentController {
     }
 
 
-    @PreAuthorize("hasAuthority('student:write')")
+    @PreAuthorize("hasAuthority('student:manage')")
     @GetMapping("/deleteStudent/{admNo}")
     public ResponseEntity<ResponseEntity<String>> deleteStudent(@PathVariable("admNo") int admNo)
     {
@@ -94,7 +94,7 @@ public class StudentController {
         return studentsService.exportStudents(stage,stream);
     }
 
-    @GetMapping("/exportStudents")
+    @GetMapping("/printStudentsList")
     public ResponseEntity<byte[]> printStudentsList(@RequestParam(value = "stage",required = false) String stage, @RequestParam(value = "stream",required = false) String stream, @RequestBody @Valid PrintClassListRequest printClassListRequest,BindingResult bindingResult)
     {
         if(bindingResult.hasErrors())

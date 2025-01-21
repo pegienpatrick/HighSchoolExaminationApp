@@ -15,13 +15,13 @@ public class StudentPhotoController {
     @Autowired
     private StudentPhotoService studentPhotoService;
 
-    @PreAuthorize("hasAuthority(student:write)")
+    @PreAuthorize("hasAuthority(student:manage)")
     @PostMapping("/uploadStudentPhoto/{admNo}")
     public ResponseEntity<String> uploadPhoto(@RequestParam("file") MultipartFile multipartFile, @PathVariable("admNo") int admNo) {
         return studentPhotoService.upload(admNo,multipartFile);
     }
 
-    @PreAuthorize("hasAuthority(student:read)")
+    @PreAuthorize("hasAuthority(student:view)")
     @GetMapping("/getStudentPhoto/{admNo}")
     public ResponseEntity<byte[]> getPhoto(@PathVariable("admNo") int admNo) {
         return studentPhotoService.download(admNo);

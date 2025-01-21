@@ -25,7 +25,7 @@ public class GuardianController {
     @Autowired
     private GuardianService guardianService;
 
-    @PreAuthorize("hasAuthority(student:write)")
+    @PreAuthorize("hasAuthority(student:manage)")
     @PostMapping("/addGuardian")
     public ResponseEntity<String> newGuardian(@RequestBody @Valid GuardianRegisterRequest guardianRegisterRequest, BindingResult bindingResult)
     {
@@ -34,14 +34,14 @@ public class GuardianController {
         return guardianService.addGuardian(guardianRegisterRequest);
     }
 
-    @PreAuthorize("hasAuthority('student:read')")
+    @PreAuthorize("hasAuthority('student:view')")
     @GetMapping("viewGuardian/{guardianNo}")
     public ResponseEntity<Guardian> viewGuardian(@PathVariable("guardianNo") Long guardianNum)
     {
         return guardianService.viewGuardian(guardianNum);
     }
 
-    @PreAuthorize("hasAuthority('student:read')")
+    @PreAuthorize("hasAuthority('student:view')")
     @GetMapping("viewStudentGuardians/{admNo}")
     public ResponseEntity<List<Guardian>> viewStudentGuardians(@PathVariable("admNo") int admNo)
     {
@@ -50,7 +50,7 @@ public class GuardianController {
 
 
 
-    @PreAuthorize("hasAuthority(student:write)")
+    @PreAuthorize("hasAuthority(student:manage)")
     @PutMapping("/updateGuardian/{guardianNo}")
     public ResponseEntity<String> updateGuardian(@RequestBody @Valid GuardianUpdateRequest guardianUpdateRequest, BindingResult bindingResult, @PathVariable("guardianNo") Long guardianNo)
     {
@@ -59,7 +59,7 @@ public class GuardianController {
         return guardianService.updateGuardian(guardianUpdateRequest,guardianNo);
     }
 
-    @PreAuthorize("hasAuthority('student:write')")
+    @PreAuthorize("hasAuthority('student:manage')")
     @GetMapping("deleteGuardian/{guardianNo}")
     public ResponseEntity<String> deleteGuardian(@PathVariable("guardianNo") Long guardianNum)
     {

@@ -102,7 +102,7 @@ public class UsersController {
     }
 
 
-    @PreAuthorize("hasAuthority('user:write')")
+    @PreAuthorize("hasAuthority('user:manage')")
     @PutMapping("/adminUpdateUser/{num}")
     public ResponseEntity<String> adminUpdateUser(@PathVariable("num") Long num,@RequestBody @Valid UpdateRequest updateRequest, BindingResult bindingResult)
     {
@@ -111,7 +111,7 @@ public class UsersController {
         return usersService.updateUser(updateRequest,num);
     }
 
-    @PreAuthorize("hasAuthority('user:write')")
+    @PreAuthorize("hasAuthority('user:manage')")
     @PutMapping("/adminUpdatePassword/{num}")
     public ResponseEntity<String> adminUpdatePassword(@PathVariable("num") Long num,@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest, BindingResult bindingResult)
     {
@@ -142,21 +142,21 @@ public class UsersController {
 
 
 
-    @PreAuthorize("hasAuthority('user:read')")
+    @PreAuthorize("hasAuthority('user:view')")
     @GetMapping("/viewUser/{username}")
     public ResponseEntity<User> viewUser(@PathVariable("username") String username)
     {
         return usersService.viewUser(username);
     }
 
-    @PreAuthorize("hasAuthority('user:read')")
+    @PreAuthorize("hasAuthority('user:view')")
     @GetMapping("/viewUserId/{num}")
     public ResponseEntity<User> viewUserByNum(@PathVariable("num") Long num)
     {
         return usersService.viewUser(num);
     }
 
-    @PreAuthorize("hasAuthority('user:read')")
+    @PreAuthorize("hasAuthority('user:view')")
     @GetMapping("/listUsers")
     public ResponseEntity<List<User>> listUsers()
     {
@@ -164,7 +164,7 @@ public class UsersController {
     }
 
 
-    @PreAuthorize("hasAuthority(user:write)")
+    @PreAuthorize("hasAuthority(user:manage)")
     @GetMapping("/assignRoles/{num}")
     public ResponseEntity<String> assignUserRoles(@PathVariable("num") Long num,@RequestBody @Valid AssignRoleRequest assignRoleRequest,BindingResult bindingResult)
     {

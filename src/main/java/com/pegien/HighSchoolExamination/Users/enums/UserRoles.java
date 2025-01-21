@@ -9,11 +9,11 @@ import java.util.Set;
 public enum UserRoles implements GrantedAuthority {
 
 
-    ADMIN(new HashSet<>(Set.of("user:read", "user:write","logs:view"))),
-    HOD(new HashSet<>(Set.of("subject:read", "subject:write"))),
-    PRINCIPAL(new HashSet<>(Set.of("student:read", "student:write","student:register"))),
+    ADMIN(new HashSet<>(Set.of("user:view", "user:manage","logs:view"))),
+    HOD(new HashSet<>(Set.of("subject:view", "subject:manage"))),
+    PRINCIPAL(new HashSet<>(Set.of("student:view", "student:manage","student:register"))),
 
-    SECRETARY(new HashSet<>(Set.of("sms:balance","sms:send","sms:read")));
+    SECRETARY(new HashSet<>(Set.of("sms:balance","sms:send","sms:view")));
 
 
 
