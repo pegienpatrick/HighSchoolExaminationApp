@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.pegien</groupId>
 	<artifactId>High-School-Examination-App</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<name>High-School-Examination-App</name>
 	<description>High School Examination App</description>
 	<properties>
