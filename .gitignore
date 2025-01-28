@@ -31,3 +31,35 @@ build/
 
 ### VS Code ###
 .vscode/
+*.jar
+/out/**
+out/artifacts/High_School_Examination_App_jar/High-School-Examination-App.jar
+/target/**
+jcef-bundle/build_meta.json
+jcef-bundle/chrome_100_percent.pak
+jcef-bundle/chrome_200_percent.pak
+jcef-bundle/chrome-sandbox
+jcef-bundle/gluegen.LICENSE.txt
+jcef-bundle/icudtl.dat
+jcef-bundle/install.lock
+jcef-bundle/jcef_helper
+jcef-bundle/jogl.LICENSE.txt
+jcef-bundle/libcef.so
+jcef-bundle/libEGL.so
+jcef-bundle/libGLESv2.so
+jcef-bundle/libjcef.so
+jcef-bundle/libvk_swiftshader.so
+jcef-bundle/libvulkan.so.1
+jcef-bundle/LICENSE.txt
+jcef-bundle/locales
+jcef-bundle/README.txt
+jcef-bundle/resources.pak
+jcef-bundle/snapshot_blob.bin
+jcef-bundle/v8_context_snapshot.bin
+jcef-bundle/vk_swiftshader_icd.json
+*.pdf
+timetableFolder/**
+studentPhotosFolder/**
+UserPhotosFolder/**
+timetableFolder/
+
